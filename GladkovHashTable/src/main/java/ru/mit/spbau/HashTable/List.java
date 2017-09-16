@@ -8,41 +8,64 @@ import java.util.Iterator;
  */
 
 public class List implements Iterable<Node> {
-    private Node head; /** first object in table */
-    private Node tail; /** last object in table */
+    private Node head;
+    /**
+     * first object in table
+     */
+    private Node tail;
+
+    /**
+     * last object in table
+     */
 
     List() {
         head = null;
         tail = null;
     }
 
-    /** creates an object for iterating over list */
+    /**
+     * creates an object for iterating over list
+     */
     public Iterator<Node> iterator() {
         return new ListIterator(head);
     }
 
-    /** checks if list is empty. */
+    /**
+     * checks if list is empty.
+     */
     public boolean empty() {
         return head == null;
     }
 
-    /** checks if list containg an object with such key. */
-    public boolean contains(int key) {
-        for (Node x : this) { //iterating over this list
+    /**
+     * finds Node with such key
+     */
+
+    public Node find (int key) {
+        for (Node x : this) {
             if (x.key == key) {
-                return true;
+                return x;
             }
         }
 
-        return false;
+        return null;
     }
 
-    /** get an object with such key or returning null if he haven't found it */
+    /**
+     * checks if list containg an object with such key.
+     */
+
+    public boolean contains(int key) {
+        return find(key) != null;
+    }
+
+    /**
+     * get an object with such key or returning null if he haven't found it
+     */
     public String get(int key) {
-        for (Node x : this) {
-            if (x.key == key) {
-                return x.value;
-            }
+        Node found = find(key);
+        if (found != null) {
+            return found.value;
         }
 
         return null;
@@ -53,19 +76,20 @@ public class List implements Iterable<Node> {
      * otherwise overrides it's value and returns an old value
      */
     public String insert(int key, String value) {
-        for (Node x : this) {
-            if (x.key == key) {
-                String returnValue = x.value;
-                x.value = value;
-                return returnValue;
-            }
+        Node found = find(key);
+        if (found != null) {
+            String returnValue = found.value;
+            found.value = value;
+            return returnValue;
         }
 
         push(key, value);
         return null;
     }
 
-    /** adds new object to the end of the list */
+    /**
+     * adds new object to the end of the list
+     */
     public void push(Node a) {
         if (empty()) {
             head = a;
@@ -78,15 +102,19 @@ public class List implements Iterable<Node> {
         a.next = null;
     }
 
-    /** creates a Node before pushing it to the end */
+    /**
+     * creates a Node before pushing it to the end
+     */
     public void push(int key, String value) {
         Node a = new Node(key, value);
         push(a);
     }
 
-    /** removes an object with such key from the table, or returns null if there isn't such one */
+    /**
+     * removes an object with such key from the table, or returns null if there isn't such one
+     */
     public String remove(int key) {
-        Node prev = null; //previous Node in list from current one
+        Node prev = null; //previous Node in list, cause we don't store left connections
         for (Node x : this) {
             if (x.key == key) {
                 if (prev != null) { //so x isn't the first one
@@ -97,12 +125,12 @@ public class List implements Iterable<Node> {
                     }
                 } else {
                     if (x == tail && x == head) { //so list is now empty
-                        head = null;
-                        tail = null;
+                        clear();
                     } else { //else we just deleted the head of the list
                         head = x.next;
                     }
                 }
+
                 return x.value;
             }
 
@@ -112,26 +140,38 @@ public class List implements Iterable<Node> {
         return null;
     }
 
-    /** makes list empty */
+    /**
+     * makes list empty
+     */
     public void clear() {
         head = null;
         tail = null;
     }
 
-    /** class for iterating over list */
+    /**
+     * class for iterating over list
+     */
     private static class ListIterator implements Iterator<Node> {
-        private Node current; /** position of the next object we will get from the list */
+        private Node current;
+
+        /**
+         * position of the next object we will get from the list
+         */
 
         public ListIterator(Node head) {
             current = head;
         }
 
-        /** checking if there is next object */
+        /**
+         * checking if there is next object
+         */
         public boolean hasNext() {
             return current != null;
         }
 
-        /** getting the next object from the list and moving current position */
+        /**
+         * getting the next object from the list and moving current position
+         */
         public Node next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
@@ -142,7 +182,9 @@ public class List implements Iterable<Node> {
             return returnValue;
         }
 
-        /** java tells I need to add this method */
+        /**
+         * java tells I need to add this method
+         */
         public void remove() {
             throw new UnsupportedOperationException();
         }

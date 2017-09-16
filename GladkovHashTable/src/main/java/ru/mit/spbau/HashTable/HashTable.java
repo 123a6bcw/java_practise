@@ -5,12 +5,20 @@ package ru.mit.spbau.HashTable;
  */
 
 public class HashTable {
-    private int capacity; /** Size of the array in table. Increases if needed.*/
-    private int size; /**Number of objects in table */
+    private int capacity;
+    /**
+     * Size of the array in table. Increases if needed.
+     */
+    private int size;
+    /**
+     * Number of objects in table
+     */
     private List data[];
 
-    /** Just some tests to make sure it works correctly */
-    public static void main(String args[]){
+    /**
+     * Just some tests to make sure it works correctly
+     */
+    public static void main(String args[]) {
         HashTable a = new HashTable();
         System.out.println(a.size() + " 0");
         System.out.println(a.contains("sasha") + " false");
@@ -49,19 +57,25 @@ public class HashTable {
         return size;
     }
 
-    /** Check if table contains object with such key. */
+    /**
+     * Check if table contains object with such key.
+     */
     public boolean contains(String key) {
         Hashator accessor = new Hashator(key);
         return data[accessor.dataIndex].contains(accessor.hashedKey);
     }
 
-    /** Returns object from table with such key */
+    /**
+     * Returns object from table with such key
+     */
     public String get(String key) {
         Hashator accessor = new Hashator(key);
         return data[accessor.dataIndex].get(accessor.hashedKey);
     }
 
-    /** Puts an object into table with such key */
+    /**
+     * Puts an object into table with such key
+     */
     public String put(String key, String value) {
         Hashator accessor = new Hashator(key);
         String returnValue = data[accessor.dataIndex].insert(accessor.hashedKey, value);
@@ -77,7 +91,9 @@ public class HashTable {
         return returnValue;
     }
 
-    /** removes an object from table with such key*/
+    /**
+     * removes an object from table with such key
+     */
     public String remove(String key) {
         Hashator accessor = new Hashator(key);
         String returnValue = data[accessor.dataIndex].remove(accessor.hashedKey);
@@ -92,7 +108,9 @@ public class HashTable {
         return returnValue;
     }
 
-    /** deletes all objects from table */
+    /**
+     * deletes all objects from table
+     */
     public void clear() {
         for (int i = 0; i < capacity; i++) {
             data[i].clear();
@@ -104,7 +122,7 @@ public class HashTable {
      * Checks if table contains too many objects, so starting to work slow.
      * If so, creates a 2 times larger table and moves all objects there,
      * also replacing all objects by getting hash divided by new capacity (rehashing).
-     * */
+     */
 
     private void expandData() {
         if (4 * size >= capacity) {
@@ -145,7 +163,9 @@ public class HashTable {
             dataIndex = hashedKey % capacity;
         }
 
-        /** needs than we get object from an old HashTable and which hashedKey we already know*/
+        /**
+         * needs than we get object from an old HashTable and which hashedKey we already know
+         */
         Hashator(int key) {
             hashedKey = key;
             dataIndex = hashedKey % capacity;
