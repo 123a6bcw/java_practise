@@ -154,13 +154,25 @@ public class HashTable {
         static final int mod = 1000000007;
         static final int base = 31;
 
+        /**
+         * mathematicly correct mod
+         */
+        public int safeMod(int a, int b){
+            a %= b;
+            if (a < 0) {
+                a += b;
+            }
+
+            return a;
+        }
+
         Hashator(String key) {
             hashedKey = 0;
             for (int i = 0; i < key.length(); i++) {
                 hashedKey = (hashedKey * base + key.charAt(i)) % mod;
             }
 
-            dataIndex = hashedKey % capacity;
+            dataIndex = safeMod(hashedKey, capacity);
         }
 
         /**
@@ -168,7 +180,7 @@ public class HashTable {
          */
         Hashator(int key) {
             hashedKey = key;
-            dataIndex = hashedKey % capacity;
+            dataIndex = safeMod(hashedKey, capacity);
         }
     }
 }
