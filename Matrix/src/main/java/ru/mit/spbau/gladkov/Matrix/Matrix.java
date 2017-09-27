@@ -25,23 +25,23 @@ public class Matrix {
     }
 
     /**
-     * Print int[][] in spiral order
+     * print int[][] in spiral order
      *
      * @param a matrix n*n, where n is odd
      */
 
     public static int[][] spiral(int a[][]) {
-        int vectorRow[] =  {0, 1, 0, -1};
+        final int vectorRow[] =  {0, 1, 0, -1};
         /**
          * vector of movement on rows in order: right, down, left, up
          */
 
-        int vectorColumn[] = {1, 0, -1, 0};
+        final int vectorColumn[] = {1, 0, -1, 0};
         /**
          * vector of movement on columns in the same order
          */
 
-        int directions = 4;
+        final int directions = 4;
         /**
          * number of different directions in the matrix
          */

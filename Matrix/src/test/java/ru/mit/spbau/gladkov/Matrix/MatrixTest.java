@@ -15,7 +15,7 @@ public class MatrixTest {
     protected final ByteArrayOutputStream output = new ByteArrayOutputStream();
 
     /**
-     *Перехватывает поток вывода, чтобы его можно было сравнить с ожидаемым выводом.
+     *перехватывает поток вывода, чтобы его можно было сравнить с ожидаемым выводом.
      */
 
     @Before
