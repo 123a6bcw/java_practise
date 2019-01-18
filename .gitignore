@@ -1,4 +1,4 @@
-workspace.xml
-tasks.xml
-*.class
-
+*/target
+*/.idea/workspace.xml
+*/.idea/usage.statistics.xml
+*/.idea/tasks.xml
