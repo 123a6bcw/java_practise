@@ -1,26 +1,33 @@
 package ru.hse.HashTable;
 
 /**
- * Copyright (c) 2019 Gladkov Alexander
- *
  * Simple HashTable class.
+ * Copyright (c) 2019 Gladkov Alexander
  */
 
 public class HashTable {
+    /**
+     * Number of reserved lists in table.
+     */
     private int capacity;
 
     /**
-     * Size of the array in table. Increases if needed.
+     * default capacity size when creating table.
+     */
+    private static final int defaultCapacity = 8;
+
+    /**
+     * Number of objects in the table.
      */
     private int size;
 
     /**
-     * Number of objects in table
+     * Array of lists with objects with size of capacity.
      */
     private List[] data;
 
     /**
-     * Just some tests to make sure it works correctly
+     * Just some tests to make sure it works correctly.
      */
     public static void main(String[] args) {
         HashTable a = new HashTable();
@@ -47,8 +54,11 @@ public class HashTable {
         System.out.println(a.size() + " 0");
     }
 
-    public HashTable() {
-        capacity = 8;
+    /**
+     * creates HashTable with given capacity, 0 size and array of 'capacity' empty Lists.
+     */
+    public HashTable(int capacity) {
+        this.capacity = capacity;
         size = 0;
         data = new List[capacity];
 
@@ -58,15 +68,22 @@ public class HashTable {
     }
 
     /**
-     * @return number of elements in hash table
+     * creates table with default capacity.
+     */
+    public HashTable() {
+        this(defaultCapacity);
+    }
+
+    /**
+     * @return number of elements in hash table.
      */
     public int size() {
         return size;
     }
 
     /**
-     * @param key object's key
-     * @return true if table contains object with given key, false otherwise
+     * @param key object's key.
+     * @return true if table contains object with given key, false otherwise.
      */
     public boolean contains(String key) {
         Hashator accessor = new Hashator(key);
@@ -74,8 +91,8 @@ public class HashTable {
     }
 
     /**
-     * @param key object's key
-     * @return value of object with given key
+     * @param key object's key.
+     * @return value of object with given key.
      */
     public String get(String key) {
         Hashator accessor = new Hashator(key);
@@ -123,7 +140,7 @@ public class HashTable {
     }
 
     /**
-     * deletes all objects from table
+     * deletes all objects from table.
      */
     public void clear() {
         for (int i = 0; i < capacity; i++) {
@@ -168,10 +185,10 @@ public class HashTable {
         private static final int base = 31;
 
         /**
-         * mathematically correct mod
-         * @return a `mod` b
+         * mathematically correct mod.
+         * @return a `mod` b.
          */
-        private int safeMod(int a, int b){
+        private int safeMod(int a, int b) {
             a %= b;
             if (a < 0) {
                 a += b;

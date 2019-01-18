@@ -1,19 +1,19 @@
 package ru.hse.HashTable;
 
-import java.util.NoSuchElementException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * A singly-connected list with iterating option.
  */
 public class List implements Iterable<Node> {
     /**
-     * first object in list
+     * first object in list.
      */
     private Node head;
 
     /**
-     * last object in list
+     * last object in list.
      */
     private Node tail;
 
@@ -40,7 +40,7 @@ public class List implements Iterable<Node> {
     /**
      * @param key object's key
      * @return Node with given key or null if there is no such node
-     * workd in O(length)
+     * works in O(length)
      */
     private Node find(int key) {
         for (Node x : this) {
@@ -182,15 +182,15 @@ public class List implements Iterable<Node> {
         }
 
         /**
-         * checking if there is next object
+         * checking if there is next object.
          */
         public boolean hasNext() {
             return current != null;
         }
 
         /**
-         * getting the next object from the list and moving current position
-         * @return next object in the list
+         * getting the next object from the list and moving current position.
+         * @return next object in the list.
          */
         public Node next() {
             if (!hasNext()) {

@@ -10,6 +10,7 @@
         <entry key="scan-before-checkin" value="false" />
         <entry key="scanscope" value="JavaOnly" />
         <entry key="suppress-errors" value="false" />
+        <module name="SuppressionCommentFilter"/>
       </map>
     </option>
   </component>

@@ -1,7 +1,7 @@
 package ru.hse.HashTable;
 
 /**
- * object in list
+ * object in list.
  */
 /*
  Хочется сделать этот класс вложенным в List, но тогда я не могу написать "List implements Iterable<Node>"
@@ -13,7 +13,7 @@ package ru.hse.HashTable;
 public class Node {
     private final int key;
     private String value;
-    private Node next; /** next object in list */
+    private Node next; /** next object in list. */
 
     public Node(int key, String value) {
         this.key = key;
