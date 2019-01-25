@@ -37,7 +37,7 @@ public class HashTable {
      */
     public HashTable(int capacity) {
         this.capacity = capacity;
-        size = 0;
+        size = 0; //prefer to do it manually
         data = new List[capacity];
 
         for (int i = 0; i < capacity; i++) {
@@ -53,7 +53,7 @@ public class HashTable {
     }
 
     /**
-     * @return number of elements in hash table.
+     * returns number of elements in hash table.
      */
     public int size() {
         return size;
@@ -61,7 +61,7 @@ public class HashTable {
 
     /**
      * @param key object's key.
-     * @return true if table contains object with given key, false otherwise.
+     * returns 'true' if table contains object with given key, 'false' otherwise.
      */
     public boolean contains(String key) {
         Hashator accessor = new Hashator(key);
@@ -70,7 +70,7 @@ public class HashTable {
 
     /**
      * @param key object's key.
-     * @return value of object with given key.
+     * returns value of object with given key.
      */
     public String get(String key) {
         Hashator accessor = new Hashator(key);
@@ -81,7 +81,7 @@ public class HashTable {
      * @param key object's key
      * @param value object's value
      * Puts an object into table with given key if there is no object with the same key, otherwise overrides it's value
-     * @return old value of object from table or null if there was no such one
+     * returns old value of object from table or null if there was no such one
      */
     public String put(String key, String value) {
         Hashator accessor = new Hashator(key);
@@ -101,7 +101,7 @@ public class HashTable {
     /**
      * @param key object's key
      * removes an object from the table with given key
-     * @return value of deleted object or null if there was no such object
+     * returns value of deleted object or null if there was no such object
      */
     public String remove(String key) {
         Hashator accessor = new Hashator(key);
@@ -163,8 +163,8 @@ public class HashTable {
         private static final int base = 31;
 
         /**
-         * mathematically correct mod.
-         * @return a `mod` b.
+         * mathematically correct mod function.
+         * @return r = a `mod` b, where 0 <= r < b.
          */
         private int safeMod(int a, int b) {
             a %= b;

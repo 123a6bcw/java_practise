@@ -23,14 +23,14 @@ public class List implements Iterable<Node> {
     }
 
     /**
-     * @return object for iterating over the list
+     * returns object for iterating over the list
      */
     public Iterator<Node> iterator() {
         return new ListIterator(head);
     }
 
     /**
-     * @return true if list is empty, false otherwise.
+     * returns true if list is empty, false otherwise.
      * works in O(1)
      */
     public boolean empty() {
@@ -39,7 +39,7 @@ public class List implements Iterable<Node> {
 
     /**
      * @param key object's key
-     * @return Node with given key or null if there is no such node
+     * returns Node with given key or null if there is no such node
      * works in O(length)
      */
     private Node find(int key) {
@@ -54,7 +54,7 @@ public class List implements Iterable<Node> {
 
     /**
      * @param key object's key
-     * @return true if list contains object with given key, false otherwise
+     * returns true if list contains object with given key, false otherwise
      * works in O(length)
      */
     public boolean contains(int key) {
@@ -63,7 +63,7 @@ public class List implements Iterable<Node> {
 
     /**
      * @param key object's key
-     * @return value of object with given key or null if there is no such object
+     * returns value of object with given key or null if there is no such object
      * works in O(length)
      */
     public String get(int key) {
@@ -80,7 +80,7 @@ public class List implements Iterable<Node> {
      * @param value object's value
      * inserts new object with given key and value into list if there wasn't an object with such key
      * otherwise overrides value of object with given key
-     * @return old value of object with given key, null if there wasn't such object
+     * returns old value of object with given key, null if there wasn't such object
      * works in O(length)
      */
     public String insert(int key, String value) {
@@ -126,7 +126,7 @@ public class List implements Iterable<Node> {
     /**
      * @param key object's key
      * removes object with given key from the list
-     * @return value of deleted object or null if object wasn't found
+     * returns value of deleted object or null if object wasn't found
      * works in O(length)
      */
     public String remove(int key) {
@@ -190,7 +190,7 @@ public class List implements Iterable<Node> {
 
         /**
          * getting the next object from the list and moving current position.
-         * @return next object in the list.
+         * returns next object in the list.
          */
         public Node next() {
             if (!hasNext()) {
