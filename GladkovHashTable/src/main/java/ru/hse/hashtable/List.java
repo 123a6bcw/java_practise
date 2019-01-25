@@ -84,6 +84,10 @@ public class List implements Iterable<Node> {
      * works in O(length)
      */
     public String insert(int key, String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("value cannot be null");
+        }
+
         Node found = find(key);
         if (found != null) {
             String returnValue = found.getValue();
@@ -119,6 +123,10 @@ public class List implements Iterable<Node> {
      * works in O(1)
      */
     public void push(int key, String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("value cannot be null");
+        }
+
         Node a = new Node(key, value);
         push(a);
     }

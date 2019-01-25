@@ -36,6 +36,10 @@ public class HashTable {
      * creates HashTable with given capacity, 0 size and array of 'capacity' empty Lists.
      */
     public HashTable(int capacity) {
+        if (capacity < 0) {
+            throw new IllegalArgumentException("capacity of HashTable cannot be negative");
+        }
+
         this.capacity = capacity;
         size = 0; //prefer to do it manually
         data = new List[capacity];
@@ -64,6 +68,10 @@ public class HashTable {
      * returns 'true' if table contains object with given key, 'false' otherwise.
      */
     public boolean contains(String key) {
+        if (key == null) {
+            throw new IllegalArgumentException("key cannot be null");
+        }
+
         var accessor = new Hashator(key);
         return data[accessor.dataIndex].contains(accessor.hashedKey);
     }
@@ -73,6 +81,10 @@ public class HashTable {
      * returns value of object with given key.
      */
     public String get(String key) {
+        if (key == null) {
+            throw new IllegalArgumentException("key cannot be null");
+        }
+
         var accessor = new Hashator(key);
         return data[accessor.dataIndex].get(accessor.hashedKey);
     }
@@ -84,6 +96,13 @@ public class HashTable {
      * returns old value of object from table or null if there was no such one
      */
     public String put(String key, String value) {
+        if (key == null) {
+            throw new IllegalArgumentException("key cannot be null");
+        }
+        if (value == null) {
+            throw new IllegalArgumentException("value cannot be null");
+        }
+
         var accessor = new Hashator(key);
         String returnValue = data[accessor.dataIndex].insert(accessor.hashedKey, value);
         if (returnValue == null) {
@@ -104,6 +123,10 @@ public class HashTable {
      * returns value of deleted object or null if there was no such object
      */
     public String remove(String key) {
+        if (key == null) {
+            throw new IllegalArgumentException("key cannot be null");
+        }
+
         var accessor = new Hashator(key);
         String returnValue = data[accessor.dataIndex].remove(accessor.hashedKey);
         if (returnValue != null) {
@@ -169,6 +192,10 @@ public class HashTable {
          * @return r = a `mod` b, where 0 <= r < b.
          */
         private int safeMod(int a, int b) {
+            if (b < 0) {
+                throw new IllegalArgumentException("cannot get mod by negative base");
+            }
+
             a %= b;
             if (a < 0) {
                 a += b;
@@ -178,6 +205,10 @@ public class HashTable {
         }
 
         private Hashator(String key) {
+            if (key == null) {
+                throw new IllegalArgumentException("key cannot be null");
+            }
+
             hashedKey = 0;
             for (int i = 0; i < key.length(); i++) {
                 hashedKey = (hashedKey * base + key.charAt(i)) % mod;

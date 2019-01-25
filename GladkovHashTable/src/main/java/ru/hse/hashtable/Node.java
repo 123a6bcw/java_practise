@@ -9,6 +9,10 @@ public class Node {
     private Node next; /** next object in list. */
 
     public Node(int key, String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("value cannot be null");
+        }
+
         this.key = key;
         this.value = value;
         this.next = null;
@@ -23,6 +27,10 @@ public class Node {
     }
 
     public void setValue(String newValue) {
+        if (newValue == null) {
+            throw new IllegalArgumentException("newValue cannot be null");
+        }
+
         value = newValue;
     }
 
