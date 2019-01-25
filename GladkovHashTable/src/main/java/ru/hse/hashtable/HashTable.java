@@ -64,7 +64,7 @@ public class HashTable {
      * returns 'true' if table contains object with given key, 'false' otherwise.
      */
     public boolean contains(String key) {
-        Hashator accessor = new Hashator(key);
+        var accessor = new Hashator(key);
         return data[accessor.dataIndex].contains(accessor.hashedKey);
     }
 
@@ -73,7 +73,7 @@ public class HashTable {
      * returns value of object with given key.
      */
     public String get(String key) {
-        Hashator accessor = new Hashator(key);
+        var accessor = new Hashator(key);
         return data[accessor.dataIndex].get(accessor.hashedKey);
     }
 
@@ -84,7 +84,7 @@ public class HashTable {
      * returns old value of object from table or null if there was no such one
      */
     public String put(String key, String value) {
-        Hashator accessor = new Hashator(key);
+        var accessor = new Hashator(key);
         String returnValue = data[accessor.dataIndex].insert(accessor.hashedKey, value);
         if (returnValue == null) {
             size++;
@@ -104,7 +104,7 @@ public class HashTable {
      * returns value of deleted object or null if there was no such object
      */
     public String remove(String key) {
-        Hashator accessor = new Hashator(key);
+        var accessor = new Hashator(key);
         String returnValue = data[accessor.dataIndex].remove(accessor.hashedKey);
         if (returnValue != null) {
             size--;
@@ -133,17 +133,17 @@ public class HashTable {
      * also replacing all objects by getting hash divided by new capacity (rehashing).
      */
     private void expandData() {
-        if (4 * size >= capacity) {
+        if (!(4 * size >= capacity)) {
             capacity *= 2; //need to be here so Hashator() works correctly
 
-            List[] newData = new List[capacity];
+            var newData = new List[capacity];
             for (int i = 0; i < capacity; i++) {
                 newData[i] = new List();
             }
 
             for (int i = 0; 2 * i < capacity; i++) {
                 for (Node x : data[i]) {
-                    Hashator accessor = new Hashator(x.getKey());
+                    var accessor = new Hashator(x.getKey());
                     newData[accessor.dataIndex].push(x); //push works in O(1)
                 }
             }

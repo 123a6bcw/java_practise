@@ -174,7 +174,7 @@ public class List implements Iterable<Node> {
          */
         private Node current;
 
-        /*
+        /**
         position of the next object we will get from the list
          */
         private ListIterator(Node head) {
