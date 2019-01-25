@@ -147,6 +147,7 @@ public class HashTable {
         for (int i = 0; i < capacity; i++) {
             data[i].clear();
         }
+        data = new List[defaultCapacity];
         size = 0;
     }
 
