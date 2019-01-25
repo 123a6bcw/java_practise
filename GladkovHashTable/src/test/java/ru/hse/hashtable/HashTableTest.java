@@ -19,7 +19,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void SizeAfterPutting() {
+    public void checkSizeAfterPutting() {
         testTable.put("abc", "abc");
         assertEquals(1, testTable.size());
         testTable.put("b", "b");
@@ -29,7 +29,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void sizeAfterPuttingExistingKey() {
+    public void checkSizeAfterPuttingExistingKey() {
         HashTable a = new HashTable();
         a.put("testTable", "testTable");
         a.put("testTable", "b");
@@ -42,7 +42,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void sizeAfterPuttingAndRemoving() {
+    public void checkSizeAfterPuttingAndRemoving() {
         testTable.put("testTable", "testTable");
         testTable.put("b", "c");
         testTable.put("c", "d");
@@ -59,7 +59,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void sizeAfterClear() {
+    public void sizeAfterClearShouldBeZero() {
         testTable.put("testTable", "b");
         testTable.put("b", "c");
         testTable.put("c", "d");
@@ -68,7 +68,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void sizeAfterExpanding() {
+    public void sizeAfterExpandingShouldNotChange() {
         String s = "testTable";
         for (int i = 0; i < 32; i++) {
             s += "testTable";
@@ -78,12 +78,12 @@ public class HashTableTest {
     }
 
     @Test
-    public void containsInEmptyTable() {
+    public void containsInEmptyTableShouldReturnFalse() {
         assertFalse(testTable.contains("testTable"));
     }
 
     @Test
-    public void containsTrue() {
+    public void containsExistingElementsReturnsTrue() {
         testTable.put("testTable", "testTable");
         testTable.put("testTable", "b");
         testTable.put("b", "c");
@@ -94,7 +94,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void containsFalse() {
+    public void containsNotExistingElementsReturnsFalse() {
         testTable.put("testTable", "testTable");
         testTable.put("testTable", "b");
         testTable.put("b", "c");
@@ -103,7 +103,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void containsAfterRemoving() {
+    public void containsAfterRemovingReturnsFalse() {
         testTable.put("testTable", "testTable");
         testTable.put("testTable", "b");
         testTable.put("b", "c");
@@ -115,7 +115,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void containsAfterClear() {
+    public void containsAfterClearReturnsFalse() {
         testTable.put("testTable", "testTable");
         testTable.put("testTable", "b");
         testTable.put("b", "c");
@@ -126,7 +126,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void get() { //same as Contains, so just simple test.
+    public void getWorksAsContains() { //same as Contains, so just simple test.
         testTable.put("testTable", "testTable");
         testTable.put("testTable", "b");
         assertEquals("b", testTable.get("testTable"));
@@ -140,7 +140,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void getAfterExpanding() { //same as Contains, so just simple test.
+    public void getAfterExpandingWorksAsContains() { //same as Contains, so just simple test.
         String s = "testTable";
         for (int i = 0; i < 32; i++) {
             s = "testTable";
@@ -153,13 +153,13 @@ public class HashTableTest {
     }
 
     @Test
-    public void putSimple() {
+    public void putOneObject() {
         testTable.put("testTable", "b");
         assertTrue(testTable.contains("testTable"));
     }
 
     @Test
-    public void putSameObject() {
+    public void putSameObjectTwiceShouldPutItOnlyOnce() {
         testTable.put("testTable", "b");
         testTable.put("testTable", "b");
         assertEquals("b", testTable.get("testTable"));
@@ -183,7 +183,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void removeInEmptyTable() {
+    public void removeInEmptyTableDoesNothing() {
         assertNull(testTable.remove("testTable"));
         assertEquals(0, testTable.size());
     }
@@ -196,7 +196,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void removeNotExistingObject() {
+    public void removeNotExistingObjectDoesNothing() {
         testTable.put("testTable", "b");
         testTable.put("b", "c");
         assertNull(testTable.remove("c"));
@@ -204,13 +204,13 @@ public class HashTableTest {
     }
 
     @Test
-    public void clearEmptyTable() {
+    public void clearEmptyTableDoesNothing() {
         testTable.clear();
         assertEquals(0, testTable.size());
     }
 
     @Test
-    public void clearBigTable() {
+    public void clearBigTableRemovesAllObjects() {
         testTable.put("testTable", "b");
         testTable.put("b", "c");
         testTable.put("c", "d");
@@ -220,7 +220,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void clearAfterExpanding() {
+    public void clearAfterExpandingRemovesAllObjects() {
         String s = "testTable";
         for (int i = 0; i < 32; i++) {
             s += "testTable";

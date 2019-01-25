@@ -21,7 +21,7 @@ class ListTest {
     }
 
     @Test
-    void iteratorAddAndCheck() {
+    void iteratorAddAndCheckSucesfullyIteratesOverList() {
         a.push(1, "a");
         a.push(2, "b");
         a.push(3, "c");
@@ -35,12 +35,12 @@ class ListTest {
     }
 
     @Test
-    void emptyEmpty() {
+    void emptyReturnsTrueForEmptyList() {
         assertTrue(a.empty());
     }
 
     @Test
-    void emptyNotEmpty() {
+    void emptyReturnsFalseForNonEmptyList() {
         a.push(1, "a");
         assertFalse(a.empty());
         a.push(2, "b");
@@ -49,7 +49,7 @@ class ListTest {
     }
 
     @Test
-    void emptyAfterRemoving() {
+    void emptyAfterRemovingAllObjectsReturnTrue() {
         a.push(1, "a");
         a.remove(1);
         assertTrue(a.empty());
@@ -65,7 +65,7 @@ class ListTest {
     }
 
     @Test
-    void emptyAfterClear() {
+    void emptyAfterClearReturnTrue() {
         a.push(1, "a");
         a.clear();
         assertTrue(a.empty());
@@ -76,12 +76,12 @@ class ListTest {
     }
 
     @Test
-    void findInEmptyList() {
+    void findInEmptyListReturnNull() {
         assertNull(a.get(1));
     }
 
     @Test
-    void findNotExistingObject() {
+    void findNotExistingObjectReturnsNull() {
         a.push(1, "a");
         assertNull(a.get(2));
         a.push(2, "b");
@@ -91,7 +91,7 @@ class ListTest {
     }
 
     @Test
-    void findExistingObject() {
+    void findExistingObjectReturnsThisObject() {
         a.push(1, "a");
         assertEquals("a", a.get(1));
         a.push(2, "b");
@@ -104,7 +104,7 @@ class ListTest {
     }
 
     @Test
-    void findAfterRemovingObjects() {
+    void findAfterRemovingObjectsReturnsNull() {
         a.push(1, "a");
         a.remove(1);
         assertNull(a.get(1)); //make empty
@@ -129,7 +129,7 @@ class ListTest {
     }
 
     @Test
-    void contains() { //Not much point in testing that, cause it's just find(), so just a simple test
+    void containsWorksAsFind() { //Not much point in testing that, cause it's just find(), so just a simple test
         a.push(1, "a");
         a.push(2, "b");
         a.push(3, "c");
@@ -148,7 +148,7 @@ class ListTest {
     }
 
     @Test
-    void get() { //also just find()
+    void getWorksAsFind() { //also just find()
         a.push(1, "a");
         a.push(2, "b");
         a.push(3, "c");
@@ -167,7 +167,7 @@ class ListTest {
     }
 
     @Test
-    void insertExistingKey() { //find() + push(), just simple tests
+    void insertExistingKeyWorksAsFindAndPush() { //find() + push(), just simple tests
         a.push(1, "a");
         a.push(2, "b");
         a.push(3, "c");
@@ -183,7 +183,7 @@ class ListTest {
     }
 
     @Test
-    void insertNewKeys() {
+    void insertNewKeysWorksAsFindAndPush() {
         a.insert(1, "a");
         assertEquals("a", a.get(1));
         a.insert(2, "b");
@@ -207,7 +207,7 @@ class ListTest {
     }
 
     @Test
-    void push() { //many tests already exists in find(), so just simple test
+    void pushGeneralTest() { //many tests already exists in find(), so just simple test
         a.push(19, "a");
         assertEquals("a", a.get(19));
         a.push(20, "b");
@@ -228,7 +228,7 @@ class ListTest {
     }
 
     @Test
-    void removeNotExistingKey() { //many testcase already exists in find and push, so just simple ones
+    void removeNotExistingKeyReturnsNull() { //many testcase already exists in find and push, so just simple ones
         assertNull(a.remove(0));
         a.push(1, "a");
         a.push(2, "b");
@@ -239,7 +239,7 @@ class ListTest {
     }
 
     @Test
-    void removeExistingKeys() {
+    void removeExistingKeysReturnsDeletedValues() {
         a.push(1, "a");
         a.push(2, "b");
         a.push(3, "c");
@@ -249,7 +249,7 @@ class ListTest {
     }
 
     @Test
-    void removeRepeating() {
+    void removeRepeatingRemovesObjectOnlyOnce() {
         a.push(1, "a");
         a.push(2, "b");
         a.push(3, "c");
@@ -258,7 +258,7 @@ class ListTest {
     }
 
     @Test
-    void clearEmptyList() {
+    void clearEmptyListDoesNothing() {
         a.clear();
         assertTrue(a.empty());
     }
