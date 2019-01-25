@@ -234,7 +234,7 @@ public class HashTableTest {
     @Test
     public void PuttingNullShouldThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> testTable.put(null, "b"));
-        assertThrows(IllegalArgumentException.class, () -> testTable.put("a", null));
+        assertThrows(IllegalArgumentException.class, () -> testTable.put("testList", null));
         assertThrows(IllegalArgumentException.class, () -> testTable.put(null, null));
     }
 
