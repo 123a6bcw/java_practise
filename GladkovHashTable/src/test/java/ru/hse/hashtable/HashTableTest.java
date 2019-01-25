@@ -1,4 +1,4 @@
-package ru.hse.HashTable;
+package ru.hse.hashtable;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;

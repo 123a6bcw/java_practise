@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.example</groupId>
-    <artifactId>Example</artifactId>
+    <groupId>ru.hse.HashTable</groupId>
+    <artifactId>HashTable</artifactId>
     <version>1.0-SNAPSHOT</version>
     <build>
         <plugins>
@@ -18,6 +18,12 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>ru.hse.hashtable</mainClass>
+                        </manifest>
+                    </archive>
                     <release>11</release>
                 </configuration>
             </plugin>

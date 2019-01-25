@@ -1,7 +1,7 @@
-package ru.hse.HashTable;
+package ru.hse.hashtable;
 
 /**
- * Simple HashTable class.
+ * Simple hashtable class.
  * Copyright (c) 2019 Gladkov Alexander
  */
 
@@ -55,7 +55,7 @@ public class HashTable {
     }
 
     /**
-     * creates HashTable with given capacity, 0 size and array of 'capacity' empty Lists.
+     * creates hashtable with given capacity, 0 size and array of 'capacity' empty Lists.
      */
     public HashTable(int capacity) {
         this.capacity = capacity;
@@ -207,7 +207,7 @@ public class HashTable {
         }
 
         /**
-         * needs than we get object from an old HashTable and which hashedKey we already know
+         * needs than we get object from an old hashtable and which hashedKey we already know
          */
         private Hashator(int key) {
             hashedKey = key;

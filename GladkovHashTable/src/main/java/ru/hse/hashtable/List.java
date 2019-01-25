@@ -1,4 +1,4 @@
-package ru.hse.HashTable;
+package ru.hse.hashtable;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
