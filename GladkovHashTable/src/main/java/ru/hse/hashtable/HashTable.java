@@ -1,7 +1,7 @@
 package ru.hse.hashtable;
 
 /**
- * Simple hashtable class.
+ * Simple HashTable class.
  * Copyright (c) 2019 Gladkov Alexander
  */
 
@@ -30,32 +30,10 @@ public class HashTable {
      * Just some tests to make sure it works correctly.
      */
     public static void main(String[] args) {
-        HashTable a = new HashTable();
-        System.out.println(a.size() + " 0");
-        System.out.println(a.contains("sasha") + " false");
-        System.out.println(a.put("sasha", "clever") + " null");
-        System.out.println(a.contains("sasha") + " true");
-        System.out.println(a.put("java", "rules") + " null");
-        System.out.println(a.contains("java") + " true");
-        System.out.println(a.put("sasha", "smart") + " clever");
-        System.out.println(a.contains("sasha") + " true");
-        System.out.println(a.size() + " 2");
-        System.out.println(a.get("sasha") + " smart");
-        System.out.println(a.get("java") + " rules");
-        System.out.println(a.remove("sasha") + " smart");
-        System.out.println(a.contains("sasha") + " false");
-        System.out.println(a.get("sasha") + " null");
-        System.out.println(a.size() + " 1");
-        a.clear();
-        System.out.println(a.size() + " 0");
-        System.out.println(a.get("java") + " null");
-        System.out.println(a.contains("java") + " false");
-        System.out.println(a.remove("Dima") + " null");
-        System.out.println(a.size() + " 0");
     }
 
     /**
-     * creates hashtable with given capacity, 0 size and array of 'capacity' empty Lists.
+     * creates HashTable with given capacity, 0 size and array of 'capacity' empty Lists.
      */
     public HashTable(int capacity) {
         this.capacity = capacity;
@@ -207,7 +185,7 @@ public class HashTable {
         }
 
         /**
-         * needs than we get object from an old hashtable and which hashedKey we already know
+         * needs than we get object from an old HashTable and which hashedKey we already know
          */
         private Hashator(int key) {
             hashedKey = key;
