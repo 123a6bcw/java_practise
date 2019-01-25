@@ -14,7 +14,7 @@ public class HashTable {
     /**
      * default capacity size when creating table.
      */
-    private static final int defaultCapacity = 8;
+    private static final int DEFAULT_CAPACITY = 8;
 
     /**
      * Number of objects in the table.
@@ -60,7 +60,7 @@ public class HashTable {
      * creates table with default capacity.
      */
     public HashTable() {
-        this(defaultCapacity);
+        this(DEFAULT_CAPACITY);
     }
 
     /**
@@ -151,7 +151,7 @@ public class HashTable {
      * deletes all objects from table.
      */
     public void clear() {
-        data = makeNewData(defaultCapacity);
+        data = makeNewData(DEFAULT_CAPACITY);
         size = 0;
     }
 
