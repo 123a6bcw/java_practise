@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 /**
  * A singly-connected list with iterating option.
  */
-public class List implements Iterable<Node> {
+public class List implements Iterable<StringPair> {
     /**
      * first object in list.
      */
@@ -25,7 +25,7 @@ public class List implements Iterable<Node> {
     /**
      * returns object for iterating over the list
      */
-    public Iterator<Node> iterator() {
+    public Iterator<StringPair> iterator() {
         return new ListIterator(head);
     }
 
@@ -43,7 +43,7 @@ public class List implements Iterable<Node> {
      * works in O(length)
      */
     private Node find(int key) {
-        for (Node x : this) {
+        for (var x = head; x != null; x = x.getNext()) {
             if (x.getKey() == key) {
                 return x;
             }
@@ -104,7 +104,7 @@ public class List implements Iterable<Node> {
      * adds new object to the end of the list
      * works in O(1) and does not check existence of object's with same key
      */
-    protected void push(Node node) {
+    private void push(Node node) {
         if (empty()) {
             head = node;
             tail = node;
@@ -132,6 +132,15 @@ public class List implements Iterable<Node> {
     }
 
     /**
+     * @param pair pair of object's key and value
+     * push object with given key and value (packed inside StringPair) to the end of the list
+     * works in O(1)
+     */
+    public void push(StringPair pair) {
+        push(pair.getKey(), pair.getValue());
+    }
+
+    /**
      * @param key object's key
      * removes object with given key from the list
      * returns value of deleted object or null if object wasn't found
@@ -139,7 +148,7 @@ public class List implements Iterable<Node> {
      */
     public String remove(int key) {
         Node prev = null; //previous Node in list, cause we don't store left connections
-        for (Node x : this) {
+        for (var x = head; x != null; x = x.getNext()) {
             if (x.getKey() == key) {
                 if (prev != null) { //so x isn't the first one
                     prev.setNext(x.getNext());
@@ -176,7 +185,7 @@ public class List implements Iterable<Node> {
     /**
      * class for iterating over list
      */
-    private static class ListIterator implements Iterator<Node> {
+    private static class ListIterator implements Iterator<StringPair> {
         /**
          * current element in the iterating process
          */
@@ -200,14 +209,14 @@ public class List implements Iterable<Node> {
          * getting the next object from the list and moving current position.
          * returns next object in the list.
          */
-        public Node next() {
+        public StringPair next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
 
             Node returnValue = current;
             current = current.getNext();
-            return returnValue;
+            return returnValue.toStringPair();
         }
 
         /*
@@ -215,6 +224,57 @@ public class List implements Iterable<Node> {
          */
         public void remove() {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    /**
+     * object in list.
+     */
+    public class Node {
+        private final int key;
+        private String value;
+        private Node next; /** next object in list. */
+
+        public Node(int key, String value) {
+            if (value == null) {
+                throw new IllegalArgumentException("value cannot be null");
+            }
+
+            this.key = key;
+            this.value = value;
+            this.next = null;
+        }
+
+        public int getKey() {
+            return key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String newValue) {
+            if (newValue == null) {
+                throw new IllegalArgumentException("newValue cannot be null");
+            }
+
+            value = newValue;
+        }
+
+        public void setNext(Node newNext) {
+            next = newNext;
+        }
+
+        public Node getNext() {
+            return next;
+        }
+
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        public StringPair toStringPair() {
+            return new StringPair(key, value);
         }
     }
 }

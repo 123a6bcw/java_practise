@@ -7,7 +7,7 @@ class ListTest {
     @Test
     void iteratorEmpty() {
         List a = new List();
-        for (Node x : a) {
+        for (var x : a) {
             fail(); //checking if we never go into cycle body
         }
     }
@@ -15,11 +15,11 @@ class ListTest {
     @Test
     void iteratorAddAndCheck() {
         List a = new List();
-        a.push(new Node(1, "a"));
-        a.push(new Node(2, "b"));
-        a.push(new Node(3, "c"));
+        a.push(1, "a");
+        a.push(2, "b");
+        a.push(3, "c");
         int q = 1;
-        for (Node x : a) {
+        for (StringPair x : a) {
             assertEquals(q, x.getKey());
             q++;
         }
@@ -205,7 +205,7 @@ class ListTest {
         a.insert(1, "b");
 
         int q = 0;
-        for (Node x : a) {
+        for (StringPair x : a) {
             q++;
         }
 
@@ -228,7 +228,7 @@ class ListTest {
         a.push(4, "o");
 
         int q = 0;
-        for (Node x : a) {
+        for (StringPair x : a) {
             q++;
             assertEquals(q, x.getKey());
         }

@@ -170,7 +170,7 @@ public class HashTable {
         List[] newData = makeNewData(capacity); // type is not obvious from context
 
         for (int i = 0; 2 * i < capacity; i++) {
-            for (Node x : data[i]) {
+            for (var x : data[i]) {
                 var accessor = new Hashator(x.getKey());
                 newData[accessor.dataIndex].push(x); //push works in O(1)
             }
