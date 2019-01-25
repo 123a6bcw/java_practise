@@ -1,18 +1,25 @@
 package ru.hse.hashtable;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class HashTableTest {
+    HashTable a;
+
+    @BeforeEach
+    public void initialise() {
+        a = new HashTable();
+    }
+
     @Test
-    public void sizeEmpty() throws Exception {
-        HashTable a = new HashTable();
+    public void sizeEmpty() {
         assertEquals(0, a.size());
     }
 
     @Test
-    public void sizeAfterPutting() throws Exception {
-        HashTable a = new HashTable();
+    public void sizeAfterPutting() {
         a.put("abc", "abc");
         assertEquals(1, a.size());
         a.put("b", "b");
@@ -22,7 +29,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void sizeAfterPuttingExistingKey() throws Exception {
+    public void sizeAfterPuttingExistingKey() {
         HashTable a = new HashTable();
         a.put("a", "a");
         a.put("a", "b");
@@ -35,8 +42,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void sizeAfterPuttingAndRemoving() throws Exception {
-        HashTable a = new HashTable();
+    public void sizeAfterPuttingAndRemoving() {
         a.put("a", "a");
         a.put("b", "c");
         a.put("c", "d");
@@ -53,8 +59,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void sizeAfterClear() throws Exception {
-        HashTable a = new HashTable();
+    public void sizeAfterClear() {
         a.put("a", "b");
         a.put("b", "c");
         a.put("c", "d");
@@ -63,8 +68,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void sizeAfterExpanding() throws Exception {
-        HashTable a = new HashTable();
+    public void sizeAfterExpanding() {
         String s = "a";
         for (int i = 0; i < 32; i++) {
             s += "a";
@@ -74,14 +78,12 @@ public class HashTableTest {
     }
 
     @Test
-    public void containsInEmptyTable() throws Exception {
-        HashTable a = new HashTable();
+    public void containsInEmptyTable() {
         assertFalse(a.contains("a"));
     }
 
     @Test
-    public void containsTrue() throws Exception {
-        HashTable a = new HashTable();
+    public void containsTrue() {
         a.put("a", "a");
         a.put("a", "b");
         a.put("b", "c");
@@ -92,8 +94,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void containsFalse() throws Exception {
-        HashTable a = new HashTable();
+    public void containsFalse() {
         a.put("a", "a");
         a.put("a", "b");
         a.put("b", "c");
@@ -102,8 +103,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void containsAfterRemoving() throws Exception {
-        HashTable a = new HashTable();
+    public void containsAfterRemoving() {
         a.put("a", "a");
         a.put("a", "b");
         a.put("b", "c");
@@ -115,8 +115,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void containsAfterClear() throws Exception {
-        HashTable a = new HashTable();
+    public void containsAfterClear() {
         a.put("a", "a");
         a.put("a", "b");
         a.put("b", "c");
@@ -127,8 +126,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void get() throws Exception { //same as Contains, so just simple test.
-        HashTable a = new HashTable();
+    public void get() { //same as Contains, so just simple test.
         a.put("a", "a");
         a.put("a", "b");
         assertEquals("b", a.get("a"));
@@ -142,8 +140,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void getAfterExpanding() throws Exception { //same as Contains, so just simple test.
-        HashTable a = new HashTable();
+    public void getAfterExpanding() { //same as Contains, so just simple test.
         String s = "a";
         for (int i = 0; i < 32; i++) {
             s = "a";
@@ -156,15 +153,13 @@ public class HashTableTest {
     }
 
     @Test
-    public void putSimple() throws Exception {
-        HashTable a = new HashTable();
+    public void putSimple() {
         a.put("a", "b");
         assertTrue(a.contains("a"));
     }
 
     @Test
-    public void putSameObject() throws Exception {
-        HashTable a = new HashTable();
+    public void putSameObject() {
         a.put("a", "b");
         a.put("a", "b");
         assertEquals("b", a.get("a"));
@@ -172,8 +167,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void putSameObjectAfterExpanding() throws Exception {
-        HashTable a = new HashTable();
+    public void putSameObjectAfterExpanding() {
         String s = "a";
         for (int i = 0; i < 32; i++) {
             s += "a";
@@ -189,23 +183,20 @@ public class HashTableTest {
     }
 
     @Test
-    public void removeInEmptyTable() throws Exception {
-        HashTable a = new HashTable();
+    public void removeInEmptyTable() {
         assertNull(a.remove("a"));
         assertEquals(0, a.size());
     }
 
     @Test
-    public void removeExistingObject() throws Exception {
-        HashTable a = new HashTable();
+    public void removeExistingObject() {
         a.put("a", "b");
         assertEquals("b", a.remove("a"));
         assertEquals(0, a.size());
     }
 
     @Test
-    public void removeNotExistingObject() throws Exception {
-        HashTable a = new HashTable();
+    public void removeNotExistingObject() {
         a.put("a", "b");
         a.put("b", "c");
         assertNull(a.remove("c"));
@@ -213,15 +204,13 @@ public class HashTableTest {
     }
 
     @Test
-    public void clearEmptyTable() throws Exception {
-        HashTable a = new HashTable();
+    public void clearEmptyTable() {
         a.clear();
         assertEquals(0, a.size());
     }
 
     @Test
-    public void clearBigTable() throws Exception {
-        HashTable a = new HashTable();
+    public void clearBigTable() {
         a.put("a", "b");
         a.put("b", "c");
         a.put("c", "d");
@@ -231,8 +220,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void clearAfterExpanding() throws Exception {
-        HashTable a = new HashTable();
+    public void clearAfterExpanding() {
         String s = "a";
         for (int i = 0; i < 32; i++) {
             s += "a";
