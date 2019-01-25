@@ -42,11 +42,18 @@ public class HashTable {
 
         this.capacity = capacity;
         size = 0; //prefer to do it manually
-        data = new List[capacity];
+        data = makeNewData(capacity);
+    }
 
-        for (int i = 0; i < capacity; i++) {
-            data[i] = new List();
+    /**
+     * creates new array of lists and calls constructor of lists for each element
+     */
+    private List[] makeNewData(int size) {
+        var newData = new List[size];
+        for (int i = 0; i < size; i++) {
+            newData[i] = new List();
         }
+        return newData;
     }
 
     /**
@@ -144,10 +151,7 @@ public class HashTable {
      * deletes all objects from table.
      */
     public void clear() {
-        for (int i = 0; i < capacity; i++) {
-            data[i].clear();
-        }
-        data = new List[defaultCapacity];
+        data = makeNewData(defaultCapacity);
         size = 0;
     }
 
@@ -163,10 +167,7 @@ public class HashTable {
 
         capacity *= 2; //need to be here so Hashator() works correctly
 
-        var newData = new List[capacity];
-        for (int i = 0; i < capacity; i++) {
-            newData[i] = new List();
-        }
+        List[] newData = makeNewData(capacity); // type is not obvious from context
 
         for (int i = 0; 2 * i < capacity; i++) {
             for (Node x : data[i]) {
