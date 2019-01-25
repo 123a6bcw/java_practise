@@ -6,228 +6,228 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class HashTableTest {
-    HashTable a;
+    private HashTable testTable;
 
     @BeforeEach
     public void initialise() {
-        a = new HashTable();
+        testTable = new HashTable();
     }
 
     @Test
     public void sizeEmpty() {
-        assertEquals(0, a.size());
+        assertEquals(0, testTable.size());
     }
 
     @Test
     public void sizeAfterPutting() {
-        a.put("abc", "abc");
-        assertEquals(1, a.size());
-        a.put("b", "b");
-        assertEquals(2, a.size());
-        a.put("c", "c");
-        assertEquals(3, a.size());
+        testTable.put("abc", "abc");
+        assertEquals(1, testTable.size());
+        testTable.put("b", "b");
+        assertEquals(2, testTable.size());
+        testTable.put("c", "c");
+        assertEquals(3, testTable.size());
     }
 
     @Test
     public void sizeAfterPuttingExistingKey() {
         HashTable a = new HashTable();
-        a.put("a", "a");
-        a.put("a", "b");
+        a.put("testTable", "testTable");
+        a.put("testTable", "b");
         assertEquals(1, a.size());
-        a.put("b", "a");
+        a.put("b", "testTable");
         a.put("b", "b");
-        a.put("a", "a");
-        a.put("a", "b");
+        a.put("testTable", "testTable");
+        a.put("testTable", "b");
         assertEquals(2, a.size());
     }
 
     @Test
     public void sizeAfterPuttingAndRemoving() {
-        a.put("a", "a");
-        a.put("b", "c");
-        a.put("c", "d");
-        a.remove("a");
-        assertEquals(2, a.size());
-        a.remove("b");
-        assertEquals(1, a.size());
-        a.remove("c");
-        assertEquals(0, a.size());
-        a.put("a", "a");
-        assertEquals(1, a.size());
-        a.remove("a");
-        assertEquals(0, a.size());
+        testTable.put("testTable", "testTable");
+        testTable.put("b", "c");
+        testTable.put("c", "d");
+        testTable.remove("testTable");
+        assertEquals(2, testTable.size());
+        testTable.remove("b");
+        assertEquals(1, testTable.size());
+        testTable.remove("c");
+        assertEquals(0, testTable.size());
+        testTable.put("testTable", "testTable");
+        assertEquals(1, testTable.size());
+        testTable.remove("testTable");
+        assertEquals(0, testTable.size());
     }
 
     @Test
     public void sizeAfterClear() {
-        a.put("a", "b");
-        a.put("b", "c");
-        a.put("c", "d");
-        a.clear();
-        assertEquals(0, a.size());
+        testTable.put("testTable", "b");
+        testTable.put("b", "c");
+        testTable.put("c", "d");
+        testTable.clear();
+        assertEquals(0, testTable.size());
     }
 
     @Test
     public void sizeAfterExpanding() {
-        String s = "a";
+        String s = "testTable";
         for (int i = 0; i < 32; i++) {
-            s += "a";
-            a.put(s, s);
-            assertEquals(i + 1, a.size());
+            s += "testTable";
+            testTable.put(s, s);
+            assertEquals(i + 1, testTable.size());
         }
     }
 
     @Test
     public void containsInEmptyTable() {
-        assertFalse(a.contains("a"));
+        assertFalse(testTable.contains("testTable"));
     }
 
     @Test
     public void containsTrue() {
-        a.put("a", "a");
-        a.put("a", "b");
-        a.put("b", "c");
-        a.put("sasha", "dasha");
-        assertTrue(a.contains("a"));
-        assertTrue(a.contains("b"));
-        assertTrue(a.contains("sasha"));
+        testTable.put("testTable", "testTable");
+        testTable.put("testTable", "b");
+        testTable.put("b", "c");
+        testTable.put("sasha", "dasha");
+        assertTrue(testTable.contains("testTable"));
+        assertTrue(testTable.contains("b"));
+        assertTrue(testTable.contains("sasha"));
     }
 
     @Test
     public void containsFalse() {
-        a.put("a", "a");
-        a.put("a", "b");
-        a.put("b", "c");
-        a.put("sasha", "dasha");
-        assertFalse(a.contains("masha"));
+        testTable.put("testTable", "testTable");
+        testTable.put("testTable", "b");
+        testTable.put("b", "c");
+        testTable.put("sasha", "dasha");
+        assertFalse(testTable.contains("masha"));
     }
 
     @Test
     public void containsAfterRemoving() {
-        a.put("a", "a");
-        a.put("a", "b");
-        a.put("b", "c");
-        a.put("sasha", "dasha");
-        a.remove("a");
-        a.remove("b");
-        assertFalse(a.contains("a"));
-        assertFalse(a.contains("b"));
+        testTable.put("testTable", "testTable");
+        testTable.put("testTable", "b");
+        testTable.put("b", "c");
+        testTable.put("sasha", "dasha");
+        testTable.remove("testTable");
+        testTable.remove("b");
+        assertFalse(testTable.contains("testTable"));
+        assertFalse(testTable.contains("b"));
     }
 
     @Test
     public void containsAfterClear() {
-        a.put("a", "a");
-        a.put("a", "b");
-        a.put("b", "c");
-        a.put("sasha", "dasha");
-        a.clear();
-        assertFalse(a.contains("a"));
-        assertFalse(a.contains("b"));
+        testTable.put("testTable", "testTable");
+        testTable.put("testTable", "b");
+        testTable.put("b", "c");
+        testTable.put("sasha", "dasha");
+        testTable.clear();
+        assertFalse(testTable.contains("testTable"));
+        assertFalse(testTable.contains("b"));
     }
 
     @Test
     public void get() { //same as Contains, so just simple test.
-        a.put("a", "a");
-        a.put("a", "b");
-        assertEquals("b", a.get("a"));
-        assertNull(a.get("b"));
-        a.remove("a");
-        assertNull(a.get("a"));
+        testTable.put("testTable", "testTable");
+        testTable.put("testTable", "b");
+        assertEquals("b", testTable.get("testTable"));
+        assertNull(testTable.get("b"));
+        testTable.remove("testTable");
+        assertNull(testTable.get("testTable"));
 
-        a.put("a", "b");
-        a.clear();
-        assertNull(a.get("a"));
+        testTable.put("testTable", "b");
+        testTable.clear();
+        assertNull(testTable.get("testTable"));
     }
 
     @Test
     public void getAfterExpanding() { //same as Contains, so just simple test.
-        String s = "a";
+        String s = "testTable";
         for (int i = 0; i < 32; i++) {
-            s = "a";
-            a.put(s, s + "b");
+            s = "testTable";
+            testTable.put(s, s + "b");
         }
 
         for (int i = 0; i < 32; i++){
-            assertEquals(s + "b", a.get(s));
+            assertEquals(s + "b", testTable.get(s));
         }
     }
 
     @Test
     public void putSimple() {
-        a.put("a", "b");
-        assertTrue(a.contains("a"));
+        testTable.put("testTable", "b");
+        assertTrue(testTable.contains("testTable"));
     }
 
     @Test
     public void putSameObject() {
-        a.put("a", "b");
-        a.put("a", "b");
-        assertEquals("b", a.get("a"));
-        assertEquals(1, a.size());
+        testTable.put("testTable", "b");
+        testTable.put("testTable", "b");
+        assertEquals("b", testTable.get("testTable"));
+        assertEquals(1, testTable.size());
     }
 
     @Test
     public void putSameObjectAfterExpanding() {
-        String s = "a";
+        String s = "testTable";
         for (int i = 0; i < 32; i++) {
-            s += "a";
-            a.put(s, s + "b");
+            s += "testTable";
+            testTable.put(s, s + "b");
         }
 
-        s = "a";
+        s = "testTable";
         for (int i = 0; i < 32; i++) {
-            s += "a";
-            a.put(s, s + "c");
-            assertEquals(s + "c", a.get(s));
+            s += "testTable";
+            testTable.put(s, s + "c");
+            assertEquals(s + "c", testTable.get(s));
         }
     }
 
     @Test
     public void removeInEmptyTable() {
-        assertNull(a.remove("a"));
-        assertEquals(0, a.size());
+        assertNull(testTable.remove("testTable"));
+        assertEquals(0, testTable.size());
     }
 
     @Test
     public void removeExistingObject() {
-        a.put("a", "b");
-        assertEquals("b", a.remove("a"));
-        assertEquals(0, a.size());
+        testTable.put("testTable", "b");
+        assertEquals("b", testTable.remove("testTable"));
+        assertEquals(0, testTable.size());
     }
 
     @Test
     public void removeNotExistingObject() {
-        a.put("a", "b");
-        a.put("b", "c");
-        assertNull(a.remove("c"));
-        assertEquals(2, a.size());
+        testTable.put("testTable", "b");
+        testTable.put("b", "c");
+        assertNull(testTable.remove("c"));
+        assertEquals(2, testTable.size());
     }
 
     @Test
     public void clearEmptyTable() {
-        a.clear();
-        assertEquals(0, a.size());
+        testTable.clear();
+        assertEquals(0, testTable.size());
     }
 
     @Test
     public void clearBigTable() {
-        a.put("a", "b");
-        a.put("b", "c");
-        a.put("c", "d");
-        a.put("d", "e");
-        a.clear();
-        assertEquals(0, a.size());
+        testTable.put("testTable", "b");
+        testTable.put("b", "c");
+        testTable.put("c", "d");
+        testTable.put("d", "e");
+        testTable.clear();
+        assertEquals(0, testTable.size());
     }
 
     @Test
     public void clearAfterExpanding() {
-        String s = "a";
+        String s = "testTable";
         for (int i = 0; i < 32; i++) {
-            s += "a";
-            a.put(s, s);
+            s += "testTable";
+            testTable.put(s, s);
         }
 
-        a.clear();
-        assertEquals(0, a.size());
+        testTable.clear();
+        assertEquals(0, testTable.size());
     }
 }
