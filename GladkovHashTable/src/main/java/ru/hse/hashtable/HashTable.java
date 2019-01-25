@@ -134,22 +134,24 @@ public class HashTable {
      */
     private void expandData() {
         if (!(4 * size >= capacity)) {
-            capacity *= 2; //need to be here so Hashator() works correctly
-
-            var newData = new List[capacity];
-            for (int i = 0; i < capacity; i++) {
-                newData[i] = new List();
-            }
-
-            for (int i = 0; 2 * i < capacity; i++) {
-                for (Node x : data[i]) {
-                    var accessor = new Hashator(x.getKey());
-                    newData[accessor.dataIndex].push(x); //push works in O(1)
-                }
-            }
-
-            data = newData;
+            return;
         }
+
+        capacity *= 2; //need to be here so Hashator() works correctly
+
+        var newData = new List[capacity];
+        for (int i = 0; i < capacity; i++) {
+            newData[i] = new List();
+        }
+
+        for (int i = 0; 2 * i < capacity; i++) {
+            for (Node x : data[i]) {
+                var accessor = new Hashator(x.getKey());
+                newData[accessor.dataIndex].push(x); //push works in O(1)
+            }
+        }
+
+        data = newData;
     }
 
     /**
