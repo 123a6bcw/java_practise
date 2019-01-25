@@ -19,7 +19,7 @@ public class HashTableTest {
     }
 
     @Test
-    public void sizeAfterPutting() {
+    public void SizeAfterPutting() {
         testTable.put("abc", "abc");
         assertEquals(1, testTable.size());
         testTable.put("b", "b");
@@ -229,5 +229,33 @@ public class HashTableTest {
 
         testTable.clear();
         assertEquals(0, testTable.size());
+    }
+
+    @Test
+    public void PuttingNullShouldThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> testTable.put(null, "b"));
+        assertThrows(IllegalArgumentException.class, () -> testTable.put("a", null));
+        assertThrows(IllegalArgumentException.class, () -> testTable.put(null, null));
+    }
+
+    @Test
+    public void GettingNullShouldThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> testTable.get(null));
+        testTable.put("5", "6");
+        assertThrows(IllegalArgumentException.class, () -> testTable.get(null));
+    }
+
+    @Test
+    public void ContainsNullShouldThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> testTable.contains(null));
+        testTable.put("5", "6");
+        assertThrows(IllegalArgumentException.class, () -> testTable.contains(null));
+    }
+
+    @Test
+    public void RemoveNullShouldThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> testTable.remove(null));
+        testTable.put("5", "6");
+        assertThrows(IllegalArgumentException.class, () -> testTable.remove(null));
     }
 }
