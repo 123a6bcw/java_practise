@@ -27,12 +27,6 @@ public class HashTable {
     private List[] data;
 
     /**
-     * Just some tests to make sure it works correctly.
-     */
-    public static void main(String[] args) {
-    }
-
-    /**
      * creates HashTable with given capacity, 0 size and array of 'capacity' empty Lists.
      */
     public HashTable(int capacity) {
