@@ -38,9 +38,9 @@ public class List implements Iterable<StringPair> {
     }
 
     /**
-     * @param key object's key
      * returns Node with given key or null if there is no such node
      * works in O(length)
+     * @param key object's key
      */
     private Node find(int key) {
         for (var x = head; x != null; x = x.getNext()) {
@@ -53,18 +53,18 @@ public class List implements Iterable<StringPair> {
     }
 
     /**
-     * @param key object's key
      * returns true if list contains object with given key, false otherwise
      * works in O(length)
+     * @param key object's key
      */
     public boolean contains(int key) {
         return find(key) != null;
     }
 
     /**
-     * @param key object's key
      * returns value of object with given key or null if there is no such object
      * works in O(length)
+     * @param key object's key
      */
     public String get(int key) {
         Node found = find(key);
@@ -76,12 +76,12 @@ public class List implements Iterable<StringPair> {
     }
 
     /**
-     * @param key object's key
-     * @param value object's value
      * inserts new object with given key and value into list if there wasn't an object with such key
      * otherwise overrides value of object with given key
      * returns old value of object with given key, null if there wasn't such object
      * works in O(length)
+     * @param key object's key
+     * @param value object's value
      */
     public String insert(int key, String value) {
         if (value == null) {
@@ -100,9 +100,9 @@ public class List implements Iterable<StringPair> {
     }
 
     /**
-     * @param node object with key and value
      * adds new object to the end of the list
      * works in O(1) and does not check existence of object's with same key
+     * @param node object with key and value
      */
     private void push(Node node) {
         if (empty()) {
@@ -117,10 +117,10 @@ public class List implements Iterable<StringPair> {
     }
 
     /**
-     * @param key object's key
-     * @param value object's value
      * push object with given key and value to the end of the list
      * works in O(1)
+     * @param key object's key
+     * @param value object's value
      */
     public void push(int key, String value) {
         if (value == null) {
@@ -132,19 +132,19 @@ public class List implements Iterable<StringPair> {
     }
 
     /**
-     * @param pair pair of object's key and value
      * push object with given key and value (packed inside StringPair) to the end of the list
      * works in O(1)
+     * @param pair pair of object's key and value
      */
     public void push(StringPair pair) {
         push(pair.getKey(), pair.getValue());
     }
 
     /**
-     * @param key object's key
      * removes object with given key from the list
      * returns value of deleted object or null if object wasn't found
      * works in O(length)
+     * @param key object's key
      */
     public String remove(int key) {
         Node prev = null; //previous Node in list, cause we don't store left connections

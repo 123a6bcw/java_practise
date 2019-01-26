@@ -65,8 +65,8 @@ public class HashTable {
     }
 
     /**
-     * @param key object's key.
      * returns 'true' if table contains object with given key, 'false' otherwise.
+     * @param key object's key.
      */
     public boolean contains(String key) {
         if (key == null) {
@@ -78,8 +78,8 @@ public class HashTable {
     }
 
     /**
-     * @param key object's key.
      * returns value of object with given key.
+     * @param key object's key.
      */
     public String get(String key) {
         if (key == null) {
@@ -91,10 +91,10 @@ public class HashTable {
     }
 
     /**
-     * @param key object's key
-     * @param value object's value
      * Puts an object into table with given key if there is no object with the same key, otherwise overrides it's value
      * returns old value of object from table or null if there was no such one
+     * @param key object's key
+     * @param value object's value
      */
     public String put(String key, String value) {
         if (key == null) {
@@ -119,9 +119,9 @@ public class HashTable {
     }
 
     /**
-     * @param key object's key
      * removes an object from the table with given key
      * returns value of deleted object or null if there was no such object
+     * @param key object's key
      */
     public String remove(String key) {
         if (key == null) {
