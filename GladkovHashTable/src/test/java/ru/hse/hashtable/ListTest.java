@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ListTest {
-    List testList;
+    private List testList;
 
     @BeforeEach
     public void initialise() {
