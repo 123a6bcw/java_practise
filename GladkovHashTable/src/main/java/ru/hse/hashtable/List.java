@@ -230,7 +230,7 @@ public class List implements Iterable<StringPair> {
     /**
      * object in list.
      */
-    private class Node {
+    private static class Node {
         private final int key;
         private String value;
         private Node next; /** next object in list. */
