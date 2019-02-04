@@ -1,5 +1,8 @@
 package ru.hse.hw3.trie;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 
 /**
@@ -25,7 +28,8 @@ public class Trie {
      * Tries to find the longest prefix of element that exists in trie (not necessary as terminal string)
      * Returns a pair (packed in special class) of found Node and corresponding element's prefix
      */
-    private ParsedNode findDeepestExistingNode(String element) {
+    @NotNull
+    private ParsedNode findDeepestExistingNode(@NotNull String element) {
         Node currentNode = root;
         for (int i = 0; i < element.length(); i++) {
             Node sonNode = currentNode.getSonNode(element.charAt(i));
@@ -46,11 +50,12 @@ public class Trie {
         private Node parsedNode;
         private int parsedPrefix;
 
-        private ParsedNode(Node parsedNode, int parsedPrefix) {
+        private ParsedNode(@NotNull Node parsedNode, int parsedPrefix) {
             this.parsedNode = parsedNode;
             this.parsedPrefix = parsedPrefix;
         }
 
+        @NotNull
         private Node getParsedNode() {
             return parsedNode;
         }
@@ -88,6 +93,7 @@ public class Trie {
         /**
          * By char gives Node representing corresponding child string for this node.
          */
+        @Nullable
         private Node getSonNode(char key) {
             return sonNodes.get(key);
         }
@@ -95,6 +101,7 @@ public class Trie {
         /**
          * Creates new empty Node with given key, throws exception if Node with given key already exists.
          */
+        @NotNull
         private Node createSonNode(char key, boolean isTerminal) {
             /*
             Should I throw IllegalArgumentExceptions etc in the non-public interface or I may avoid it for optimisation purposes?
@@ -103,6 +110,7 @@ public class Trie {
                 throw new IllegalArgumentException("Can't create son node cause node with given key already exists");
             }
 
+            //noinspection ConstantConditions --- there is no need since we checking not nullability in the above if statement.
             return sonNodes.put(key, new Node());
         }
 
@@ -112,6 +120,20 @@ public class Trie {
         private void increaseTerminality() {
             size++;
             terminalSize++;
+        }
+
+        /**
+         * Returns true if there is no terminal strings in given subtree
+         */
+        private boolean isEmpty() {
+            return size == 0;
+        }
+
+        /**
+         * Return true if there is terminal string ended in this Node.
+         */
+        private  boolean isTerminal() {
+            return terminalSize > 0;
         }
     }
 }
