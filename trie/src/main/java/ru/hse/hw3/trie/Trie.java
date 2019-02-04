@@ -253,7 +253,7 @@ public class Trie {
         }
 
         /**
-         * increase size by 1 if changeSize is 1, decrease by -1 if changeSize is -1, does nothing if changeSize is 0.
+         * Increase size by 1 if changeSize is 1, decrease by -1 if changeSize is -1, does nothing if changeSize is 0.
          * Throws exception in any other case.
          */
         private void changeSize(int changeSize) {
