@@ -151,6 +151,9 @@ public class Trie implements MySerializable {
         return parsedNode.getParsedNode().getSize();
     }
 
+    /**
+     * Returns true if two tries is equal as collections of terminal strings
+     */
     public boolean equals(Trie another) {
         if (another == null) {
             return false;
