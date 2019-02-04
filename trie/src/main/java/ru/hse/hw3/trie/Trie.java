@@ -104,7 +104,7 @@ public class Trie {
     }
 
     /**
-     * true if trie contains given terminal string
+     * True if trie contains given terminal string
      */
     public boolean contains(@NotNull String element) {
         ParsedNode parsedNode = findDeepestExistingNode(element, 0);
