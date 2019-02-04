@@ -118,6 +118,23 @@ class TrieTest {
         assertTrue(trie.contains(""));
     }
 
+    @Test
+    void addsExistingElementReturnFalse() {
+        trie.add("abc");
+        assertFalse(trie.add("abc"));
+        trie.add("");
+        assertFalse(trie.add(""));
+    }
+
+    @Test
+    void addsNewElementsReturnsTrue() {
+        assertTrue(trie.add("abc"));
+        assertTrue(trie.add("bc"));
+        assertTrue(trie.add("a"));
+        assertTrue(trie.add(""));
+        assertTrue(trie.add("abcd"));
+    }
+
 
     @Test
     void containsInEmptyTrieReturnsFalse() {
