@@ -210,7 +210,7 @@ public class Trie implements MySerializable {
         }
 
         /**
-         * Creates new empty Node with given key, throws exception if Node with given key already exists.
+         * Creates new empty Node with given key and put it to Node son's, throws exception if Node with given key already exists.
          * Return created node
          */
         @NotNull
