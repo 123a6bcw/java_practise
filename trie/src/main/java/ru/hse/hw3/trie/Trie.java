@@ -245,6 +245,18 @@ public class Trie {
         }
 
         /**
+         * increase size by 1 if changeSize is 1, decrease by -1 if changeSize is -1, does npthing otherwise
+         */
+        private void changeSize(int changeSize) {
+            if (changeSize == 1) {
+                increaseSize();
+            } else
+            if (changeSize == -1) {
+                decreaseSize();
+            }
+        }
+
+        /**
          * Returns number of terminal string in this subtree
          */
         private int getSize() {
@@ -270,15 +282,6 @@ public class Trie {
          */
         private int getTerminality() {
             return terminalSize;
-        }
-
-        private void changeSize(int changeSize) {
-            if (changeSize == 1) {
-                increaseSize();
-            } else
-            if (changeSize == -1) {
-                decreaseSize();
-            }
         }
     }
 }
