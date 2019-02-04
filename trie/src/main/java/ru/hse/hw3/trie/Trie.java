@@ -107,7 +107,9 @@ public class Trie {
      * true if trie contains given terminal string
      */
     public boolean contains(@NotNull String element) {
-        return findDeepestExistingNode(element, 0).getParsedPrefix() == element.length();
+        ParsedNode parsedNode = findDeepestExistingNode(element, 0);
+        return parsedNode.getParsedPrefix() == element.length() &&
+                parsedNode.getParsedNode().isTerminal();
     }
 
     /**
@@ -131,6 +133,19 @@ public class Trie {
      */
     public int size() {
         return root.getSize();
+    }
+
+    /**
+     * Returns number of terminal strings started with given prefix
+     * Return zero if Trie does not contains given string as prefix of any terminal string
+     */
+    public int howManyStartsWithPrefix(@NotNull String prefix) {
+        ParsedNode parsedNode = findDeepestExistingNode(prefix, 0);
+        if (parsedNode.getParsedPrefix() != prefix.length()) {
+            return 0;
+        }
+
+        return parsedNode.getParsedNode().getSize();
     }
 
     /**
