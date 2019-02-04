@@ -111,6 +111,22 @@ public class Trie {
     }
 
     /**
+     * Removes given terminal string from trie.
+     * Return false if there was no such terminal string in trie.
+     */
+    public boolean remove(@NotNull String element) {
+        if (!contains(element)) {
+            return false;
+        }
+
+        /*
+        Since we checked trie contains given string as terminal, it surely contains corresponding Node, so we should just decrease sizes of Nodes
+         */
+        findDeepestExistingNode(element, -1);
+        return true;
+    }
+
+    /**
      * Class representing the node inside trie.
      */
     private class Node {
