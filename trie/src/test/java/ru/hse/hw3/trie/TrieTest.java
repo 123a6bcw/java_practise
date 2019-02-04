@@ -70,9 +70,9 @@ class TrieTest {
         trie.remove("f");
         trie.remove("e");
         assertEquals(3, trie.size());
-        trie.add("longString !!! with Strange &&&&***!!! characters");
+        trie.add("abc");
         assertEquals(4, trie.size());
-        trie.remove("longString !!! with Strange &&&&***!!! characters");
+        trie.remove("abc");
         trie.remove("a");
         trie.remove("b");
         trie.remove("a");

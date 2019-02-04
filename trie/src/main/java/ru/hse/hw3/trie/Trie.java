@@ -40,12 +40,7 @@ public class Trie {
 
         Node currentNode = root;
         for (int i = 0; i < element.length(); i++) {
-            if (changeSize == 1) {
-                currentNode.increaseSize();
-            } else
-            if (changeSize == -1) {
-                currentNode.decreaseSize();
-            }
+            currentNode.changeSize(changeSize);
 
             Node sonNode = currentNode.getSonNode(element.charAt(i));
             if (sonNode == null) {
@@ -63,6 +58,7 @@ public class Trie {
             }
         }
 
+        currentNode.changeSize(changeSize);
         return new ParsedNode(currentNode, element.length()); //Trie contains entire given string (as prefix of terminal).
     }
 
@@ -124,7 +120,7 @@ public class Trie {
         /*
         Since we checked trie contains given string as terminal, it surely contains corresponding Node, so we should just decrease sizes of Nodes and probably delete some
          */
-        findDeepestExistingNode(element, -1);
+        findDeepestExistingNode(element, -1).getParsedNode().decreaseTerminality();
         return true;
     }
 
@@ -274,6 +270,15 @@ public class Trie {
          */
         private int getTerminality() {
             return terminalSize;
+        }
+
+        private void changeSize(int changeSize) {
+            if (changeSize == 1) {
+                increaseSize();
+            } else
+            if (changeSize == -1) {
+                decreaseSize();
+            }
         }
     }
 }
