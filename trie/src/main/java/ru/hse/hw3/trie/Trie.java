@@ -239,6 +239,10 @@ public class Trie implements MySerializable {
          * Checks if subtree of this node is equal to subtree of some other node
          */
         private boolean equals(Node other) {
+            if (other == null) {
+                return false;
+            }
+
             if (!(size == other.size && terminalSize == other.terminalSize)) {
                 return false;
             }
