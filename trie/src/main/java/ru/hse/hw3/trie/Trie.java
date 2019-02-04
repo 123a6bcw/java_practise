@@ -2,9 +2,18 @@ package ru.hse.hw3.trie;
 
 import java.util.HashMap;
 
+/**
+ * Class-collection of Strings using the trie algorithm.
+ *
+ * Abstractly, one may see this class as an expanding array of strings. Let's call strings added by method "add(String element)"
+ * as "terminal strings". Method "add" will strictly increase number of terminal strings by 1 (which allows one to store duplicated strings),
+ * and method "remove(String element)" can only remove terminal string if this string stored in trie as a terminal string.
+ *
+ * As one can expect that from trie, limited work with the prefixes of terminal strings is supported, too.
+ */
 public class Trie {
     /**
-     * root of the trie
+     * Root of the trie
      */
     private Node root;
 
