@@ -335,7 +335,7 @@ public class Trie implements MySerializable {
             return terminalSize;
         }
 
-        public void setTerminality(int terminality) {
+        private void setTerminality(int terminality) {
             this.terminalSize = terminality;
         }
     }
