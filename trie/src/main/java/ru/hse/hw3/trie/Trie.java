@@ -104,6 +104,13 @@ public class Trie {
     }
 
     /**
+     * true if trie contains given terminal string
+     */
+    public boolean contains(@NotNull String element) {
+        return findDeepestExistingNode(element, 0).getParsedPrefix() == element.length();
+    }
+
+    /**
      * Class representing the node inside trie.
      */
     private class Node {
