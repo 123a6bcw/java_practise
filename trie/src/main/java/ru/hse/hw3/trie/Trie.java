@@ -99,7 +99,7 @@ public class Trie {
         }
 
         currentNode.increaseTerminality();
-        return currentNode.getTerminality() > 1;
+        return currentNode.getTerminality() == 1;
     }
 
     /**
