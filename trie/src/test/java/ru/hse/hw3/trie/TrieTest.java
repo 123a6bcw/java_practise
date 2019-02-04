@@ -278,16 +278,114 @@ class TrieTest {
     }
 
     @Test
-    void serialiseEmptyTrie() throws IOException {
+    void equalOnEmptyTriesReturnsTrue() throws IOException {
+        assertTrue(trie.equals(anotherTrie));
+        assertTrue(anotherTrie.equals(trie));
+    }
+
+    @Test
+    void equalOnEmptyAndNonEmptyTriesReturnsFalse() throws IOException {
+        trie.add("a");
+        assertFalse(trie.equals(anotherTrie));
+    }
+
+    @Test
+    void equalOnEmptyAndEmptyAfterClearTriesReturnsTrue() throws IOException {
+        trie.add("a");
+        trie.add("abc");
+        trie.add("c");
+        trie.remove("a");
+        trie.remove("abc");
+        trie.remove("c");
+        assertTrue(trie.equals(anotherTrie));
+    }
+
+    @Test
+    void equalOnOneDuplicatedElements() throws IOException {
+        trie.add("a");
+        trie.add("a");
+        anotherTrie.add("a");
+        anotherTrie.add("a");
+        assertTrue(trie.equals(anotherTrie));
+        anotherTrie.remove("a");
+        anotherTrie.remove("a");
+        anotherTrie.add("b");
+        anotherTrie.add("b");
+        assertFalse(trie.equals(anotherTrie));
+    }
+
+    private void makeBigTrie(Trie trie) {
+        trie.add("a");
+        trie.add("abc");
+        trie.add("bcdagfh");
+        trie.add("abcde");
+        trie.add("aaaaaa");
+        trie.add("bbb");
+        trie.add("bcdaaaa");
+    }
+
+    @Test
+    void equalOnBigTries() throws IOException {
+        makeBigTrie(trie);
+        makeBigTrie(anotherTrie);
+        assertTrue(trie.equals(anotherTrie));
+        assertTrue(anotherTrie.equals(trie));
+
+        trie.remove("bbb");
+        assertFalse(trie.equals(anotherTrie));
+        anotherTrie.remove("bbb");
+        assertTrue(anotherTrie.equals(trie));
+    }
+
+    /**
+     * Serialise trie to output stream and deserialise from here anotherTrie
+     */
+    private void convertTrieToAnotherTrie(Trie trie, Trie anotherTrie) throws IOException {
         try (var output = new ByteArrayOutputStream()) {
             trie.serialize(output);
+            output.flush();
 
             try (var input = new ByteArrayInputStream(output.toByteArray())) {
                 anotherTrie.deserialize(input);
-
-
             }
         }
     }
 
+    @Test
+    void serialiseEmptyTrie() throws IOException {
+        convertTrieToAnotherTrie(trie, anotherTrie);
+        assertTrue(trie.equals(anotherTrie));
+    }
+
+    @Test
+    void serialiseOneElementTrie() throws IOException {
+        trie.add("a");
+        convertTrieToAnotherTrie(trie, anotherTrie);
+        assertTrue(trie.equals(anotherTrie));
+    }
+
+    @Test
+    void serialiseDuplicatedElementsTrie() throws IOException {
+        trie.add("a");
+        trie.add("abc");
+        trie.add("abc");
+        convertTrieToAnotherTrie(trie, anotherTrie);
+        assertTrue(trie.equals(anotherTrie));
+    }
+
+    @Test
+    void serialiseBigTrie() throws IOException {
+        makeBigTrie(trie);
+        convertTrieToAnotherTrie(trie, anotherTrie);
+        assertTrue(trie.equals(anotherTrie));
+    }
+
+    @Test
+    void deserialiseTwice() throws IOException {
+        makeBigTrie(trie);
+        convertTrieToAnotherTrie(trie, anotherTrie);
+        trie.remove("bbb");
+        convertTrieToAnotherTrie(trie, anotherTrie);
+        assertTrue(trie.equals(anotherTrie));
+    }
 }
