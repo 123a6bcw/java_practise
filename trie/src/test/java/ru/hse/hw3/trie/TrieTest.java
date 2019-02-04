@@ -147,11 +147,6 @@ class TrieTest {
     }
 
     @Test
-    void containsNullThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> trie.contains(null));
-    }
-
-    @Test
     void containsNotAddedEmptyStringReturnsFalse() {
         trie.add("a");
         assertFalse(trie.contains(""));
