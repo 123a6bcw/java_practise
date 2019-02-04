@@ -127,6 +127,13 @@ public class Trie {
     }
 
     /**
+     * Returns number of terminal strings in Trie
+     */
+    public int size() {
+        return root.getSize();
+    }
+
+    /**
      * Class representing the node inside trie.
      */
     private class Node {
