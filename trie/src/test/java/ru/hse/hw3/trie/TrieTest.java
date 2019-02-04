@@ -192,15 +192,21 @@ class TrieTest {
     Main functionality was tested above, so just cimple tests
      */
     @Test
-    void removeInEmptyTrieDoesNotThrow() {
-        assertDoesNotThrow(() -> trie.remove("abc"));
+    void removeInEmptyTrieReturnsFalse() {
+        assertFalse(trie.remove("abc"));
     }
 
     @Test
-    void removeExistedElementTwiceDoesNotThrow() {
+    void removeExistedElementReturnsTrue() {
         trie.add("abc");
-        assertDoesNotThrow(() -> trie.remove("abc"));
-        assertDoesNotThrow(() -> trie.remove("abc"));
+        assertTrue(trie.remove("abc"));
+        assertFalse(trie.remove("abc"));
+        trie.add("a");
+        trie.add("");
+        trie.add("abcd");
+        assertTrue(trie.remove("a"));
+        assertTrue(trie.remove(""));
+        assertTrue(trie.remove("abcd"));
     }
 
     @Test
