@@ -1,22 +1,22 @@
 package ru.hse.hw3.trie;
 
+import java.util.HashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-
 /**
  * Class-collection of Strings using the trie algorithm.
- *
- * Abstractly, one may see this class as an expanding array of strings. Let's call strings added by method "add(String element)"
- * as "terminal strings". Method "add" will strictly increase number of terminal strings by 1 (which allows one to store duplicated strings),
- * and method "remove(String element)" can only remove terminal string if this string stored in trie as a terminal string.
- *
+ * <p></p>
+ * Abstractly, one may see this class as an expanding array of strings. Let's call strings added by method
+ * "add(String element)" as "terminal strings". Method "add" will strictly increase number of terminal strings by
+ * 1 (which allows one to store duplicated strings), and method "remove(String element)" can only remove terminal
+ * string if this string stored in trie as a terminal string.
+ * <p></p>
  * As one can expect that from trie, limited work with the prefixes of terminal strings is supported, too.
  */
 public class Trie {
     /**
-     * Root of the trie
+     * Root of the trie.
      */
     private Node root;
 
@@ -26,10 +26,11 @@ public class Trie {
 
     /**
      * Tries to find the longest prefix of element that exists in trie (not necessary as terminal string)
-     *
-     * If changeSize is 0, does not change sizes of nodes, changeSize is 1, increase it by 1 (using to add new string to trie),
-     * if changeSize if -1, decrease it by 1 (using to remove terminal string from trie after making sure this terminal string exists), in any other case throws exception
-     *
+     * <p></p>
+     * If changeSize is 0, does not change sizes of nodes, changeSize is 1, increase it by 1 (using to add
+     * new string to trie), if changeSize if -1, decrease it by 1 (using to remove terminal string from trie
+     * after making sure this terminal string exists), in any other case throws exception
+     * <p></p>
      * Returns a pair (packed in special class) of found Node and corresponding element's prefix.
      */
     @NotNull
@@ -48,7 +49,8 @@ public class Trie {
             } else {
                 if (changeSize == -1 && sonNode.getSize() == 1) {
                     /*
-                    Son node represents only one terminal string and it's going to be deleted, so we erasing memory by deleting reference to it
+                    Son node represents only one terminal string and it's going to be deleted, so we erasing memory
+                    by deleting reference to it
                     Since we always deletes son nodes, root of the trie will never be deleted
                     */
                     currentNode.removeSonNode(element.charAt(i));
@@ -85,11 +87,12 @@ public class Trie {
     }
 
     /**
-     * Adds terminal string to the trie
-     * Returns true if Trie already contained given terminal string
+     * Adds terminal string to the trie.
+     * Returns true if Trie already contained given terminal string.
      */
     public boolean add(@NotNull String element) {
-        ParsedNode parsedNode = findDeepestExistingNode(element, 1); //I believe type of this variable is not obvious from the context so I'm not using var on purpose
+        //I believe type of this variable is not obvious from the context so I'm not using var on purpose
+        ParsedNode parsedNode = findDeepestExistingNode(element, 1);
         Node currentNode = parsedNode.getParsedNode();
         for (int i = parsedNode.getParsedPrefix(); i < element.length(); i++) {
             currentNode = currentNode.createSonNode(element.charAt(i));
@@ -100,12 +103,12 @@ public class Trie {
     }
 
     /**
-     * True if trie contains given terminal string
+     * True if trie contains given terminal string.
      */
     public boolean contains(@NotNull String element) {
         ParsedNode parsedNode = findDeepestExistingNode(element, 0);
-        return parsedNode.getParsedPrefix() == element.length() &&
-                parsedNode.getParsedNode().isTerminal();
+        return parsedNode.getParsedPrefix() == element.length()
+                && parsedNode.getParsedNode().isTerminal();
     }
 
     /**
@@ -118,22 +121,23 @@ public class Trie {
         }
 
         /*
-        Since we checked trie contains given string as terminal, it surely contains corresponding Node, so we should just decrease sizes of Nodes and probably delete some
+        Since we checked trie contains given string as terminal, it surely contains corresponding Node, so
+        we should just decrease sizes of Nodes and probably delete some
          */
         findDeepestExistingNode(element, -1).getParsedNode().decreaseTerminality();
         return true;
     }
 
     /**
-     * Returns number of terminal strings in Trie
+     * Returns number of terminal strings in Trie.
      */
     public int size() {
         return root.getSize();
     }
 
     /**
-     * Returns number of terminal strings started with given prefix
-     * Return zero if Trie does not contains given string as prefix of any terminal string
+     * Returns number of terminal strings started with given prefix.
+     * Return zero if Trie does not contains given string as prefix of any terminal string.
      */
     public int howManyStartsWithPrefix(@NotNull String prefix) {
         ParsedNode parsedNode = findDeepestExistingNode(prefix, 0);
@@ -154,23 +158,25 @@ public class Trie {
         private HashMap<Character, Node> sonNodes;
 
         /**
-         * How many terminal strings ended somewhere in subtree of this Node
+         * How many terminal strings ended somewhere in subtree of this Node.
          */
         private int size;
 
         /**
-         * How many terminal strings ended exactly in this Node
+         * How many terminal strings ended exactly in this Node.
          */
         private int terminalSize;
 
         private Node() {
             sonNodes = new HashMap<>();
-            size = 1; //All nodes except for root should always be creating and existing to represent some stored string (size > 0)
+            //All nodes except for root should always be creating and existing to represent some stored string (size > 0)
+            size = 1;
             terminalSize = 0;
         }
 
         /**
-         * Root remains the only exception where size of the Node could be zero. This constructor supposed to be only for root Node
+         * Root remains the only exception where size of the Node could be zero.
+         * This constructor supposed to be only for root Node.
          */
         private Node(boolean isRoot) {
             this();
@@ -231,21 +237,21 @@ public class Trie {
         }
 
         /**
-         * Marks that one more terminal string ends in this subtree
+         * Marks that one more terminal string ends in this subtree.
          */
         private void increaseSize() {
             size++;
         }
 
         /**
-         * Marks that string was deleted from this subtree
+         * Marks that string was deleted from this subtree.
          */
         private void decreaseSize() {
             size--;
         }
 
         /**
-         * increase size by 1 if changeSize is 1, decrease by -1 if changeSize is -1, does npthing otherwise
+         * increase size by 1 if changeSize is 1, decrease by -1 if changeSize is -1, does nothing otherwise.
          */
         private void changeSize(int changeSize) {
             if (changeSize == 1) {
@@ -257,14 +263,14 @@ public class Trie {
         }
 
         /**
-         * Returns number of terminal string in this subtree
+         * Returns number of terminal string in this subtree.
          */
         private int getSize() {
             return size;
         }
 
         /**
-         * Returns true if there is no terminal strings in given subtree
+         * Returns true if there is no terminal strings in given subtree.
          */
         private boolean isEmpty() {
             return size == 0;
@@ -278,7 +284,7 @@ public class Trie {
         }
 
         /**
-         * Returns number of terminal strings ended in this Node
+         * Returns number of terminal strings ended in this Node.
          */
         private int getTerminality() {
             return terminalSize;
