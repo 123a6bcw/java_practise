@@ -1,6 +1,9 @@
 package ru.hse.hw3.trie;
 
+import java.io.*;
 import java.util.HashMap;
+import java.util.Map;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
  * <p></p>
  * As one can expect that from trie, limited work with the prefixes of terminal strings is supported, too.
  */
-public class Trie {
+public class Trie implements MySerializable {
     /**
      * Root of the trie.
      */
@@ -63,6 +66,46 @@ public class Trie {
         currentNode.changeSize(changeSize);
         return new ParsedNode(currentNode, element.length()); //Trie contains entire given string (as prefix of terminal).
     }
+
+    @Override
+    public void serialize(OutputStream out) throws IOException {
+        writeNode(root, new DataOutputStream(out));
+    }
+
+    private void writeNode(Node node, DataOutputStream out) throws IOException {
+        out.writeInt(node.sonNodes.size());
+        out.writeChar(' ');
+        out.writeInt(node.size);
+        out.writeChar(' ');
+        out.writeInt(node.terminalSize);
+        //I think type is not obvious from context so I'm not using var on purpose
+        for (Map.Entry<Character, Node> entry : node.sonNodes.entrySet()) {
+            out.writeChar(' ');
+            out.writeChar(entry.getKey());
+            out.writeChar(' ');
+            writeNode(entry.getValue(), out);
+        }
+    }
+
+    @Override
+    public void deserialize(InputStream in) throws IOException {
+        root = readNode(new DataInputStream(in));
+    }
+
+    private Node readNode(DataInputStream in) throws IOException {
+        var node = new Node();
+        int sonsNumber = in.readInt();
+        node.setSize(in.readInt());
+        node.setTerminality(in.readInt());
+        for (int i = 0; i < sonsNumber; i++) {
+            Character sonCharacter = in.readChar();
+            Node sonNode = readNode(in);
+            node.sonNodes.put(sonCharacter, sonNode);
+        }
+
+        return node;
+    }
+
 
     /**
      * Class for storing pair of found Node and prefix of element using in findDeepestExistingNode method
@@ -276,6 +319,13 @@ public class Trie {
         }
 
         /**
+         * Set number of terminal string in subtree (may corrupt trie. Use only in deserialisation)
+         */
+        private void setSize(int size) {
+            this.size = size;
+        }
+
+        /**
          * Returns true if there is no terminal strings in given subtree.
          */
         private boolean isEmpty() {
@@ -294,6 +344,10 @@ public class Trie {
          */
         private int getTerminality() {
             return terminalSize;
+        }
+
+        public void setTerminality(int terminality) {
+            this.terminalSize = terminality;
         }
     }
 }
