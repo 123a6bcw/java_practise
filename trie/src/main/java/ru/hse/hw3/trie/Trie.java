@@ -70,7 +70,7 @@ public class Trie implements MySerializable {
     /**
      * Class for storing pair of found Node and prefix of element using in findDeepestExistingNode method
      */
-    private class ParsedNode {
+    private static class ParsedNode {
         private Node parsedNode;
         private int parsedPrefix;
 
@@ -165,7 +165,7 @@ public class Trie implements MySerializable {
     /**
      * Class representing the node inside trie.
      */
-    private class Node {
+    private static class Node {
         /**
          * By char gives Node representing corresponding child string for this node.
          */
