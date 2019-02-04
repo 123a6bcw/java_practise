@@ -21,7 +21,7 @@ public class Trie {
     private Node root;
 
     public Trie() {
-        root = new Node();
+        root = new Node(true);
     }
 
     /**
@@ -169,9 +169,20 @@ public class Trie {
 
         private Node() {
             sonNodes = new HashMap<>();
-            size = 1; //Nodes should always be creating and existing to represent some stored string
+            size = 1; //All nodes except for root should always be creating and existing to represent some stored string (size > 0)
             terminalSize = 0;
         }
+
+        /**
+         * Root remains the only exception where size of the Node could be zero. This constructor supposed to be only for root Node
+         */
+        private Node(boolean isRoot) {
+            this();
+            if (isRoot) {
+                size = 0;
+            }
+        }
+
 
         /**
          * By char gives Node representing corresponding child string for this node.
