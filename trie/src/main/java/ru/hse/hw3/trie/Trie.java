@@ -93,7 +93,7 @@ public class Trie {
      * Returns true if Trie already contained given terminal string
      */
     public boolean add(@NotNull String element) {
-        ParsedNode parsedNode = findDeepestExistingNode(element, 1);
+        ParsedNode parsedNode = findDeepestExistingNode(element, 1); //I believe type of this variable is not obvious from the context so I'm not using var on purpose
         Node currentNode = parsedNode.getParsedNode();
         for (int i = parsedNode.getParsedPrefix(); i < element.length(); i++) {
             currentNode = currentNode.createSonNode(element.charAt(i));
@@ -193,8 +193,9 @@ public class Trie {
                 throw new IllegalArgumentException("Can't create son node cause node with given key already exists");
             }
 
-            //noinspection ConstantConditions --- there is no need since we checking not nullability in the above if statement.
-            return sonNodes.put(key, new Node());
+            var newNode = new Node();
+            sonNodes.put(key, newNode);
+            return newNode;
         }
 
         /**
