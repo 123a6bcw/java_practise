@@ -151,6 +151,14 @@ public class Trie implements MySerializable {
         return parsedNode.getParsedNode().getSize();
     }
 
+    public boolean equals(Trie another) {
+        if (another == null) {
+            return false;
+        }
+
+        return root.equals(another.root);
+    }
+
     /**
      * Class representing the node inside trie.
      */
@@ -225,6 +233,27 @@ public class Trie implements MySerializable {
             }
 
             sonNodes.remove(key);
+        }
+
+        /**
+         * Checks if subtree of this node is equal to subtree of some other node
+         */
+        private boolean equals(Node other) {
+            if (!(size == other.size && terminalSize == other.terminalSize)) {
+                return false;
+            }
+
+            for (Map.Entry<Character, Node> entry : sonNodes.entrySet()) {
+                if (!other.sonNodes.containsKey(entry.getKey())) {
+                    return false;
+                }
+
+                if (!entry.getValue().equals(other.sonNodes.get(entry.getKey()))) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /**
@@ -315,14 +344,14 @@ public class Trie implements MySerializable {
      * Writes trie to output stream as sequence of bytes
      */
     @Override
-    public void serialize(OutputStream out) throws IOException {
+    public void serialize(@NotNull OutputStream out) throws IOException {
         writeNode(root, new DataOutputStream(out));
     }
 
     /**
      * Writes Node and all it's childs to output stream
      */
-    private void writeNode(Node node, DataOutputStream out) throws IOException {
+    private void writeNode(@NotNull Node node, @NotNull DataOutputStream out) throws IOException {
         out.writeInt(node.sonNodes.size());
         out.writeChar(' ');
         out.writeInt(node.size);
@@ -341,14 +370,14 @@ public class Trie implements MySerializable {
      * Reads trie from input stream
      */
     @Override
-    public void deserialize(InputStream in) throws IOException {
+    public void deserialize(@NotNull InputStream in) throws IOException {
         root = readNode(new DataInputStream(in));
     }
 
     /**
      * Reads node and all it's child from input stream
      */
-    private Node readNode(DataInputStream in) throws IOException {
+    private Node readNode(@NotNull DataInputStream in) throws IOException {
         var node = new Node();
         int sonsNumber = in.readInt();
         node.setSize(in.readInt());

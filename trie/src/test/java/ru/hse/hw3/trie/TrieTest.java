@@ -1,11 +1,15 @@
 package ru.hse.hw3.trie;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TrieTest {
     private Trie trie = new Trie();
+    private Trie anotherTrie = new Trie();
 
     @Test
     void sizeOfEmptyTrieReturnZero() {
@@ -271,6 +275,19 @@ class TrieTest {
         assertEquals(1, trie.howManyStartsWithPrefix("bbb"));
         assertEquals(0, trie.howManyStartsWithPrefix("ca"));
         assertEquals(0, trie.howManyStartsWithPrefix("d"));
+    }
+
+    @Test
+    void serialiseEmptyTrie() throws IOException {
+        try (var output = new ByteArrayOutputStream()) {
+            trie.serialize(output);
+
+            try (var input = new ByteArrayInputStream(output.toByteArray())) {
+                anotherTrie.deserialize(input);
+
+
+            }
+        }
     }
 
 }
