@@ -51,8 +51,6 @@ public class Trie {
             if (sonNode == null) {
                 return new ParsedNode(currentNode, i);
             } else {
-                currentNode = sonNode;
-
                 if (changeSize == -1 && sonNode.getSize() == 1) {
                     /*
                     Son node represents only one terminal string and it's going to be deleted, so we erasing memory by deleting reference to it
@@ -60,6 +58,8 @@ public class Trie {
                     */
                     currentNode.removeSonNode(element.charAt(i));
                 }
+
+                currentNode = sonNode;
             }
         }
 
@@ -122,7 +122,7 @@ public class Trie {
         }
 
         /*
-        Since we checked trie contains given string as terminal, it surely contains corresponding Node, so we should just decrease sizes of Nodes
+        Since we checked trie contains given string as terminal, it surely contains corresponding Node, so we should just decrease sizes of Nodes and probably delete some
          */
         findDeepestExistingNode(element, -1);
         return true;
