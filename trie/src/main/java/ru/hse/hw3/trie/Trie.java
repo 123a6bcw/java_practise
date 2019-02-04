@@ -103,7 +103,7 @@ public class Trie {
     }
 
     /**
-     * True if trie contains given terminal string.
+     * True if trie contains given terminal! string.
      */
     public boolean contains(@NotNull String element) {
         ParsedNode parsedNode = findDeepestExistingNode(element, 0);
@@ -176,7 +176,7 @@ public class Trie {
 
         /**
          * Root remains the only exception where size of the Node could be zero.
-         * This constructor supposed to be only for root Node.
+         * This constructor supposed to be only for root Node (if isRoot is false, behave as default constructor).
          */
         private Node(boolean isRoot) {
             this();
@@ -188,6 +188,7 @@ public class Trie {
 
         /**
          * By char gives Node representing corresponding child string for this node.
+         * Returns Null if there is no such son
          */
         @Nullable
         private Node getSonNode(char key) {
@@ -196,6 +197,7 @@ public class Trie {
 
         /**
          * Creates new empty Node with given key, throws exception if Node with given key already exists.
+         * Return created node
          */
         @NotNull
         private Node createSonNode(char key) {
@@ -251,7 +253,8 @@ public class Trie {
         }
 
         /**
-         * increase size by 1 if changeSize is 1, decrease by -1 if changeSize is -1, does nothing otherwise.
+         * increase size by 1 if changeSize is 1, decrease by -1 if changeSize is -1, does nothing if changeSize is 0.
+         * Throws exception in any other case.
          */
         private void changeSize(int changeSize) {
             if (changeSize == 1) {
@@ -259,6 +262,9 @@ public class Trie {
             } else
             if (changeSize == -1) {
                 decreaseSize();
+            } else
+            if (changeSize != 0) {
+                throw new IllegalArgumentException("changeSize should be either 1, -1 or 0");
             }
         }
 
