@@ -353,15 +353,11 @@ public class Trie implements MySerializable {
      */
     private void writeNode(@NotNull Node node, @NotNull DataOutputStream out) throws IOException {
         out.writeInt(node.sonNodes.size());
-        out.writeChar(' ');
         out.writeInt(node.size);
-        out.writeChar(' ');
         out.writeInt(node.terminalSize);
         //I think type is not obvious from context so I'm not using var on purpose
         for (Map.Entry<Character, Node> entry : node.sonNodes.entrySet()) {
-            out.writeChar(' ');
             out.writeChar(entry.getKey());
-            out.writeChar(' ');
             writeNode(entry.getValue(), out);
         }
     }
