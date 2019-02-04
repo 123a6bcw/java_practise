@@ -67,46 +67,6 @@ public class Trie implements MySerializable {
         return new ParsedNode(currentNode, element.length()); //Trie contains entire given string (as prefix of terminal).
     }
 
-    @Override
-    public void serialize(OutputStream out) throws IOException {
-        writeNode(root, new DataOutputStream(out));
-    }
-
-    private void writeNode(Node node, DataOutputStream out) throws IOException {
-        out.writeInt(node.sonNodes.size());
-        out.writeChar(' ');
-        out.writeInt(node.size);
-        out.writeChar(' ');
-        out.writeInt(node.terminalSize);
-        //I think type is not obvious from context so I'm not using var on purpose
-        for (Map.Entry<Character, Node> entry : node.sonNodes.entrySet()) {
-            out.writeChar(' ');
-            out.writeChar(entry.getKey());
-            out.writeChar(' ');
-            writeNode(entry.getValue(), out);
-        }
-    }
-
-    @Override
-    public void deserialize(InputStream in) throws IOException {
-        root = readNode(new DataInputStream(in));
-    }
-
-    private Node readNode(DataInputStream in) throws IOException {
-        var node = new Node();
-        int sonsNumber = in.readInt();
-        node.setSize(in.readInt());
-        node.setTerminality(in.readInt());
-        for (int i = 0; i < sonsNumber; i++) {
-            Character sonCharacter = in.readChar();
-            Node sonNode = readNode(in);
-            node.sonNodes.put(sonCharacter, sonNode);
-        }
-
-        return node;
-    }
-
-
     /**
      * Class for storing pair of found Node and prefix of element using in findDeepestExistingNode method
      */
@@ -349,5 +309,56 @@ public class Trie implements MySerializable {
         public void setTerminality(int terminality) {
             this.terminalSize = terminality;
         }
+    }
+
+    /**
+     * Writes trie to output stream as sequence of bytes
+     */
+    @Override
+    public void serialize(OutputStream out) throws IOException {
+        writeNode(root, new DataOutputStream(out));
+    }
+
+    /**
+     * Writes Node and all it's childs to output stream
+     */
+    private void writeNode(Node node, DataOutputStream out) throws IOException {
+        out.writeInt(node.sonNodes.size());
+        out.writeChar(' ');
+        out.writeInt(node.size);
+        out.writeChar(' ');
+        out.writeInt(node.terminalSize);
+        //I think type is not obvious from context so I'm not using var on purpose
+        for (Map.Entry<Character, Node> entry : node.sonNodes.entrySet()) {
+            out.writeChar(' ');
+            out.writeChar(entry.getKey());
+            out.writeChar(' ');
+            writeNode(entry.getValue(), out);
+        }
+    }
+
+    /**
+     * Reads trie from input stream
+     */
+    @Override
+    public void deserialize(InputStream in) throws IOException {
+        root = readNode(new DataInputStream(in));
+    }
+
+    /**
+     * Reads node and all it's child from input stream
+     */
+    private Node readNode(DataInputStream in) throws IOException {
+        var node = new Node();
+        int sonsNumber = in.readInt();
+        node.setSize(in.readInt());
+        node.setTerminality(in.readInt());
+        for (int i = 0; i < sonsNumber; i++) {
+            Character sonCharacter = in.readChar();
+            Node sonNode = readNode(in);
+            node.sonNodes.put(sonCharacter, sonNode);
+        }
+
+        return node;
     }
 }
