@@ -21,7 +21,44 @@ public class Trie {
         root = new Node();
     }
 
+    /**
+     * Tries to find the longest prefix of element that exists in trie (not necessary as terminal string)
+     * Returns a pair (packed in special class) of found Node and corresponding element's prefix
+     */
+    private ParsedNode findDeepestExistingNode(String element) {
+        Node currentNode = root;
+        for (int i = 0; i < element.length(); i++) {
+            Node sonNode = currentNode.getSonNode(element.charAt(i));
+            if (sonNode == null) {
+                return new ParsedNode(currentNode, i);
+            } else {
+                currentNode = sonNode;
+            }
+        }
 
+        return new ParsedNode(currentNode, element.length());
+    }
+
+    /**
+     * Class for storing pair of found Node and prefix of element using in findDeepestExistingNode method
+     */
+    private class ParsedNode {
+        private Node parsedNode;
+        private int parsedPrefix;
+
+        private ParsedNode(Node parsedNode, int parsedPrefix) {
+            this.parsedNode = parsedNode;
+            this.parsedPrefix = parsedPrefix;
+        }
+
+        private Node getParsedNode() {
+            return parsedNode;
+        }
+
+        private int getParsedPrefix() {
+            return parsedPrefix;
+        }
+    }
 
     /**
      * Class representing the node inside trie.
