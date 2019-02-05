@@ -86,6 +86,10 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
      * Compare objects using given comparator or by asuming objects in set are comparable.
      * If both comparator not specified and objects aren't comparable, throws ClassCastException.
      */
+    /*
+    Causes UncheckedCastWarning because cast may be wrong if user gave set elements with no comparable interface
+    and didn't specify comparator
+     */
     @SuppressWarnings("unchecked")
     private int compare(Object o1, Object o2) {
         if (getComparator() == null) {
@@ -138,24 +142,34 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         }
     }
 
+    /**
+     * Creates iterator for iterating over elements in set in natural order.
+     */
     @NotNull
     @Override
     public Iterator<E> iterator() {
         return new UnbalancedTreeSetIterator(getTreeVersion(), getRightVector());
     }
 
-    @Override
-    public int size() {
-        return getSize();
-    }
-
+    /**
+     * Creates iterator for iterating over elements in set in reversed order
+     */
     @Override
     public Iterator<E> descendingIterator() {
         return new UnbalancedTreeSetIterator(getTreeVersion(), getLeftVector());
     }
 
     /**
-     * Creates the same tree set but in reversed order. Changes of this object reflects reversed object and vice versa
+     * Returns size of the tree. Works in O(1) as tree maintains it's size
+     */
+    @Override
+    public int size() {
+        return getSize();
+    }
+
+    /**
+     * Creates the same tree set but in reversed order. Changes of this object reflects reversed tree and vice versa
+     * Invalidating iterators in one tree will also reflect iterators in another tree.
      */
     @Override
     public UnbalancedTreeSet<E> descendingSet() {
