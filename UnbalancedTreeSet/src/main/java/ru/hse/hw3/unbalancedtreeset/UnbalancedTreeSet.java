@@ -1,14 +1,21 @@
 package ru.hse.hw3.unbalancedtreeset;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Array;
 import java.util.AbstractSet;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
-    Node root;
+    Node root = null;
+    private int version = 0;
+    private Comparator<? super E> comparator;
 
     @Override
     public Iterator<E> iterator() {
-        return null;
+        return new UnbalancedTreeSetIterator<E>(version);
     }
 
     @Override
@@ -58,9 +65,13 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
 
     /**
      * Class representing one node inside tree.
-     * Not static in order to correspond version of the tree
      */
-    private class Node<E> {
+    private static class Node<E> {
+        /**
+         *
+         */
+        enum Vector {LEFT, RIGHT};
+
         /**
          * Value stored in Node
          */
@@ -69,37 +80,66 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         /**
          * Left son Node in tree
          */
-        private Node leftSon;
+        @SuppressWarnings("unchecked")
+        private Node<E>[] sons = (Node<E>[]) new Node[2];
 
         /**
-         * Right son Node in tree
+         * Parent Node in tree
          */
-        private Node rightSon;
+        private Node<E> parent;
 
-        private Node(E value) {
+        private Node(E value, Node<E> parent) {
             this.value = value;
-            leftSon = null;
-            rightSon = null;
+            this.parent = parent;
         }
 
         private E getValue() {
             return value;
         }
 
-        private Node getLeftSon() {
-            return leftSon;
+        /**
+         * Returns leftmost or rightmost (depending on vector value) Node in Node's subtree
+         */
+        @Nullable
+        private Node<E> getDeepest(Vector vector) {
+            if (getSon(vector) != null) {
+                return getSon(vector).getDeepest(vector);
+            }
+
+            return this;
         }
 
-        private Node getRightSon() {
-            return rightSon;
+        /**
+         * Returns true if direction of moving from parent of this node to this node equals to vector
+         */
+        private boolean isVectorSon(Vector vector) {
+            return parent.getSon(vector) == this;
         }
 
-        private void setLeftSon(Node leftSon) {
-            this.leftSon = leftSon;
+        /**
+         * Get son in direction of vector
+         */
+        @Nullable
+        private Node<E> getSon(Vector vector) {
+            return sons[vector.ordinal()];
         }
 
-        private void setRightSon(Node rightSon) {
-            this.rightSon = rightSon;
+        private Node<E> getParent() {
+            return parent;
+        }
+
+        /**
+         * Set son of direction of vector
+         */
+        private void setSon(Node<E> leftSon, Vector vector) {
+            sons[vector.ordinal()] = leftSon;
+        }
+
+        /**
+         * Returns if Node has son in direction of vector
+         */
+        private boolean hasSon(Vector vector) {
+            return getSon(vector) != null;
         }
     }
 }

@@ -36,5 +36,11 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
             <version>5.3.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>16.0.2</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
