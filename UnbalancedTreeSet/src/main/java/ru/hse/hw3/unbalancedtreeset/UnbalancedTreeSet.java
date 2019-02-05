@@ -3,17 +3,53 @@ package ru.hse.hw3.unbalancedtreeset;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
+/**
+ * Elements of type E set collection based on Heap data structure
+ * All values in the right subtree of the node is always strictly greater than value in the node, all values in the left
+ * subtree is always strictly less.
+ */
 public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
+    /**
+     * Root of the tree
+     */
     private Node<E> root = null;
+
+    /**
+     * Current Tree's version. Changes after modifications.
+     */
     private int version = 0;
+
+    /**
+     * Comparator of elements inside the set.
+     */
     private Comparator<? super E> comparator;
+
+    /**
+     * Number of elements in set.
+     */
     private int size = 0;
 
     UnbalancedTreeSet(Comparator<? super E> comparator) {
         this.comparator = comparator;
+    }
+
+    UnbalancedTreeSet() {
+        this.comparator = null;
+    }
+
+    /**
+     * Compare objects using given comparator or by asuming objects in set are comparable.
+     * If both comparator not specified and objects aren't comparable, Set fails.
+     */
+    @SuppressWarnings("unchecked")
+    private int compare(Object o1, Object o2) {
+        if (comparator == null) {
+            return ((Comparable<? super E>)o1).compareTo((E) o2);
+        } else {
+            return comparator.compare((E) o1, (E)o2);
+        }
     }
 
     /**
@@ -39,7 +75,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
      * Returns false if element with the same value already exists in node's subtree
      */
     private boolean add(E e, @NotNull Node<E> node) {
-        int compareResult = comparator.compare(e, node.getValue());
+        int compareResult = compare(e, node.getValue());
         if (compareResult == 0) {
             return false;
         }
