@@ -13,17 +13,17 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
 
     @Override
     public Iterator<E> iterator() {
-        return new UnbalancedTreeSetIterator<E>(version);
+        return new UnbalancedTreeSetIterator(version, Vector.RIGHT);
     }
 
     @Override
     public int size() {
-        return 0;
+        return root.getSize();
     }
 
     @Override
     public Iterator<E> descendingIterator() {
-        return null;
+        return new UnbalancedTreeSetIterator(version, Vector.LEFT);
     }
 
     @Override
@@ -64,18 +64,17 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
     /**
      *
      */
-    private enum Vector {LEFT, RIGHT};
+    private enum Vector {
+        LEFT, RIGHT;
 
-    /**
-     *
-     */
-    private static Vector oppositeDirection(Vector vector) {
-        if (vector == Vector.LEFT) {
-            return Vector.RIGHT;
-        } else {
-            return Vector.LEFT;
+        private Vector opposite() {
+            if (this == LEFT) {
+                return RIGHT;
+            } else {
+                return LEFT;
+            }
         }
-    }
+    };
 
     private int getTreeVersion() {
         return version;
@@ -91,22 +90,22 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         Node<E> current;
 
         /**
-         * If vector is LEFT, leftmost Node is the starting Node, next() moves position to the RIGHT direction
-         * vice versa for RIGHT vector
-         * Thus, LEFT vector build ascending iterator, RIGHT build descending
+         * If vector is LEFT, rightmost Node is the starting Node, next() moves position to the LEFT direction
+         * vice versa for LEFT vector
+         * Thus, RIGHT vector build ascending iterator, LEFT build descending
          */
         @NotNull
         private Vector vector;
 
         /**
-         * Version of Tree when iterator has been created. If differs from actual version, iterator is invalid
+         * Version of Tree when iterator has been created. If differs from actual Tree's version, iterator is invalid
          */
         private int version;
 
         private UnbalancedTreeSetIterator(int version, @NotNull Vector vector) {
             this.version = version;
             this.vector = vector;
-            current = root.getDeepest(oppositeDirection(vector));
+            current = root.getDeepest(vector.opposite());
         }
 
         /**
@@ -149,11 +148,11 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
             }
 
             if (node.hasSon(vector)) {
-                //requireNonNull is redundant here, but IDEA can't process it for some reason
-                return Objects.requireNonNull(node.getSon(vector)).getDeepest(oppositeDirection(vector));
+                //requireNonNull is obviously redundant here, but IDEA can't process it for some reason
+                return Objects.requireNonNull(node.getSon(vector)).getDeepest(vector.opposite());
             }
 
-            if (node.isVectorSon(oppositeDirection(vector))) {
+            if (node.isVectorSon(vector.opposite())) {
                 return node.getParent();
             }
 
