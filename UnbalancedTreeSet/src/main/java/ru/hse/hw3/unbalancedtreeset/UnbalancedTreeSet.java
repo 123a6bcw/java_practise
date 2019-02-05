@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /**
-     * Class for storing tree's state
+     * Class for storing tree's state (basically all mutable fields). See DescendingTreeSet to see details of necessity in using this class
      */
     private static class TreeState<E> {
         /**
@@ -39,6 +39,10 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
 
         /**
          * Enum for moving
+         * <p></p>
+         * Placed here so programmer would not think about using TreeState.Vector.RIGHT/LEFT
+         * to create instances of Vector (too bad Java can't forbid that) as it may cause errors in synchronization
+         * with descendingTreeSet.
          */
         private enum Vector {
             LEFT, RIGHT;
@@ -55,90 +59,23 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
 
     /**
      * Current tree state. Heir classes does not have access to it and can't set it therefore cannot can't change
-     * tree's state
+     * tree's state. See details in class DescendingTreeSet
      */
     private TreeState<E> treeState;
 
     /**
-     * Returns number of elements in tree
+     * Creates new tree set, all elements will be sorted using custom comparator
      */
-    protected int getSize() {
-        return treeState.size;
-    }
-
-    /**
-     * Return current version of tree. Changes after modification.
-     */
-    protected int getTreeVersion() {
-        return treeState.version;
-    }
-
-    /**
-     * Increases size of the tree after adding new element
-     */
-    protected void increaseSize() {
-        treeState.size++;
-    }
-
-    /**
-     * Increases current tree's version after modifications of the tree.
-     * May overflow, but that's ok.
-     */
-    protected void upgradeVersion() {
-        treeState.version++;
-    }
-
-    /**
-     * Returns comparator that Set uses, or null if it does not.
-     */
-    @Nullable
-    protected Comparator<? super E> getComparator() {
-        return treeState.comparator;
-    }
-
-    /**
-     * Set comparator to another, intended use only in constructor.
-     */
-    protected void setComparator(Comparator<? super E> comparator) {
-        treeState.comparator = comparator;
-    }
-
-    /**
-     * Returns root of the tree
-     */
-    protected Node<E> getRoot() {
-        return treeState.root;
-    }
-
-    /**
-     * Set root of the tree to another
-     */
-    protected void setRoot(Node<E> root) {
-        treeState.root = root;
-    }
-
-    protected TreeState.Vector getLeftVector() {
-        return TreeState.Vector.LEFT;
-    }
-
-    protected TreeState.Vector getRightVector() {
-        return TreeState.Vector.RIGHT;
-    }
-
-    private boolean isLeftVector(TreeState.Vector vector) {
-        return vector == TreeState.Vector.LEFT;
-    }
-
-    private boolean isRightVector(TreeState.Vector vector) {
-        return vector == TreeState.Vector.RIGHT;
-    }
-
     public UnbalancedTreeSet(Comparator<? super E> comparator) {
         treeState = new TreeState<>();
         setRoot(null);
         setComparator(comparator);
     }
 
+    /**
+     * Creates new tree set, if element's type implements comparable interface, element will be sorted in corresponding
+     * order. In other case, would cause ClassCastException
+     */
     public UnbalancedTreeSet() {
         treeState = new TreeState<>();
         setRoot(null);
@@ -147,7 +84,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
 
     /**
      * Compare objects using given comparator or by asuming objects in set are comparable.
-     * If both comparator not specified and objects aren't comparable, Set fails.
+     * If both comparator not specified and objects aren't comparable, throws ClassCastException.
      */
     @SuppressWarnings("unchecked")
     private int compare(Object o1, Object o2) {
@@ -217,8 +154,11 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         return new UnbalancedTreeSetIterator(getTreeVersion(), getLeftVector());
     }
 
+    /**
+     * Creates the same tree set but in reversed order. Changes of this object reflects reversed object and vice versa
+     */
     @Override
-    public MyTreeSet<E> descendingSet() {
+    public UnbalancedTreeSet<E> descendingSet() {
         return new DescendingTreeSet<>(this);
     }
 
@@ -386,7 +326,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         }
 
         /**
-         *
+         * Returns son in direction of the vector without null checks
          */
         @Nullable
         private Node<E> getVectorSon(@NotNull TreeState.Vector vector) {
@@ -400,7 +340,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
             return getVectorSon(vector) != null;
         }
         /**
-         * Get son in direction of vector
+         * Get son in direction of vector, throws exception if this son does not exists (null)
          */
         @NotNull
         private Node<E> sonAtVector(@NotNull TreeState.Vector vector) {
@@ -412,6 +352,9 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
             return Objects.requireNonNull(getVectorSon(vector));
         }
 
+        /**
+         * Returns parent Node of the Node
+         */
         @Nullable
         private Node<E> getParent() {
             return parent;
@@ -425,7 +368,23 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         }
     }
 
+    /**
+     * Class for accessing to the tree in reversed order of the original one.
+     * Does NOT copy state of the tree (leaves it null). That way we can guaranteed that trying to change state of
+     * this tree refers to NullPointerException, therefore force to override getters and setters to use getters and
+     * setters of the original tree, that way all changes in one of the tree will reflect another tree.
+     * <p></p>
+     * Using DescendingSet will simply returns original tree.
+     * <p></p>
+     * Reversed order of iteration in this tree is achieved via making RIGHT vector to be LEFT and vice versa by overriding
+     * corresponding getters of right and left vectors.
+     * <p></p>
+     * Invalidation of iterators in one of the tree's will invalid iterators in other tree as well
+     */
     private static class DescendingTreeSet<E> extends UnbalancedTreeSet<E> {
+        /**
+         * Link to the original tree.
+         */
         UnbalancedTreeSet<E> superSet;
 
         DescendingTreeSet(UnbalancedTreeSet<E> ascendingSet) {
@@ -437,32 +396,20 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
             return superSet.size();
         }
 
-        /**
-         *
-         */
         @Override
         protected Comparator<? super E> getComparator() {
             return superSet.getComparator();
         }
 
-        /**
-         *
-         */
         @Override
         protected void setComparator(Comparator<? super E> comparator) {
             superSet.setComparator(comparator);
         }
 
-        /**
-         *
-         */
         protected Node<E> getRoot() {
             return superSet.getRoot();
         }
 
-        /**
-         *
-         */
         protected void setRoot(Node<E> root) {
             superSet.setRoot(root);
         }
@@ -471,9 +418,6 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
             return superSet.getSize();
         }
 
-        /**
-         *
-         */
         protected int getTreeVersion() {
             return superSet.getTreeVersion();
         }
@@ -482,29 +426,88 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
             superSet.increaseSize();
         }
 
-        /**
-         * Increases current tree's version after modifications of the tree.
-         * May overflow, but that's ok.
-         */
         protected void upgradeVersion() {
             superSet.upgradeVersion();
         }
 
-        /**
-         *
-         * @return
-         */
         protected TreeState.Vector getLeftVector() {
             return superSet.getRightVector();
         }
 
-        /**
-         *
-         * @return
-         */
-
         protected TreeState.Vector getRightVector() {
             return superSet.getLeftVector();
         }
+    }
+
+    /**
+     * Returns number of elements in tree
+     */
+    protected int getSize() {
+        return treeState.size;
+    }
+
+    /**
+     * Return current version of tree. Changes after modification.
+     */
+    protected int getTreeVersion() {
+        return treeState.version;
+    }
+
+    /**
+     * Increases size of the tree after adding new element
+     */
+    protected void increaseSize() {
+        treeState.size++;
+    }
+
+    /**
+     * Increases current tree's version after modifications of the tree.
+     * May overflow, but that's ok.
+     */
+    protected void upgradeVersion() {
+        treeState.version++;
+    }
+
+    /**
+     * Returns comparator that Set uses, or null if it does not.
+     */
+    @Nullable
+    protected Comparator<? super E> getComparator() {
+        return treeState.comparator;
+    }
+
+    /**
+     * Set comparator to another, intended use only in constructor.
+     */
+    protected void setComparator(Comparator<? super E> comparator) {
+        treeState.comparator = comparator;
+    }
+
+    /**
+     * Returns root of the tree
+     */
+    protected Node<E> getRoot() {
+        return treeState.root;
+    }
+
+    /**
+     * Set root of the tree to another
+     */
+    protected void setRoot(Node<E> root) {
+        treeState.root = root;
+    }
+
+    /**
+     * Returns LEFT vector.
+     */
+    protected TreeState.Vector getLeftVector() {
+        return TreeState.Vector.LEFT;
+    }
+
+    /**
+     * Returns RIGHT vector.
+     */
+    protected TreeState.Vector getRightVector() {
+        return TreeState.Vector.RIGHT;
     }
 }
