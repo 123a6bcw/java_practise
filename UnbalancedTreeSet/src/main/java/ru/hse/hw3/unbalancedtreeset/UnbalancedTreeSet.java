@@ -1,8 +1,10 @@
 package ru.hse.hw3.unbalancedtreeset;
 
+import com.sun.source.tree.Tree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.tree.TreeCellRenderer;
 import java.util.*;
 
 /**
@@ -12,7 +14,7 @@ import java.util.*;
  */
 public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /**
-     *
+     * Class for storing tree's state
      */
     private static class TreeState<E> {
         /**
@@ -34,27 +36,46 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
          * Comparator of elements inside the set.
          */
         private Comparator<? super E> comparator;
+
+        /**
+         * Enum for moving
+         */
+        private enum Vector {
+            LEFT, RIGHT;
+
+            private Vector opposite() {
+                if (this == LEFT) {
+                    return Vector.RIGHT;
+                } else {
+                    return Vector.LEFT;
+                }
+            }
+        }
     }
 
     /**
-     *
+     * Current tree state. Heir classes does not have access to it and can't set it therefore cannot can't change
+     * tree's state
      */
     private TreeState<E> treeState;
 
     /**
-     *
+     * Returns number of elements in tree
      */
     protected int getSize() {
         return treeState.size;
     }
 
     /**
-     *
+     * Return current version of tree. Changes after modification.
      */
     protected int getTreeVersion() {
         return treeState.version;
     }
 
+    /**
+     * Increases size of the tree after adding new element
+     */
     protected void increaseSize() {
         treeState.size++;
     }
@@ -68,53 +89,49 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
     }
 
     /**
-     *
+     * Returns comparator that Set uses, or null if it does not.
      */
+    @Nullable
     protected Comparator<? super E> getComparator() {
         return treeState.comparator;
     }
 
     /**
-     *
+     * Set comparator to another, intended use only in constructor.
      */
     protected void setComparator(Comparator<? super E> comparator) {
         treeState.comparator = comparator;
     }
 
     /**
-     *
+     * Returns root of the tree
      */
     protected Node<E> getRoot() {
         return treeState.root;
     }
 
     /**
-     *
+     * Set root of the tree to another
      */
     protected void setRoot(Node<E> root) {
         treeState.root = root;
     }
 
-    protected enum Vector {
-        LEFT, RIGHT;
-
-        private Vector opposite() {
-            if (this == LEFT) {
-                return Vector.RIGHT;
-            } else {
-                return Vector.LEFT;
-            }
-        }
+    protected TreeState.Vector getLeftVector() {
+        return TreeState.Vector.LEFT;
     }
 
-    protected Vector getLeftVector() {
-        return Vector.LEFT;
+    protected TreeState.Vector getRightVector() {
+        return TreeState.Vector.RIGHT;
     }
 
-    protected Vector getRightVector() {
-        return Vector.RIGHT;
+    private boolean isLeftVector(TreeState.Vector vector) {
+        return vector == TreeState.Vector.LEFT;
     }
 
+    private boolean isRightVector(TreeState.Vector vector) {
+        return vector == TreeState.Vector.RIGHT;
+    }
 
     public UnbalancedTreeSet(Comparator<? super E> comparator) {
         treeState = new TreeState<>();
@@ -169,7 +186,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
             return false;
         }
 
-        Vector vector;
+        TreeState.Vector vector;
         if (compareResult > 0) {
             vector = getRightVector();
         } else {
@@ -250,14 +267,14 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
          * Thus, RIGHT vector build ascending iterator, LEFT build descending
          */
         @NotNull
-        private Vector vector;
+        private TreeState.Vector vector;
 
         /**
          * Version of Tree when iterator has been created. If differs from actual Tree's version, iterator is invalid
          */
         private int version;
 
-        private UnbalancedTreeSetIterator(int version, @NotNull Vector vector) {
+        private UnbalancedTreeSetIterator(int version, @NotNull TreeState.Vector vector) {
             this.version = version;
             this.vector = vector;
             current = getRoot().getDeepest(vector.opposite());
@@ -350,7 +367,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
          * Returns leftmost or rightmost (depending on vector value) Node in Node's subtree
          */
         @NotNull
-        private Node<E> getDeepest(@NotNull Vector vector) {
+        private Node<E> getDeepest(@NotNull TreeState.Vector vector) {
             if (hasSon(vector)) {
                 return sonAtVector(vector).getDeepest(vector);
             }
@@ -361,7 +378,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         /**
          * Returns true if direction of moving from parent of this node to this node equals to vector
          */
-        private boolean isVectorSon(@NotNull Vector vector) {
+        private boolean isVectorSon(@NotNull TreeState.Vector vector) {
             if (parent == null) {
                 return false;
             }
@@ -372,21 +389,21 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
          *
          */
         @Nullable
-        private Node<E> getVectorSon(@NotNull Vector vector) {
+        private Node<E> getVectorSon(@NotNull TreeState.Vector vector) {
             return sons[vector.ordinal()];
         }
 
         /**
          * Returns if Node has son in direction of vector
          */
-        private boolean hasSon(@NotNull Vector vector) {
+        private boolean hasSon(@NotNull TreeState.Vector vector) {
             return getVectorSon(vector) != null;
         }
         /**
          * Get son in direction of vector
          */
         @NotNull
-        private Node<E> sonAtVector(@NotNull Vector vector) {
+        private Node<E> sonAtVector(@NotNull TreeState.Vector vector) {
             if (!hasSon(vector)) {
                 throw new IllegalArgumentException("Node does not have " + vector.name() + " son");
             }
@@ -403,7 +420,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         /**
          * Set son of direction of vector
          */
-        private void setSon(Node<E> leftSon, @NotNull Vector vector) {
+        private void setSon(Node<E> leftSon, @NotNull TreeState.Vector vector) {
             sons[vector.ordinal()] = leftSon;
         }
     }
@@ -477,8 +494,8 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
          *
          * @return
          */
-        protected Vector getLeftVector() {
-            return Vector.RIGHT;
+        protected TreeState.Vector getLeftVector() {
+            return superSet.getRightVector();
         }
 
         /**
@@ -486,8 +503,8 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
          * @return
          */
 
-        protected Vector getRightVector() {
-            return Vector.LEFT;
+        protected TreeState.Vector getRightVector() {
+            return superSet.getLeftVector();
         }
     }
 }
