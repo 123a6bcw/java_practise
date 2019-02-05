@@ -176,14 +176,20 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         return new DescendingTreeSet<>(this);
     }
 
+    /**
+     * Returns first element in set.
+     */
     @Override
     public E first() {
-        return null;
+        return iterator().next();
     }
 
+    /**
+     * Returns last element in set.
+     */
     @Override
     public E last() {
-        return null;
+        return descendingIterator().next();
     }
 
     @Override
@@ -213,7 +219,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         /**
          * Current Node iterator is point to
          */
-        Node<E> current;
+        Node<E> next;
 
         /**
          * If vector is LEFT, rightmost Node is the starting Node, next() moves position to the LEFT direction
@@ -231,7 +237,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         private UnbalancedTreeSetIterator(int version, @NotNull TreeState.Vector vector) {
             this.version = version;
             this.vector = vector;
-            current = getRoot().getDeepest(vector.opposite());
+            next = getRoot().getDeepest(vector.opposite());
         }
 
         /**
@@ -248,7 +254,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         public boolean hasNext() {
             checkVersion();
 
-            return getNextNode(current) != null;
+            return next != null;
         }
 
         @Override
@@ -256,11 +262,13 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         public E next() {
             checkVersion();
 
-            current = getNextNode(current);
-            if (current == null) {
+            if (!hasNext()) {
                 throw new NoSuchElementException("No next element in tree");
             }
-            return current.getValue();
+
+            var returnValue = next.value;
+            next = getNextNode(next);
+            return returnValue;
         }
 
         /**
