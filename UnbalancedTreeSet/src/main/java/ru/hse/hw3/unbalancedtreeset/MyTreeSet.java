@@ -12,7 +12,6 @@ public interface MyTreeSet<E> extends Set<E> {
     /** {@link TreeSet#descendingSet()} **/
     MyTreeSet<E> descendingSet();
 
-
     /** {@link TreeSet#first()} **/
     E first();
 
