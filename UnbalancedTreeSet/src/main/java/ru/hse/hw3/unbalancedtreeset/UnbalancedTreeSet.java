@@ -127,12 +127,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
             return false;
         }
 
-        TreeState.Vector vector;
-        if (compareResult > 0) {
-            vector = getRightVector();
-        } else {
-            vector = getLeftVector();
-        }
+        var vector = getVectorByCompareResult(compareResult);
 
         if (node.hasSon(vector)) {
             return add(e, node.sonAtVector(vector));
@@ -178,6 +173,7 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
 
     /**
      * Returns first element in set.
+     * Throws NoSuchElementException if there is no elements in Set.
      */
     @Override
     public E first() {
@@ -186,30 +182,121 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
 
     /**
      * Returns last element in set.
+     * Throws NoSuchElementException if there is no elements in Set.
      */
     @Override
     public E last() {
         return descendingIterator().next();
     }
 
+    /**
+     * Finds greatest element lower than given one, or null if there is no such one.
+     */
     @Override
     public E lower(E e) {
-        return null;
+        return findVectoredValue(getRoot(), e, getLeftVector());
     }
 
+    /**
+     * Finds greatest element lower or equal to given one, or null if there is no such one
+     */
     @Override
     public E floor(E e) {
-        return null;
+        return findVectoredOrExactValue(getRoot(), e, getLeftVector());
     }
 
+    /**
+     * Find lowerst element greater or equal to given one, or null if there is no such one
+     */
     @Override
     public E ceiling(E e) {
-        return null;
+        return findVectoredOrExactValue(getRoot(), e, getRightVector());
     }
 
+    /**
+     * Find lowest element greater than given one, or null if there is no such one
+     */
     @Override
     public E higher(E e) {
-        return null;
+        return findVectoredValue(getRoot(), e, getRightVector());
+    }
+
+    /**
+     * RIGHT vector correspond to finding greater element (aka moving to the right son), LEFT vice versa
+     * <p></p>
+     * Finds lowest element that strictly greater (greatest lower) than given value in given node's subtree
+     * <p></p>
+     * Returns null if there is no such element
+     */
+    private E findVectoredValue(Node<E> node, E value, TreeState.Vector vector) {
+        Node<E> nodeResult = findVectoredNode(node, value, vector);
+        if (nodeResult == null) {
+            return null;
+        }
+        return nodeResult.getValue();
+    }
+
+    /**
+     * RIGHT vector correspond to finding greater element (aka moving to the right son), LEFT vice versa
+     * <p></p>
+     * Finds lowest element that greater (lower) or equal to given value in given node's subtree
+     * <p></p>
+     * Returns null if there is no such element
+     */
+    private E findVectoredOrExactValue(Node<E> node, E value, TreeState.Vector vector) {
+        var nodeResult = findVectoredOrExactNodeWithQualification(node, value, vector).getKey();
+        if (nodeResult == null) {
+            return null;
+        }
+        return nodeResult.getValue();
+    }
+
+    /**
+     * RIGHT vector correspond to finding greater element (aka moving to the right son), LEFT vice versa
+     * <p></p>
+     * Finds Node with lowest value that strictly greater (greatest lower) than given value in given node's subtree
+     * <p></p>
+     * Returns null if there is no such Node
+     */
+    private Node<E> findVectoredNode(Node<E> node, E value, TreeState.Vector vector) {
+        AbstractMap.SimpleEntry<Node<E>, Boolean> qualifiedResult = findVectoredOrExactNodeWithQualification(node, value, vector);
+        if (!qualifiedResult.getValue()) {
+            return qualifiedResult.getKey();
+        }
+        return qualifiedResult.getKey().getNextNode(vector);
+    }
+
+    /**
+     * RIGHT vector correspond to finding greater element (aka moving to the right son), LEFT vice versa
+     * <p></p>
+     * First element in pair is Node with lowest value that strictly greater (greatest lower) than given value in given node's subtree,
+     * null if there is no such Node
+     * <p></p>
+     * Second element in pair is true if value in found node is equal to given one, false if found node is null or have
+     * not equal value.
+     */
+    private AbstractMap.SimpleEntry<Node<E>, Boolean> findVectoredOrExactNodeWithQualification
+            (Node<E> node, E value, TreeState.Vector vector) {
+        if (node == null) {
+            return new AbstractMap.SimpleEntry<>(null, false);
+        }
+
+        int compareResult = compare(node.getValue(), value);
+        if (compareResult == 0) {
+            return new AbstractMap.SimpleEntry<>(node, true);
+        }
+
+        boolean isVectoredValue = (getVectorByCompareResult(compareResult) == vector);
+        AbstractMap.SimpleEntry<Node<E>, Boolean> vectoredNode =
+                findVectoredOrExactNodeWithQualification(node.getVectorSon(getVectorByCompareResult(compareResult)), value, vector);
+        if (vectoredNode != null) {
+            return vectoredNode;
+        }
+        if (isVectoredValue) {
+            return new AbstractMap.SimpleEntry<>(node, false);
+        }
+
+        return new AbstractMap.SimpleEntry<>(null, false);
     }
 
     /**
@@ -267,29 +354,8 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
             }
 
             var returnValue = next.value;
-            next = getNextNode(next);
+            next = next.getNextNode(vector);
             return returnValue;
-        }
-
-        /**
-         * Returns the next Node in order
-         * Returns null if there is no such
-         */
-        @Nullable
-        private Node<E> getNextNode(@NotNull Node<E> node) {
-            if (node.getParent() == null) {
-                return null;
-            }
-
-            if (node.hasSon(vector)) {
-                return node.sonAtVector(vector).getDeepest(vector.opposite());
-            }
-
-            if (node.isVectorSon(vector.opposite())) {
-                return node.getParent();
-            }
-
-            return getNextNode(node.getParent());
         }
     }
 
@@ -323,6 +389,27 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         @NotNull
         private E getValue() {
             return value;
+        }
+
+        /**
+         * Returns the next Node in order
+         * Returns null if there is no such
+         */
+        @Nullable
+        private Node<E> getNextNode(TreeState.Vector vector) {
+            if (hasSon(vector)) {
+                return sonAtVector(vector).getDeepest(vector.opposite());
+            }
+
+            if (getParent() == null) {
+                return null;
+            }
+
+            if (isVectorSon(vector.opposite())) {
+                return getParent();
+            }
+
+            return getParent().getNextNode(vector);
         }
 
         /**
@@ -531,5 +618,20 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
      */
     protected TreeState.Vector getRightVector() {
         return TreeState.Vector.RIGHT;
+    }
+
+    /**
+     * Returns LEFT vector if compareResult > 0, RIGHT if compareResult < 0, throws exception otherwise
+     */
+    private TreeState.Vector getVectorByCompareResult(int compareResult) {
+        if (compareResult < 0) {
+            return getRightVector();
+        }
+
+        if (compareResult > 0) {
+            return getLeftVector();
+        }
+
+        throw new IllegalArgumentException("compareResult can't be zero");
     }
 }
