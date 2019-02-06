@@ -12,7 +12,7 @@ import java.util.*;
  * All values in the right subtree of the node is always strictly greater than value in the node, all values in the left
  * subtree is always strictly less.
  */
-public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
+public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTreeSet<E> {
     /**
      * Class for storing tree's state (basically all mutable fields). See DescendingTreeSet to see details of necessity in using this class
      */
@@ -222,33 +222,33 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
     }
 
     /**
-     * RIGHT vector correspond to finding greater element (aka moving to the right son), LEFT vice versa
-     * <p></p>
-     * Finds lowest element that strictly greater (greatest lower) than given value in tree
-     * <p></p>
-     * Returns null if there is no such element
+     * findVectoredValue started from the root, other parameters is the same.
+     */
+    /*
+    Here and below I could copypast JavaDoc from findVectoredNode, but that would be terrible in size.
+    Am I supposed to do that anyway?
      */
     private E findVectoredValue(Object value, TreeState.Vector vector) {
         return findVectoredValue(getRoot(), value, vector);
     }
 
     /**
-     * RIGHT vector correspond to finding greater element (aka moving to the right son), LEFT vice versa
-     * <p></p>
-     * Finds lowest element that greater (lower) or equal to given value in tree
-     * <p></p>
-     * Returns null if there is no such element
+     * findVectoredOrExactValue started from the root, other parameters is the same.
      */
     private E findVectoredOrExactValue(Object value, TreeState.Vector vector) {
         return findVectoredOrExactValue(getRoot(), value, vector);
     }
 
     /**
-     * RIGHT vector correspond to finding greater element (aka moving to the right son), LEFT vice versa
-     * <p></p>
-     * Finds lowest element that strictly greater (greatest lower) than given value in given node's subtree
-     * <p></p>
-     * Returns null if there is no such element
+     * findVectoredOrExactNodeWithQualification starting from the root, other parameters is the same.
+     */
+    private AbstractMap.SimpleEntry<Node<E>, Boolean> findVectoredOrExactNodeWithQualification
+    (Object value, TreeState.Vector vector) {
+        return findVectoredOrExactNodeWithQualification(getRoot(), value, vector);
+    }
+
+    /**
+     * Returns value of findVectoredValue with same parameters, or null if result is null
      */
     private E findVectoredValue(Node<E> node, Object value, TreeState.Vector vector) {
         Node<E> nodeResult = findVectoredNode(node, value, vector);
@@ -259,11 +259,8 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
     }
 
     /**
-     * RIGHT vector correspond to finding greater element (aka moving to the right son), LEFT vice versa
-     * <p></p>
-     * Finds lowest element that greater (lower) or equal to given value in given node's subtree
-     * <p></p>
-     * Returns null if there is no such element
+     * Returns value of node found in findVectoredOrExactValueWithQualification with the same parameters, or
+     * null if that node is null.
      */
     private E findVectoredOrExactValue(Node<E> node, Object value, TreeState.Vector vector) {
         var nodeResult = findVectoredOrExactNodeWithQualification(node, value, vector).getKey();
@@ -286,20 +283,6 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
             return qualifiedResult.getKey();
         }
         return qualifiedResult.getKey().getNextNode(vector);
-    }
-
-    /**
-     * RIGHT vector correspond to finding greater element (aka moving to the right son), LEFT vice versa
-     * <p></p>
-     * First element in pair is Node with lowest value that strictly greater (greatest lower) than given value in tree,
-     * null if there is no such Node
-     * <p></p>
-     * Second element in pair is true if value in found node is equal to given one, false if found node is null or have
-     * not equal value.
-     */
-    private AbstractMap.SimpleEntry<Node<E>, Boolean> findVectoredOrExactNodeWithQualification
-    (Object value, TreeState.Vector vector) {
-        return findVectoredOrExactNodeWithQualification(getRoot(), value, vector);
     }
 
     /**
@@ -335,14 +318,10 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
         return new AbstractMap.SimpleEntry<>(null, false);
     }
 
+    // Standard implementation is quite unoptimal
     @Override
     public boolean contains(Object o) {
         return findVectoredOrExactNodeWithQualification(o, getLeftVector()).getValue();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return getRoot() == null;
     }
 
     /*
@@ -351,22 +330,22 @@ public class UnbalancedTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E>
 
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("Clear not supported");
+        throw new UnsupportedOperationException("clear not supported");
     }
 
     @Override
     public boolean remove(Object o) {
-        throw new UnsupportedOperationException("Remove not supported");
+        throw new UnsupportedOperationException("remove not supported");
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        throw new UnsupportedOperationException("RemoveAll not supported");
+        throw new UnsupportedOperationException("removeAll not supported");
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException("RetainAll not supported");
+        throw new UnsupportedOperationException("retainAll not supported");
     }
 
     /**
