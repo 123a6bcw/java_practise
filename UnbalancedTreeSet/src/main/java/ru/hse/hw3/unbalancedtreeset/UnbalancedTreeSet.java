@@ -373,7 +373,11 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         private UnbalancedTreeSetIterator(int version, @NotNull TreeState.Vector vector) {
             this.version = version;
             this.vector = vector;
-            next = getRoot().getDeepest(vector.opposite());
+            if (getRoot() == null) {
+                next = null;
+            } else {
+                next = getRoot().getDeepest(vector.opposite());
+            }
         }
 
         /**
