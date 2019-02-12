@@ -90,7 +90,6 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     public UnbalancedTreeSet() {
         treeState = new TreeState<>();
         setRoot(null);
-        setComparator(null);
     }
 
     /**
@@ -366,6 +365,8 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     @Override
     public void clear() {
         setRoot(null);
+        clearSize();
+        upgradeVersion();
     }
 
     /**
@@ -407,7 +408,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         /**
          * Current Node iterator is point to
          */
-        Node<E> next;
+        private Node<E> next;
 
         /**
          * If vector is LEFT, rightmost Node is the starting Node, next() moves position to the LEFT direction
@@ -621,7 +622,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         /**
          * Creates set that shares treeState of the original tree, but changes way vector in viewing options.
          */
-        DescendingTreeSet(@NotNull UnbalancedTreeSet<E> ascendingSet) {
+        private DescendingTreeSet(@NotNull UnbalancedTreeSet<E> ascendingSet) {
             superSet = ascendingSet;
             setTreeState(superSet.getTreeState());
             setLowerVector(Vector.RIGHT);
@@ -656,6 +657,13 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      */
     private int getSize() {
         return treeState.size;
+    }
+
+    /**
+     * Changes size to zero.
+     */
+    private int clearSize() {
+        return treeState.size = 0;
     }
 
     /**
