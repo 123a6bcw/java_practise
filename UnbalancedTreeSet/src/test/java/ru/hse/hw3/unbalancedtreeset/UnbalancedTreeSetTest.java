@@ -454,4 +454,45 @@ class UnbalancedTreeSetTest {
         assertEquals(filledSet.descendingSet().first(), filledSet.last());
         assertThrows(NoSuchElementException.class, () -> emptySet.descendingSet().first());
     }
+
+    @Test
+    void descendingSetIteratorsInvalidsAfterModificationOfInitialSet() {
+        var iterator = filledSet.descendingSet().iterator();
+        filledSet.add(1);
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+        iterator = filledSet.descendingSet().iterator();
+        filledSet.remove(6);
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+        iterator = emptySet.descendingSet().iterator();
+        emptySet.add(1);
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+
+        iterator = filledSet.descendingSet().iterator();
+        filledSet.add(2);
+        assertDoesNotThrow(iterator::next);
+
+        filledSet.remove(22);
+        assertDoesNotThrow(iterator::next);
+    }
+
+    @Test
+    void initialSetIteratorsInvalidsAfterModificationOfDescendingSet() {
+        var iterator = filledSet.iterator();
+        var descendingSet = filledSet.descendingSet();
+        descendingSet.add(1);
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+        iterator = filledSet.descendingIterator();
+        descendingSet.remove(6);
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+        iterator = emptySet.descendingIterator();
+        emptySet.descendingSet().add(1);
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+
+        iterator = filledSet.descendingIterator();
+        descendingSet.add(2);
+        assertDoesNotThrow(iterator::next);
+
+        descendingSet.remove(22);
+        assertDoesNotThrow(iterator::next);
+    }
 }
