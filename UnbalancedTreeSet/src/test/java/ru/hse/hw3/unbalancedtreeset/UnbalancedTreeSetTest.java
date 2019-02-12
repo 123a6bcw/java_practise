@@ -143,8 +143,26 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
+    void lowerOnOneElementSet() {
+        emptySet.add(2);
+        assertNull(emptySet.lower(2));
+        assertEquals(2, emptySet.lower(3));
+        assertNull(emptySet.lower(1));
+    }
+
+    @Test
+    void lowerOfNullThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> filledSet.lower(null));
+    }
+
+    @Test
     void lowerOfFilledSet() {
-        assertEquals(Integer.valueOf(2), filledSet.lower(3));
+        assertNull(filledSet.lower(1));
+        assertNull(filledSet.lower(2));
+        for (int i = 3; i <= 8; i += 2) {
+            assertEquals(i-1, filledSet.lower(i));
+            assertEquals(i-1, filledSet.lower(i + 1));
+        }
     }
 
     @Test
@@ -153,7 +171,25 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
+    void floorOnNullThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> filledSet.floor(null));
+    }
+
+    @Test
+    void floorOnOneElementSet() {
+        emptySet.add(2);
+        assertEquals(2, emptySet.floor(2));
+        assertEquals(2, emptySet.floor(3));
+        assertNull(emptySet.floor(1));
+    }
+
+    @Test
     void floorOfFilledSet() {
+        assertNull(filledSet.floor(1));
+        for (int i = 2; i <= 8; i += 2) {
+            assertEquals(i, filledSet.floor(i));
+            assertEquals(i, filledSet.floor(i+1));
+        }
     }
 
     @Test
@@ -162,25 +198,71 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
+    void ceilingOnNullThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> emptySet.ceiling(null));
+    }
+
+    @Test
+    void CeilingOnOneElementSet() {
+        emptySet.add(2);
+        assertEquals(2, emptySet.ceiling(1));
+        assertEquals(2, emptySet.ceiling(2));
+        assertNull(emptySet.ceiling(3));
+    }
+
+    @Test
     void ceilingOfFilledSet() {
+        assertNull(filledSet.ceiling(9));
+        for (int i = 1; i <= 8; i += 2) {
+            assertEquals(i+1, filledSet.ceiling(i));
+            assertEquals(i+1, filledSet.ceiling(i + 1));
+        }
     }
 
     @Test
     void higherOfEmptySetReturnsNull() {
+        assertNull(emptySet.higher(2));
+    }
+
+    @Test
+    void higherOnOneElementSet() {
+        emptySet.add(2);
         assertNull(emptySet.higher(3));
+        assertEquals(2, emptySet.higher(1));
+        assertNull(emptySet.higher(2));
+    }
+
+    @Test
+    void higherOfNullThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> filledSet.higher(null));
     }
 
     @Test
     void higherOfFilledSet() {
+        assertNull(filledSet.higher(8));
+        assertNull(filledSet.higher(9));
+        for (int i = 7; i >= 3; i -= 2) {
+            assertEquals(i+1, filledSet.higher(i));
+            assertEquals(i+1, filledSet.higher(i - 1));
+        }
     }
 
     @Test
     void containsInEmptySetReturnsFalse() {
+        assertFalse(emptySet.contains(0));
+    }
+
+    @Test
+    void containsInOneElementSet() {
+        emptySet.add(4);
+        assertTrue(emptySet.contains(4));
     }
 
     @Test
     void containsInFilledSet() {
-        assertTrue(filledSet.contains(6));
+        for (int i = 2; i <= 8; i += 2) {
+            assertTrue(filledSet.contains(i));
+        }
     }
 
     @Test
@@ -193,10 +275,6 @@ class UnbalancedTreeSetTest {
 
     @Test
     void removeAllThrowsUnsupported() {
-    }
-
-    @Test
-    void retainAllThrowsUnsupported() {
     }
 
     @Test

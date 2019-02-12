@@ -32,17 +32,20 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         /**
          * Root of the tree.
          */
+        @Nullable
         private Node<E> root;
 
         /**
          * Comparator of elements inside the set.
          */
+        @Nullable
         private Comparator<? super E> comparator;
     }
 
     /**
      * Stored current tree state.
      */
+    @NotNull
     private TreeState<E> treeState;
 
     /**
@@ -68,12 +71,13 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * it's right son. Uses only for VIEWING options (one that does not changes state of the tree).
      * Basically, it is LEFT for default set and RIGHT for descendingSet.
      */
+    @NotNull
     private Vector lowerVector = Vector.LEFT;
 
     /**
      * Creates new tree set, all elements will be sorted using custom comparator
      */
-    public UnbalancedTreeSet(Comparator<? super E> comparator) {
+    public UnbalancedTreeSet(@NotNull Comparator<? super E> comparator) {
         treeState = new TreeState<>();
         setRoot(null);
         setComparator(comparator);
@@ -92,13 +96,14 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * Compare objects using given comparator or by asuming objects in set are comparable.
      * If both comparator not specified and objects aren't comparable, throws ClassCastException.
+     * Objects cannot be null because Null can't be contained in given set.
      */
     /*
     Causes UncheckedCastWarning because cast may be wrong if user gave set elements with no comparable interface
     and didn't specify comparator
      */
     @SuppressWarnings("unchecked")
-    private int compare(Object o1, Object o2) {
+    private int compare(@NotNull Object o1, @NotNull Object o2) {
         if (getComparator() == null) {
             return ((Comparable<? super E>)o1).compareTo((E) o2);
         } else {
@@ -111,11 +116,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * Otherwise does nothing and returns false.
      */
     @Override
-    public boolean add(E e) {
-        if (e == null) {
-            throw new IllegalArgumentException("You cannot add null elements in set. Sorry!");
-        }
-
+    public boolean add(@NotNull E e) {
         if (getRoot() == null) {
             setRoot(new Node<>(e, null));
         } else
@@ -132,7 +133,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * Adds value to the node's subtree in the correct order
      * Returns false if element with the same value already exists in node's subtree
      */
-    private boolean add(E e, @NotNull Node<E> node) {
+    private boolean add(@NotNull E e, @NotNull Node<E> node) {
         int compareResult = compare(e, node.getValue());
         if (compareResult == 0) {
             return false;
@@ -160,6 +161,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * Creates iterator for iterating over elements in set in the reversed order.
      */
+    @NotNull
     @Override
     public Iterator<E> descendingIterator() {
         return new UnbalancedTreeSetIterator(getTreeVersion(), lowerVector);
@@ -177,6 +179,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * Creates the same tree set but in reversed order. Changes state of this tree reflects reversed tree and vice versa,
      * including invalidating iterators in one of the tree's.
      */
+    @NotNull
     @Override
     public UnbalancedTreeSet<E> descendingSet() {
         return new DescendingTreeSet<>(this);
@@ -186,6 +189,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * Returns first element in set.
      * Throws NoSuchElementException if there is no elements in Set.
      */
+    @NotNull
     @Override
     public E first() {
         return iterator().next();
@@ -195,6 +199,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * Returns last element in set.
      * Throws NoSuchElementException if there is no elements in Set.
      */
+    @NotNull
     @Override
     public E last() {
         return descendingIterator().next();
@@ -203,32 +208,36 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * Finds greatest element lower than given one, or null if there is no such one.
      */
+    @Nullable
     @Override
-    public E lower(E e) {
+    public E lower(@NotNull E e) {
         return findVectoredValue(e, lowerVector);
     }
 
     /**
      * Finds greatest element lower or equal to given one, or null if there is no such one
      */
+    @Nullable
     @Override
-    public E floor(E e) {
+    public E floor(@NotNull E e) {
         return findVectoredOrExactValue(e, lowerVector);
     }
 
     /**
      * Find lowest element greater or equal to given one, or null if there is no such one
      */
+    @Nullable
     @Override
-    public E ceiling(E e) {
+    public E ceiling(@NotNull E e) {
         return findVectoredOrExactValue(e, lowerVector.opposite());
     }
 
     /**
      * Find lowest element greater than given one, or null if there is no such one
      */
+    @Nullable
     @Override
-    public E higher(E e) {
+    public E higher(@NotNull E e) {
         return findVectoredValue(e, lowerVector.opposite());
     }
 
@@ -239,21 +248,24 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     Here and below I could copypast JavaDoc from another findVectoredNode method, but that would be terrible in size.
     Am I supposed to do that anyway?
      */
-    private E findVectoredValue(Object value, Vector vector) {
+    @Nullable
+    private E findVectoredValue(@NotNull Object value, @NotNull Vector vector) {
         return findVectoredValue(getRoot(), value, vector);
     }
 
     /**
      * findVectoredOrExactValue started from the root, other parameters is the same.
      */
-    private E findVectoredOrExactValue(Object value, Vector vector) {
+    @Nullable
+    private E findVectoredOrExactValue(@NotNull Object value, @NotNull Vector vector) {
         return findVectoredOrExactValue(getRoot(), value, vector);
     }
 
     /**
      * Returns value of findVectoredNode with same parameters, or null if result is null
      */
-    private E findVectoredValue(Node<E> node, Object value, Vector vector) {
+    @Nullable
+    private E findVectoredValue(@Nullable Node<E> node, @NotNull Object value, @NotNull Vector vector) {
         Node<E> nodeResult = findVectoredNode(node, value, vector);
         if (nodeResult == null) {
             return null;
@@ -265,7 +277,8 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * Returns value of node found in findVectoredOrExactValueWithQualification with the same parameters, or
      * null if that node is null.
      */
-    private E findVectoredOrExactValue(Node<E> node, Object value, Vector vector) {
+    @Nullable
+    private E findVectoredOrExactValue(@Nullable Node<E> node, @NotNull Object value, @NotNull Vector vector) {
         Node<E> nodeResult = findVectoredOrExactNodeWithQualification(node, value, vector).getKey();
         if (nodeResult == null) {
             return null;
@@ -280,7 +293,8 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * <p></p>
      * Returns null if there is no such Node
      */
-    private Node<E> findVectoredNode(Node<E> node, Object value, Vector vector) {
+    @Nullable
+    private Node<E> findVectoredNode(@Nullable Node<E> node, @NotNull Object value, @NotNull Vector vector) {
         AbstractMap.SimpleEntry<Node<E>, Boolean> qualifiedResult = findVectoredOrExactNodeWithQualification(node, value, vector);
         if (!qualifiedResult.getValue()) {
             return qualifiedResult.getKey();
@@ -300,8 +314,9 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /*
     Is it okay to use that type of pairs or I should better implement my own every time? (second option is kinda gross).
      */
+    @NotNull
     private AbstractMap.SimpleEntry<Node<E>, Boolean> findVectoredOrExactNodeWithQualification
-            (Node<E> node, Object value, Vector vector) {
+            (@Nullable Node<E> node, @NotNull Object value, @NotNull Vector vector) {
         if (node == null) {
             return new AbstractMap.SimpleEntry<>(null, false);
         }
@@ -328,7 +343,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * Finds Node with value equals to given value. Returns null if there is no such Node.
      */
     @Nullable
-    private Node<E> findExactNode(Object value) {
+    private Node<E> findExactNode(@NotNull Object value) {
         AbstractMap.SimpleEntry<Node<E>, Boolean> result = findVectoredOrExactNodeWithQualification(getRoot(), value, Vector.LEFT);
         if (result.getValue()) {
             return result.getKey();
@@ -341,7 +356,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * Returns true if set contains given object.
      */
     @Override
-    public boolean contains(Object o) {
+    public boolean contains(@NotNull Object o) {
         return findExactNode(o) != null;
     }
 
@@ -358,11 +373,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * Returns true if object was in set and was removed, false otherwise.
      */
     @Override
-    public boolean remove(Object o) {
-        if (o == null) {
-            throw new IllegalArgumentException("You cannot remove null elements from the set.");
-        }
-
+    public boolean remove(@NotNull Object o) {
         Node<E> removeNode = findExactNode(o);
         if (removeNode == null) {
             return false;
@@ -476,10 +487,12 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         Creating an array parametrized by generic type is unchecked cast???? Well, too bad...
          */
         @SuppressWarnings("unchecked")
+        @Nullable
         private Node<E>[] sons = (Node<E>[]) new Node[2];
 
         /**
          * Parent Node in tree
+         * Null only for root Node
          */
         @Nullable
         private Node<E> parent;
@@ -502,7 +515,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
          * Returns null if there is no such
          */
         @Nullable
-        private Node<E> getNextNode(Vector vector) {
+        private Node<E> getNextNode(@NotNull Vector vector) {
             if (hasSon(vector)) {
                 return sonAtVector(vector).getDeepest(vector.opposite());
             }
@@ -545,7 +558,11 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
          */
         @Nullable
         private Node<E> getVectorSon(@NotNull Vector vector) {
-            return sons[vector.ordinal()];
+            /*
+            Sons always not null, actually, but I cannot annotate it with @NotNull because it annotates it's content
+            as NotNull which is false
+             */
+            return Objects.requireNonNull(sons)[vector.ordinal()];
         }
 
         /**
@@ -579,8 +596,8 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         /**
          * Set son of direction of vector
          */
-        private void setSon(Node<E> son, @NotNull Vector vector) {
-            sons[vector.ordinal()] = son;
+        private void setSon(@Nullable Node<E> son, @NotNull Vector vector) {
+            Objects.requireNonNull(sons)[vector.ordinal()] = son;
         }
     }
 
@@ -611,7 +628,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         }
 
         /**
-         * Returns original set. In this way, using descendingSet() multiple times won't make more than one extra object.
+         * Returns original set. In this way using descendingSet() multiple times won't make more than one extra object.
          */
         @Override
         @NotNull
@@ -681,13 +698,14 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * Set comparator to another, intended use only in constructor.
      */
-    private void setComparator(Comparator<? super E> comparator) {
+    private void setComparator(@NotNull Comparator<? super E> comparator) {
         treeState.comparator = comparator;
     }
 
     /**
      * Returns root of the tree
      */
+    @Nullable
     private Node<E> getRoot() {
         return treeState.root;
     }
@@ -695,13 +713,14 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * Set root of the tree to another
      */
-    private void setRoot(Node<E> root) {
+    private void setRoot(@Nullable Node<E> root) {
         treeState.root = root;
     }
 
     /**
      * Returns state of the tree.
      */
+    @NotNull
     protected TreeState<E> getTreeState() {
         return treeState;
     }
@@ -709,13 +728,14 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * Sets state of the tree.
      */
-    protected void setTreeState(TreeState<E> treeState) {
+    protected void setTreeState(@NotNull TreeState<E> treeState) {
         this.treeState = treeState;
     }
 
     /**
      * Returns LEFT vector if compareResult > 0, RIGHT if compareResult < 0, throws exception otherwise
      */
+    @NotNull
     private Vector getVectorByCompareResult(int compareResult) {
         if (compareResult < 0) {
             return Vector.LEFT;
@@ -731,6 +751,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * Returns LEFT vector if predicate is true, RIGHT otherwise
      */
+    @NotNull
     private Vector getVectorByPredicate(boolean predicate) {
         return (predicate) ? Vector.LEFT : Vector.RIGHT;
     }
