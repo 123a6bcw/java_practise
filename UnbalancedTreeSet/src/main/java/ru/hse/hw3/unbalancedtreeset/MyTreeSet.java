@@ -5,10 +5,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- *
+ * Interface for sorted type of sets that allows to find first element that lower than given one etc and iterates over set
+ * in descending order
  */
 public interface MyTreeSet<E> extends Set<E> {
-
     /** {@link TreeSet#descendingIterator()} **/
     Iterator<E> descendingIterator();
 
