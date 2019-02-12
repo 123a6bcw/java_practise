@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,9 +14,6 @@ class UnbalancedTreeSetTest {
     private UnbalancedTreeSet<Integer> emptySet;
     private UnbalancedTreeSet<Integer> filledSet;
     private Integer[] values = {6,4,2,8};
-    private Integer[] sortedValues = {1,2,3,4};
-    private Integer[] sortedDescendingValues = {4,3,2,1};
-
 
     @BeforeEach
     private void initialise() {
@@ -52,6 +50,19 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
+    void addExistingObject() {
+        filledSet.add(6);
+        assertEquals(4, filledSet.size());
+    }
+
+    @Test
+    void addRemovedObject() {
+        filledSet.remove(6);
+        filledSet.add(6);
+        assertEquals(4, filledSet.size());
+    }
+
+    @Test
     void addNullThrowsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> emptySet.add(null));
     }
@@ -78,6 +89,44 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
+    void iteratorInvalidatesAfterModifications() {
+        var iterator = filledSet.iterator();
+        filledSet.add(1);
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+        iterator = filledSet.iterator();
+        iterator = filledSet.iterator();
+        filledSet.remove(6);
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+        iterator = emptySet.iterator();
+        emptySet.add(1);
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+    }
+
+    @Test
+    void iteratorInvalidatesAfterClear() {
+        var iterator = filledSet.iterator();
+        filledSet.clear();
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+    }
+
+    @Test
+    void iteratorDoesNotInvalidatesIfObjectWasntRemovedOrAddWithNoEffect() {
+        var iterator = filledSet.iterator();
+        filledSet.add(2);
+        assertDoesNotThrow(iterator::next);
+
+        filledSet.remove(1);
+        assertDoesNotThrow(iterator::next);
+    }
+
+    @Test
+    void iteratorInvalidatesAfterClearWithNoEffect() {
+        var iterator = emptySet.iterator();
+        emptySet.clear();
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+    }
+
+    @Test
     void descendingIterator() {
         var iterator = filledSet.descendingIterator();
         assertTrue(iterator.hasNext());
@@ -92,6 +141,26 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
+    void descendingIteratorInvalidation() {
+        var iterator = filledSet.descendingIterator();
+        filledSet.add(1);
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+        iterator = filledSet.descendingIterator();
+        filledSet.remove(6);
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+        iterator = emptySet.descendingIterator();
+        emptySet.add(1);
+        assertThrows(ConcurrentModificationException.class, iterator::next);
+
+        iterator = filledSet.descendingIterator();
+        filledSet.add(2);
+        assertDoesNotThrow(iterator::next);
+
+        filledSet.remove(10);
+        assertDoesNotThrow(iterator::next);
+    }
+
+    @Test
     void sizeOfEmptySetIsZero() {
         assertEquals(0, emptySet.size());
     }
@@ -103,6 +172,18 @@ class UnbalancedTreeSetTest {
         emptySet.add(6);
         assertEquals(2, emptySet.size());
         assertEquals(4, filledSet.size());
+    }
+
+    @Test
+    void creatingNonSortableElementsCrashes() {
+        var crashSet = new UnbalancedTreeSet<UnbalancedTreeSet<Object>>();
+        assertDoesNotThrow(() -> crashSet.add(new UnbalancedTreeSet<>())); //No elements are being compare, nothing to crash
+        assertThrows(ClassCastException.class, () -> crashSet.remove(new UnbalancedTreeSet<>()));
+    }
+
+    @Test
+    void creatingNullComparatorCrashes() {
+        assertThrows(IllegalArgumentException.class, () -> new UnbalancedTreeSet<Integer>(null));
     }
 
     @Test
@@ -266,19 +347,93 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void clearThrowsUnsupported() {
+    void sizeOfEmptySet() {
+        assertEquals(0, emptySet.size());
     }
 
     @Test
-    void removeThrowsUnsupported() {
+    void sizeAfterAddsAndRemoving() {
+        assertEquals(4, filledSet.size());
+        filledSet.add(10);
+        filledSet.add(12);
+        assertEquals(6, filledSet.size());
+        filledSet.remove(4);
+        assertEquals(5, filledSet.size());
+        for (int i = 2; i <= 10; i++) {
+            filledSet.remove(i);
+        }
+        assertEquals(1, filledSet.size());
+        filledSet.remove(12);
+        assertEquals(0, filledSet.size());
     }
 
     @Test
-    void removeAllThrowsUnsupported() {
+    void clearOfEmptySet() {
+        emptySet.clear();
+        assertEquals(0, emptySet.size());
     }
 
     @Test
-    void descendingSet() {
+    void clearOfFilledSet() {
+        filledSet.clear();
+        assertEquals(0, filledSet.size());
+    }
 
+    @Test
+    void removeInEmptySetDoesNothing() {
+        assertDoesNotThrow(() -> emptySet.remove(45));
+    }
+
+    @Test
+    void removeInOneObjectSetMakesItClear() {
+        emptySet.add(5);
+        emptySet.remove(5);
+        assertEquals(0, emptySet.size());
+    }
+
+    @Test
+    void descendingSetOfDescendingSetIsTheSameObject() {
+        assertSame(emptySet, emptySet.descendingSet().descendingSet());
+        assertSame(filledSet, filledSet.descendingSet().descendingSet());
+    }
+
+    @Test
+    void descendingSetHaveTheSameElementsInDescendingOrder() {
+        assertEquals(0, emptySet.descendingSet().size());
+        assertEquals(4, filledSet.descendingSet().size());
+
+        var iterator = filledSet.iterator();
+        var iteratorDescending = filledSet.descendingSet().descendingIterator();
+
+        while (iterator.hasNext()) {
+            assertEquals(iterator.next(), iteratorDescending.next());
+        }
+
+        assertFalse(iteratorDescending.hasNext());
+    }
+
+    @Test
+    void descendingSetChangesReflectsAnotherSet() {
+        var descendingSet = filledSet.descendingSet();
+
+        filledSet.remove(6);
+        assertFalse(descendingSet.contains(6));
+
+        filledSet.add(10);
+        assertTrue(descendingSet.contains(10));
+
+        descendingSet.add(0);
+        assertTrue(filledSet.contains(0));
+
+        descendingSet.remove(0);
+        assertFalse(filledSet.contains(0));
+
+        descendingSet.clear();
+        assertEquals(0, filledSet.size());
     }
 }
+
+/*
+Сделать проверку на неправильные параметры
+Проверка на то, как работает lower и поллуовер
+ */

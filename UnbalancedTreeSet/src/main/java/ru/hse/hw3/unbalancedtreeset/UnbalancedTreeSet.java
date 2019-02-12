@@ -662,8 +662,8 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * Changes size to zero.
      */
-    private int clearSize() {
-        return treeState.size = 0;
+    private void clearSize() {
+        treeState.size = 0;
     }
 
     /**
