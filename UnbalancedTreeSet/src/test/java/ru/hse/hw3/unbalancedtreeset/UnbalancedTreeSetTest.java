@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UnbalancedTreeSetTest {
     private UnbalancedTreeSet<Integer> emptySet;
     private UnbalancedTreeSet<Integer> filledSet;
-    private Integer[] values = {6,4,2,8};
+    private Integer[] values = {6,4,2,8,16,10,0,12,14};
 
     @BeforeEach
     private void initialise() {
@@ -27,18 +27,18 @@ class UnbalancedTreeSetTest {
          */
         filledSet.addAll(Arrays.asList(values));
         filledSet.remove(2);
-        filledSet.add(10);
+        filledSet.add(22);
         filledSet.add(5);
-        filledSet.remove(10);
+        filledSet.remove(22);
         filledSet.remove(5);
         filledSet.add(2);
-        filledSet.add(0);
-        filledSet.remove(0);
+        filledSet.add(-1);
+        filledSet.remove(-1);
     }
 
     @Test
     void addAll() {
-        assertEquals(4, filledSet.size());
+        assertEquals(9, filledSet.size());
     }
 
     @Test
@@ -52,14 +52,14 @@ class UnbalancedTreeSetTest {
     @Test
     void addExistingObject() {
         filledSet.add(6);
-        assertEquals(4, filledSet.size());
+        assertEquals(9, filledSet.size());
     }
 
     @Test
     void addRemovedObject() {
         filledSet.remove(6);
         filledSet.add(6);
-        assertEquals(4, filledSet.size());
+        assertEquals(9, filledSet.size());
     }
 
     @Test
@@ -77,14 +77,10 @@ class UnbalancedTreeSetTest {
     @Test
     void iteratorOnFilledSet() {
         var iterator = filledSet.iterator();
-        assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(2), iterator.next());
-        assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(4), iterator.next());
-        assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(6), iterator.next());
-        assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(8), iterator.next());
+        for (int i = 0; i <= 16; i += 2) {
+            assertTrue(iterator.hasNext());
+            assertEquals(i, iterator.next());
+        }
         assertFalse(iterator.hasNext());
     }
 
@@ -128,14 +124,10 @@ class UnbalancedTreeSetTest {
     @Test
     void descendingIterator() {
         var iterator = filledSet.descendingIterator();
-        assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(8), iterator.next());
-        assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(6), iterator.next());
-        assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(4), iterator.next());
-        assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(2), iterator.next());
+        for (int i = 16; i >= 0; i -= 2) {
+            assertTrue(iterator.hasNext());
+            assertEquals(i, iterator.next());
+        }
         assertFalse(iterator.hasNext());
     }
 
@@ -155,7 +147,7 @@ class UnbalancedTreeSetTest {
         filledSet.add(2);
         assertDoesNotThrow(iterator::next);
 
-        filledSet.remove(10);
+        filledSet.remove(22);
         assertDoesNotThrow(iterator::next);
     }
 
@@ -170,7 +162,7 @@ class UnbalancedTreeSetTest {
         assertEquals(1, emptySet.size());
         emptySet.add(6);
         assertEquals(2, emptySet.size());
-        assertEquals(4, filledSet.size());
+        assertEquals(9, filledSet.size());
     }
 
     @Test
@@ -192,7 +184,7 @@ class UnbalancedTreeSetTest {
 
     @Test
     void firstOfFilledSet() {
-        assertEquals(Integer.valueOf(2), filledSet.first());
+        assertEquals(0, filledSet.first());
     }
 
     @Test
@@ -208,7 +200,7 @@ class UnbalancedTreeSetTest {
 
     @Test
     void LastOfFilledSet() {
-        assertEquals(Integer.valueOf(8), filledSet.last());
+        assertEquals(16, filledSet.last());
     }
 
     @Test
@@ -237,9 +229,9 @@ class UnbalancedTreeSetTest {
 
     @Test
     void lowerOfFilledSet() {
-        assertNull(filledSet.lower(1));
-        assertNull(filledSet.lower(2));
-        for (int i = 3; i <= 8; i += 2) {
+        assertNull(filledSet.lower(-1));
+        assertNull(filledSet.lower(0));
+        for (int i = 1; i <= 16; i += 2) {
             assertEquals(i-1, filledSet.lower(i));
             assertEquals(i-1, filledSet.lower(i + 1));
         }
@@ -265,8 +257,8 @@ class UnbalancedTreeSetTest {
 
     @Test
     void floorOfFilledSet() {
-        assertNull(filledSet.floor(1));
-        for (int i = 2; i <= 8; i += 2) {
+        assertNull(filledSet.floor(-1));
+        for (int i = 0; i <= 16; i += 2) {
             assertEquals(i, filledSet.floor(i));
             assertEquals(i, filledSet.floor(i+1));
         }
@@ -292,8 +284,8 @@ class UnbalancedTreeSetTest {
 
     @Test
     void ceilingOfFilledSet() {
-        assertNull(filledSet.ceiling(9));
-        for (int i = 1; i <= 8; i += 2) {
+        assertNull(filledSet.ceiling(17));
+        for (int i = -1; i <= 16; i += 2) {
             assertEquals(i+1, filledSet.ceiling(i));
             assertEquals(i+1, filledSet.ceiling(i + 1));
         }
@@ -319,9 +311,9 @@ class UnbalancedTreeSetTest {
 
     @Test
     void higherOfFilledSet() {
-        assertNull(filledSet.higher(8));
-        assertNull(filledSet.higher(9));
-        for (int i = 7; i >= 3; i -= 2) {
+        assertNull(filledSet.higher(16));
+        assertNull(filledSet.higher(17));
+        for (int i = 15; i >= -1; i -= 2) {
             assertEquals(i+1, filledSet.higher(i));
             assertEquals(i+1, filledSet.higher(i - 1));
         }
@@ -352,17 +344,17 @@ class UnbalancedTreeSetTest {
 
     @Test
     void sizeAfterAddsAndRemoving() {
-        assertEquals(4, filledSet.size());
+        assertEquals(9, filledSet.size());
         filledSet.add(10);
         filledSet.add(12);
-        assertEquals(6, filledSet.size());
+        assertEquals(9, filledSet.size());
         filledSet.remove(4);
-        assertEquals(5, filledSet.size());
-        for (int i = 2; i <= 10; i++) {
+        assertEquals(8, filledSet.size());
+        for (int i = 2; i <= 16; i++) {
             filledSet.remove(i);
         }
         assertEquals(1, filledSet.size());
-        filledSet.remove(12);
+        filledSet.remove(0);
         assertEquals(0, filledSet.size());
     }
 
@@ -399,7 +391,7 @@ class UnbalancedTreeSetTest {
     @Test
     void descendingSetHaveTheSameElementsInDescendingOrder() {
         assertEquals(0, emptySet.descendingSet().size());
-        assertEquals(4, filledSet.descendingSet().size());
+        assertEquals(9, filledSet.descendingSet().size());
 
         var iterator = filledSet.iterator();
         var iteratorDescending = filledSet.descendingSet().descendingIterator();
