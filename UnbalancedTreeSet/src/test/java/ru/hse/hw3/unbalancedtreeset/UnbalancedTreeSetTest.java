@@ -94,7 +94,6 @@ class UnbalancedTreeSetTest {
         filledSet.add(1);
         assertThrows(ConcurrentModificationException.class, iterator::next);
         iterator = filledSet.iterator();
-        iterator = filledSet.iterator();
         filledSet.remove(6);
         assertThrows(ConcurrentModificationException.class, iterator::next);
         iterator = emptySet.iterator();
@@ -430,10 +429,37 @@ class UnbalancedTreeSetTest {
 
         descendingSet.clear();
         assertEquals(0, filledSet.size());
+        assertEquals(0, descendingSet.size());
+    }
+
+    @Test
+    void descendingSetLowerIsOppositeToHigher() {
+        for (int i = 0; i <= 10; i++) {
+            assertEquals(filledSet.lower(i), filledSet.descendingSet().higher(i));
+            assertEquals(emptySet.lower(i), emptySet.descendingSet().higher(i));
+
+            assertEquals(filledSet.descendingSet().lower(i), filledSet.higher(i));
+            assertEquals(emptySet.descendingSet().lower(i), emptySet.higher(i));
+        }
+    }
+
+    @Test
+    void descendingSetFloorIsOppositeToCeiling() {
+        for (int i = 0; i <= 10; i++) {
+            assertEquals(filledSet.floor(i), filledSet.descendingSet().ceiling(i));
+            assertEquals(emptySet.floor(i), emptySet.descendingSet().ceiling(i));
+
+            assertEquals(filledSet.descendingSet().floor(i), filledSet.ceiling(i));
+            assertEquals(emptySet.descendingSet().floor(i), emptySet.ceiling(i));
+        }
+    }
+
+    @Test
+    void descendingSetFirstIsOppositeToLast() {
+        assertEquals(filledSet.first(), filledSet.descendingSet().last());
+        assertThrows(NoSuchElementException.class, () -> emptySet.descendingSet().last());
+
+        assertEquals(filledSet.descendingSet().first(), filledSet.last());
+        assertThrows(NoSuchElementException.class, () -> emptySet.descendingSet().first());
     }
 }
-
-/*
-Сделать проверку на неправильные параметры
-Проверка на то, как работает lower и поллуовер
- */
