@@ -444,7 +444,9 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         }
 
         /**
-         * {@inheritDoc}
+         * Returns whether iterator contains next object.
+         * Throws ConcurrentModificationException() if iterator is invalid after tree's modification
+         *
          */
         @Override
         public boolean hasNext() {
@@ -454,7 +456,9 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         }
 
         /**
-         * {@inheritDoc}
+         * Returns next object in iterator.
+         * Throws NoSuchElementException if there is no next element
+         * Throws ConcurrentModificationException() if iterator is invalid after tree's modification
          */
         @Override
         @NotNull
