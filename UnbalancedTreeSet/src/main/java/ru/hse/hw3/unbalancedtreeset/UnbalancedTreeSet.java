@@ -1,9 +1,9 @@
 package ru.hse.hw3.unbalancedtreeset;
 
+import java.util.*;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
 
 /**
  * Elements of type E set collection based on Heap data structure
@@ -253,14 +253,6 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     }
 
     /**
-     * findVectoredOrExactValue started from the root, other parameters is the same.
-     */
-    @Nullable
-    private E findVectoredOrExactValue(@NotNull Object value, @NotNull Vector vector) {
-        return findVectoredOrExactValue(getRoot(), value, vector);
-    }
-
-    /**
      * Returns value of findVectoredNode with same parameters, or null if result is null
      */
     @Nullable
@@ -270,6 +262,14 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
             return null;
         }
         return nodeResult.getValue();
+    }
+
+    /**
+     * findVectoredOrExactValue started from the root, other parameters is the same.
+     */
+    @Nullable
+    private E findVectoredOrExactValue(@NotNull Object value, @NotNull Vector vector) {
+        return findVectoredOrExactValue(getRoot(), value, vector);
     }
 
     /**
