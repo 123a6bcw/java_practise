@@ -154,7 +154,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     @NotNull
     @Override
     public Iterator<E> iterator() {
-        return new UnbalancedTreeSetIterator(getTreeVersion(), lowerVector);
+        return new UnbalancedTreeSetIterator(getTreeVersion(), lowerVector.opposite());
     }
 
     /**
@@ -311,13 +311,13 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
             return new AbstractMap.SimpleEntry<>(node, true);
         }
 
-        boolean isVectoredValue = (getVectorByCompareResult(compareResult) == vector);
+        boolean isVectoredValue = (getVectorByCompareResult(compareResult) == vector.opposite());
         AbstractMap.SimpleEntry<Node<E>, Boolean> vectoredNode =
-                findVectoredOrExactNodeWithQualification(node.getVectorSon(getVectorByCompareResult(compareResult)), value, vector);
-        if (vectoredNode != null) {
+                findVectoredOrExactNodeWithQualification(node.getVectorSon(getVectorByCompareResult(compareResult).opposite()), value, vector);
+        if (vectoredNode.getKey() != null) {
             return vectoredNode;
         }
-        if (isVectoredValue) {
+        if (!isVectoredValue) {
             return new AbstractMap.SimpleEntry<>(node, false);
         }
 
@@ -327,6 +327,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * Finds Node with value equals to given value. Returns null if there is no such Node.
      */
+    @Nullable
     private Node<E> findExactNode(Object value) {
         AbstractMap.SimpleEntry<Node<E>, Boolean> result = findVectoredOrExactNodeWithQualification(getRoot(), value, Vector.LEFT);
         if (result.getValue()) {
@@ -376,12 +377,15 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
             leftSon.setSon(rightSon, Vector.RIGHT);
         }
 
-        if (removeNode == getRoot()) {
+        if (removeNode.getParent() == null) {
+            //True only for root node
             setRoot(leftSon);
         } else {
-            getRoot().setSon(leftSon, getVectorByPredicate(removeNode.isVectorSon(Vector.LEFT)));
+            removeNode.getParent().setSon(leftSon, getVectorByPredicate(removeNode.isVectorSon(Vector.LEFT)));
         }
 
+        decreaseSize();
+        upgradeVersion();
         return true;
     }
 
@@ -511,7 +515,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
                 return getParent();
             }
 
-            return getParent().getNextNode(vector);
+            return null;
         }
 
         /**
@@ -550,6 +554,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         private boolean hasSon(@NotNull Vector vector) {
             return getVectorSon(vector) != null;
         }
+
         /**
          * Get son in direction of vector, throws exception if this son does not exists (equals to null)
          */
@@ -574,8 +579,8 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         /**
          * Set son of direction of vector
          */
-        private void setSon(Node<E> leftSon, @NotNull Vector vector) {
-            sons[vector.ordinal()] = leftSon;
+        private void setSon(Node<E> son, @NotNull Vector vector) {
+            sons[vector.ordinal()] = son;
         }
     }
 
@@ -651,6 +656,13 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     }
 
     /**
+     * Decreases size of the tree after removing element
+     */
+    private void decreaseSize() {
+        treeState.size--;
+    }
+
+    /**
      * Increases current tree's version after modifications of the tree.
      * May overflow, but that's ok.
      */
@@ -706,11 +718,11 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      */
     private Vector getVectorByCompareResult(int compareResult) {
         if (compareResult < 0) {
-            return Vector.RIGHT;
+            return Vector.LEFT;
         }
 
         if (compareResult > 0) {
-            return Vector.LEFT;
+            return Vector.RIGHT;
         }
 
         throw new IllegalArgumentException("compareResult can't be zero");
@@ -719,7 +731,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * Returns LEFT vector if predicate is true, RIGHT otherwise
      */
-    private Vector getVectorByPredicate(boolean predicat) {
-        return (predicat) ? Vector.LEFT : Vector.RIGHT;
+    private Vector getVectorByPredicate(boolean predicate) {
+        return (predicate) ? Vector.LEFT : Vector.RIGHT;
     }
 }

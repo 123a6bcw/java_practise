@@ -12,16 +12,30 @@ import static org.junit.jupiter.api.Assertions.*;
 class UnbalancedTreeSetTest {
     private UnbalancedTreeSet<Integer> emptySet;
     private UnbalancedTreeSet<Integer> filledSet;
-    private Integer[] values = {1,5,6,2};
-    private Integer[] sortedValues = {1,2,5,6};
-    private Integer[] sortedDescendingValues = {6,5,2,1};
+    private Integer[] values = {6,4,2,8};
+    private Integer[] sortedValues = {1,2,3,4};
+    private Integer[] sortedDescendingValues = {4,3,2,1};
 
 
     @BeforeEach
     private void initialise() {
         emptySet  = new UnbalancedTreeSet<>(Comparator.naturalOrder());
         filledSet = new UnbalancedTreeSet<>(Comparator.naturalOrder());
+
+        /*
+        Is it okay to initialise that way?
+        Cause if add() or remove fails (throws exceptions or something), all my tests would fail.
+        And I want to have remove here so I would sure that everything works not just for just created tree.
+         */
         filledSet.addAll(Arrays.asList(values));
+        filledSet.remove(2);
+        filledSet.add(10);
+        filledSet.add(5);
+        filledSet.remove(10);
+        filledSet.remove(5);
+        filledSet.add(2);
+        filledSet.add(0);
+        filledSet.remove(0);
     }
 
     @Test
@@ -53,13 +67,13 @@ class UnbalancedTreeSetTest {
     void iteratorOnFilledSet() {
         var iterator = filledSet.iterator();
         assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(1), iterator.next());
-        assertTrue(iterator.hasNext());
         assertEquals(Integer.valueOf(2), iterator.next());
         assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(5), iterator.next());
+        assertEquals(Integer.valueOf(4), iterator.next());
         assertTrue(iterator.hasNext());
         assertEquals(Integer.valueOf(6), iterator.next());
+        assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(8), iterator.next());
         assertFalse(iterator.hasNext());
     }
 
@@ -67,13 +81,13 @@ class UnbalancedTreeSetTest {
     void descendingIterator() {
         var iterator = filledSet.descendingIterator();
         assertTrue(iterator.hasNext());
+        assertEquals(Integer.valueOf(8), iterator.next());
+        assertTrue(iterator.hasNext());
         assertEquals(Integer.valueOf(6), iterator.next());
         assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(5), iterator.next());
+        assertEquals(Integer.valueOf(4), iterator.next());
         assertTrue(iterator.hasNext());
         assertEquals(Integer.valueOf(2), iterator.next());
-        assertTrue(iterator.hasNext());
-        assertEquals(Integer.valueOf(1), iterator.next());
         assertFalse(iterator.hasNext());
     }
 
@@ -98,13 +112,13 @@ class UnbalancedTreeSetTest {
 
     @Test
     void firstOfFilledSet() {
-        assertEquals(Integer.valueOf(1), filledSet.first());
+        assertEquals(Integer.valueOf(2), filledSet.first());
     }
 
     @Test
     void firstOfOneObjectSet() {
         emptySet.add(5);
-        assertEquals(Integer.valueOf(5), filledSet.first());
+        assertEquals(Integer.valueOf(5), emptySet.first());
     }
 
     @Test
@@ -114,7 +128,7 @@ class UnbalancedTreeSetTest {
 
     @Test
     void LastOfFilledSet() {
-        assertEquals(Integer.valueOf(6), filledSet.last());
+        assertEquals(Integer.valueOf(8), filledSet.last());
     }
 
     @Test
@@ -130,7 +144,7 @@ class UnbalancedTreeSetTest {
 
     @Test
     void lowerOfFilledSet() {
-        assertEquals(Integer.valueOf(1), filledSet.lower(2));
+        assertEquals(Integer.valueOf(2), filledSet.lower(3));
     }
 
     @Test
