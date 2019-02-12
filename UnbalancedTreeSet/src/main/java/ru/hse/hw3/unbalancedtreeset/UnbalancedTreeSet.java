@@ -14,6 +14,10 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * Class for storing tree's state (basically all mutable fields). See DescendingTreeSet to see details of necessity in using this class
      */
+    /*
+    Parametrized because root has to be parametrized.
+    Root IS mutable field because it may be null.
+     */
     private static class TreeState<E> {
         /**
          * Current Tree's version. Changes after modifications.
@@ -26,7 +30,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         private int size = 0;
 
         /**
-         * Root of the tree
+         * Root of the tree.
          */
         private Node<E> root;
 
@@ -37,21 +41,19 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     }
 
     /**
-     * Current tree state. Heir classes does not have access to it and can't set it therefore cannot can't change
-     * tree's state. See details in class DescendingTreeSet
+     * Stored current tree state.
      */
     private TreeState<E> treeState;
 
     /**
-     * Enum for moving
-     * <p></p>
-     * Placed here so programmer would not think about using TreeState.Vector.RIGHT/LEFT
-     * to create instances of Vector (too bad Java can't forbid that) as it may cause errors in synchronization
-     * with descendingTreeSet.
+     * Enum for moving to either left or right son of the Node.
      */
     private enum Vector {
         LEFT, RIGHT;
 
+        /**
+         * Returns vector opposite to this one.
+         */
         private Vector opposite() {
             if (this == LEFT) {
                 return Vector.RIGHT;
@@ -64,6 +66,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * If lowerVector is LEFT, tree assumes that left son of the node contains lower elements, otherwise assumes
      * it's right son. Uses only for VIEWING options (one that does not changes state of the tree).
+     * Basically, it is LEFT for default set and RIGHT for descendingSet.
      */
     private Vector lowerVector = Vector.LEFT;
 
@@ -104,13 +107,17 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     }
 
     /**
-     * If set does not contain element with the same value, adds given element to the set and returns true
-     * Otherwise does nothing and returns false
+     * If set does not contain element with the same value, adds given element to the set and returns true.
+     * Otherwise does nothing and returns false.
      */
     @Override
     public boolean add(E e) {
+        if (e == null) {
+            throw new IllegalArgumentException("You cannot add null elements in set. Sorry!");
+        }
+
         if (getRoot() == null) {
-            setRoot(new Node<E>(e, null));
+            setRoot(new Node<>(e, null));
         } else
         if (!add(e, getRoot())) {
             return false;
@@ -142,7 +149,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     }
 
     /**
-     * Creates iterator for iterating over elements in set in natural order.
+     * Creates iterator for iterating over elements in set in the natural order.
      */
     @NotNull
     @Override
@@ -151,7 +158,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     }
 
     /**
-     * Creates iterator for iterating over elements in set in reversed order
+     * Creates iterator for iterating over elements in set in the reversed order.
      */
     @Override
     public Iterator<E> descendingIterator() {
@@ -167,8 +174,8 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     }
 
     /**
-     * Creates the same tree set but in reversed order. Changes of this object reflects reversed tree and vice versa
-     * Invalidating iterators in one tree will also reflect iterators in another tree.
+     * Creates the same tree set but in reversed order. Changes state of this tree reflects reversed tree and vice versa,
+     * including invalidating iterators in one of the tree's.
      */
     @Override
     public UnbalancedTreeSet<E> descendingSet() {
@@ -210,7 +217,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     }
 
     /**
-     * Find lowerst element greater or equal to given one, or null if there is no such one
+     * Find lowest element greater or equal to given one, or null if there is no such one
      */
     @Override
     public E ceiling(E e) {
@@ -229,7 +236,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * findVectoredValue started from the root, other parameters is the same.
      */
     /*
-    Here and below I could copypast JavaDoc from findVectoredNode, but that would be terrible in size.
+    Here and below I could copypast JavaDoc from another findVectoredNode method, but that would be terrible in size.
     Am I supposed to do that anyway?
      */
     private E findVectoredValue(Object value, Vector vector) {
@@ -244,15 +251,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     }
 
     /**
-     * findVectoredOrExactNodeWithQualification starting from the root, other parameters is the same.
-     */
-    private AbstractMap.SimpleEntry<Node<E>, Boolean> findVectoredOrExactNodeWithQualification
-    (Object value, Vector vector) {
-        return findVectoredOrExactNodeWithQualification(getRoot(), value, vector);
-    }
-
-    /**
-     * Returns value of findVectoredValue with same parameters, or null if result is null
+     * Returns value of findVectoredNode with same parameters, or null if result is null
      */
     private E findVectoredValue(Node<E> node, Object value, Vector vector) {
         Node<E> nodeResult = findVectoredNode(node, value, vector);
@@ -267,7 +266,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * null if that node is null.
      */
     private E findVectoredOrExactValue(Node<E> node, Object value, Vector vector) {
-        var nodeResult = findVectoredOrExactNodeWithQualification(node, value, vector).getKey();
+        Node<E> nodeResult = findVectoredOrExactNodeWithQualification(node, value, vector).getKey();
         if (nodeResult == null) {
             return null;
         }
@@ -290,13 +289,16 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     }
 
     /**
-     * RIGHT vector correspond to finding greater element (aka moving to the right son), LEFT vice versa
+     * RIGHT vector corresponds to finding greater element (aka moving to the right son), LEFT vice versa
      * <p></p>
      * First element in pair is Node with lowest value that strictly greater (greatest lower) than given value in given node's subtree,
      * null if there is no such Node
      * <p></p>
      * Second element in pair is true if value in found node is equal to given one, false if found node is null or have
      * not equal value.
+     */
+    /*
+    Is it okay to use that type of pairs or I should better implement my own every time? (second option is kinda gross).
      */
     private AbstractMap.SimpleEntry<Node<E>, Boolean> findVectoredOrExactNodeWithQualification
             (Node<E> node, Object value, Vector vector) {
@@ -322,6 +324,9 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         return new AbstractMap.SimpleEntry<>(null, false);
     }
 
+    /**
+     * Finds Node with value equals to given value. Returns null if there is no such Node.
+     */
     private Node<E> findExactNode(Object value) {
         AbstractMap.SimpleEntry<Node<E>, Boolean> result = findVectoredOrExactNodeWithQualification(getRoot(), value, Vector.LEFT);
         if (result.getValue()) {
@@ -353,6 +358,10 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      */
     @Override
     public boolean remove(Object o) {
+        if (o == null) {
+            throw new IllegalArgumentException("You cannot remove null elements from the set.");
+        }
+
         Node<E> removeNode = findExactNode(o);
         if (removeNode == null) {
             return false;
@@ -370,14 +379,14 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         if (removeNode == getRoot()) {
             setRoot(leftSon);
         } else {
-            getRoot().setSon(leftSon, Vector.LEFT);
+            getRoot().setSon(leftSon, getVectorByPredicate(removeNode.isVectorSon(Vector.LEFT)));
         }
 
         return true;
     }
 
     /**
-     * Class for iterating over tree in ascending order
+     * Class for iterating over tree in given (ascending or descending) order
      */
     private class UnbalancedTreeSetIterator implements Iterator<E> {
         /**
@@ -387,7 +396,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
 
         /**
          * If vector is LEFT, rightmost Node is the starting Node, next() moves position to the LEFT direction
-         * vice versa for LEFT vector
+         * vice versa for RIGHT vector
          * Thus, RIGHT vector build ascending iterator, LEFT build descending
          */
         @NotNull
@@ -418,6 +427,9 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean hasNext() {
             checkVersion();
@@ -425,6 +437,9 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
             return next != null;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         @NotNull
         public E next() {
@@ -453,6 +468,9 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         /**
          * Left son Node in tree
          */
+        /*
+        Creating an array parametrized by generic type is unchecked cast???? Well, too bad...
+         */
         @SuppressWarnings("unchecked")
         private Node<E>[] sons = (Node<E>[]) new Node[2];
 
@@ -467,6 +485,9 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
             this.parent = parent;
         }
 
+        /**
+         * Returns value stored in Node. Cannot be null.
+         */
         @NotNull
         private E getValue() {
             return value;
@@ -530,7 +551,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
             return getVectorSon(vector) != null;
         }
         /**
-         * Get son in direction of vector, throws exception if this son does not exists (null)
+         * Get son in direction of vector, throws exception if this son does not exists (equals to null)
          */
         @NotNull
         private Node<E> sonAtVector(@NotNull Vector vector) {
@@ -559,42 +580,54 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     }
 
     /**
-     *
+     * Class that creates tree that absolutely equals to the original tree, but all VIEWING operations are being made in
+     * reversed order to the original set. It is achieved by reversing corresponding way vector and sharing the same
+     * state of the tree between two sets.
      */
     /*
-    What is better: make this class non-static and use super-class setters and getters or make necessary setters/getters protected?
+    What is better: to make this class non-static and use super-class setters and getters
+    (which is stupid because I use the reference to the super set as a parameter) or to make necessary setters/getters protected?
+    (You made me being afraid of using 'protected' and lose my scores :( ).
      */
     private static class DescendingTreeSet<E> extends UnbalancedTreeSet<E> {
         /**
          * Original ascending set this set was created from. Saving, so we could return it using DescendingSet();
          */
+        @NotNull
         UnbalancedTreeSet<E> superSet;
 
         /**
-         *
-         *
+         * Creates set that shares treeState of the original tree, but changes way vector in viewing options.
          */
-        DescendingTreeSet(UnbalancedTreeSet<E> ascendingSet) {
+        DescendingTreeSet(@NotNull UnbalancedTreeSet<E> ascendingSet) {
             superSet = ascendingSet;
             setTreeState(superSet.getTreeState());
             setLowerVector(Vector.RIGHT);
         }
 
         /**
-         *
+         * Returns original set. In this way, using descendingSet() multiple times won't make more than one extra object.
          */
         @Override
+        @NotNull
         public UnbalancedTreeSet<E> descendingSet() {
             return superSet;
         }
     }
 
     /**
-     * Changes the way tree assumes the lower element is relarively to the parent node
+     * Changes the way tree assumes the lower element is relatively to the parent node
      */
-    protected void setLowerVector(Vector vector) {
+    /*
+    Protected, so we could use it in DescendingTreeSet
+     */
+    protected void setLowerVector(@NotNull Vector vector) {
         lowerVector = vector;
     }
+
+    /*
+    I implemented all (necessary) setters and getters so I wouldn't have to write treeState.something each time I want to use fields.
+     */
 
     /**
      * Returns number of elements in tree
@@ -681,5 +714,12 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         }
 
         throw new IllegalArgumentException("compareResult can't be zero");
+    }
+
+    /**
+     * Returns LEFT vector if predicate is true, RIGHT otherwise
+     */
+    private Vector getVectorByPredicate(boolean predicat) {
+        return (predicat) ? Vector.LEFT : Vector.RIGHT;
     }
 }
