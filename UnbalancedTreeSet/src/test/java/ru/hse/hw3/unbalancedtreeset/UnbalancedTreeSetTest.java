@@ -190,7 +190,7 @@ class UnbalancedTreeSetTest {
     @Test
     void firstOfOneObjectSet() {
         emptySet.add(5);
-        assertEquals(Integer.valueOf(5), emptySet.first());
+        assertEquals(5, emptySet.first());
     }
 
     @Test
@@ -206,7 +206,7 @@ class UnbalancedTreeSetTest {
     @Test
     void LastOfOneObjectSet() {
         emptySet.add(7);
-        assertEquals(Integer.valueOf(7), emptySet.last());
+        assertEquals(7, emptySet.last());
     }
 
     @Test
