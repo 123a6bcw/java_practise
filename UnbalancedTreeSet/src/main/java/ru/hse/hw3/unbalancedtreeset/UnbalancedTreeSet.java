@@ -392,6 +392,9 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         if (removeNode.getParent() == null) {
             //True only for root node
             setRoot(leftSon);
+            if (leftSon != null) {
+                leftSon.setParent(null);
+            }
         } else {
             removeNode.getParent().setSon(leftSon, getVectorByPredicate(removeNode.isVectorSon(Vector.LEFT)));
         }
@@ -525,15 +528,16 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
                 return sonAtVector(vector).getDeepest(vector.opposite());
             }
 
-            if (getParent() == null) {
+            var resultNode = this;
+            while (resultNode != null && !resultNode.isVectorSon(vector.opposite())) {
+                resultNode = resultNode.getParent();
+            }
+
+            if (resultNode == null) {
                 return null;
             }
 
-            if (isVectorSon(vector.opposite())) {
-                return getParent();
-            }
-
-            return null;
+            return resultNode.getParent();
         }
 
         /**
@@ -599,10 +603,20 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         }
 
         /**
+         * Sets parent of the Node
+         */
+        private void  setParent(@Nullable Node<E> parent) {
+            this.parent = parent;
+        }
+
+        /**
          * Set son of direction of vector
          */
         private void setSon(@Nullable Node<E> son, @NotNull Vector vector) {
             Objects.requireNonNull(sons)[vector.ordinal()] = son;
+            if (son != null) {
+                son.setParent(this);
+            }
         }
     }
 
