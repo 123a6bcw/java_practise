@@ -1,12 +1,9 @@
 language: java
 jdk:
   - oraclejdk11
-  
-install:
-  - cd GladkovHashTable
-  - mvn install -P travis
-  - cd ../
-  
-  - cd trie
-  - mvn install -P travis
-  - cd ../
+os:
+- linux
+env:
+- PROJECT_DIR=GladkovHashTable
+- PROJECT_DIR=trie
+script: cd $PROJECT_DIR && ./mvn install -P travis
