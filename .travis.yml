@@ -6,4 +6,4 @@ os:
 env:
 - PROJECT_DIR=GladkovHashTable
 - PROJECT_DIR=trie
-script: cd $PROJECT_DIR && mvn install -P travis
+script: cd $PROJECT_DIR && mvn install
