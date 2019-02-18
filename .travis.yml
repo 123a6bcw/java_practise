@@ -1,0 +1,12 @@
+language: java
+jdk:
+  - oraclejdk11
+  
+install:
+  - cd GladkovHashTable
+  - mvn install -P travis
+  - cd ../
+  
+  - cd trie
+  - mvn install -P travis
+  - cd ../
