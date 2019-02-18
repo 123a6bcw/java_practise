@@ -1,0 +1,9 @@
+language: java
+jdk:
+  - oraclejdk11
+os:
+- linux
+env:
+- PROJECT_DIR=GladkovHashTable
+- PROJECT_DIR=trie
+script: cd $PROJECT_DIR && mvn install -P travis
