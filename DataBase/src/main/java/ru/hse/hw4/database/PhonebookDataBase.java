@@ -15,12 +15,13 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- *
+ * A simple phonebook database with console interface.
  */
 public class PhonebookDataBase {
 
     /**
-     *
+     * Runs infinitive loop which reads user's command and updates database.
+     * If args length is more than 0, the first argument is the name of the database. Otherwise it's name is "mainDataBase"
      */
     public static void main(String[] argc) {
         //Hides mongoDB logs from console (too many trash).
@@ -33,7 +34,7 @@ public class PhonebookDataBase {
             dataBaseName = "mainDataBase";
         }
 
-        //Google says I'm not suppose to explicitly close MongoClient, but does not work otherwise.
+        //Google says I'm not suppose to explicitly close MongoClient, but it does not work otherwise.
         try (var inputScanner = new Scanner(System.in);
              var mongoClient = new MongoClient()) {
 
@@ -43,9 +44,10 @@ public class PhonebookDataBase {
 
             final Datastore datastore = morphia.createDatastore(mongoClient, dataBaseName);
 
+            //See printHelp() to read help!
             System.out.println("\nWrite help to get help");
 
-            boolean stopInteraction = false; //
+            boolean stopInteraction = false;
             while (!stopInteraction) {
                 if (inputScanner.hasNextLine()) {
                     var commandScanner = new Scanner(inputScanner.nextLine());
@@ -84,7 +86,7 @@ public class PhonebookDataBase {
     }
 
     /**
-     *Error:(10, 30) java: package ch.qos.logback.classic does not exist
+     * Prints info about commands supported by this database.
      */
     private static void printHelp() {
         System.out.println("\nPlease use one of the following commands:\n" +
@@ -95,11 +97,16 @@ public class PhonebookDataBase {
                 "deleteRecord name phoneNumber                 deletes given record from the base\n" +
                 "changeName name phoneNumber newName           changes name to newName for given record\n" +
                 "changePhone name phoneNumber newPhoneNumber   changes phoneNumber to newPhoneNumber for given record\n" +
-                "printAll                                      prints all record in the base\n");
+                "printAll                                      prints all record in the base\n\n" +
+                "Please use only digits, whitespaces, '-', '(' and ')' in phone numbers (this will be checked, so don't worry)" +
+                "Please note that database does not check your phone number for correctness!\n\n");
+
+        //TODO check number for correctness (symbols)
     }
 
     /**
-     *
+     * Reads name and phoneNumber from System.in. Adds corresponding record to the database.
+     * Mostly does not make checks on correctness of the phone number. Only check if it uses only digits, whitespaces, '-', '(' and ')'.
      */
     private static void addRecord(Scanner commandScanner, Datastore datastore) {
         String[] parameters = getParameters(commandScanner, 2);
@@ -108,14 +115,31 @@ public class PhonebookDataBase {
             return;
         }
 
-        String name = parameters[0], phone = parameters[1];
+        String name = parameters[0];
+        var phoneBuilder = new StringBuilder(parameters[1]);
+        while (commandScanner.hasNext()) {
+            phoneBuilder.append(commandScanner.next());
+        }
+        String phone = phoneBuilder.toString();
+
+        for (int i = 0; i < phone.length(); i++) {
+            if (phone.charAt(i) != ' ' && phone.charAt(i) != '-' && phone.charAt(i) != '(' && phone.charAt(i) != ')' && (phone.charAt(i) < '0' || phone.charAt(i) > '9')) {
+                System.out.println("incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'");
+            }
+        }
+
+        Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
+        if (record != null) {
+            System.out.println("Given record already exists in data base!");
+            return;
+        }
 
         datastore.save(new DataRecord(name, phone));
         System.out.println("Ok! Record " + name + " " + phone + " has been added\n");
     }
 
     /**
-     *
+     * Prints to System.out all phones found by specific filter.
      */
     private static void findPhones(Scanner commandScanner, Datastore datastore) {
         String key = getParameter(commandScanner);
@@ -152,7 +176,7 @@ public class PhonebookDataBase {
     }
 
     /**
-     *
+     * Prints to System.out all names found by specific filter.
      */
     private static void findNames(Scanner commandScanner, Datastore datastore) {
         String findNamesKey = getParameter(commandScanner);
@@ -188,10 +212,10 @@ public class PhonebookDataBase {
     }
 
     /**
-     *
+     * Reads name and phoneNumber from System.in , deletes corresponding record from the database (if it exists).
      */
     private static void deleteRecord(Scanner commandScanner, Datastore datastore) {
-        String[] parameters = getParameters(commandScanner, 3);
+        String[] parameters = getParameters(commandScanner, 2);
         if (parameters == null) {
             System.out.println("name or phone not specified, no record has been deleted\n");
             return;
@@ -199,12 +223,17 @@ public class PhonebookDataBase {
 
         String deleteName = parameters[0], deletePhone = parameters[1];
 
-        datastore.delete(new DataRecord(deleteName, deletePhone));
-        System.out.println("Ok! Record " + deleteName + " " + deletePhone + " has been deleted\n");
+        Query<DataRecord> record = getRecordFromDatastore(datastore, deleteName, deletePhone);
+        if (record == null) {
+            System.out.println("No given record found in database.\n");
+        } else {
+            datastore.findAndDelete(record);
+            System.out.println("Ok! Record " + deleteName + " " + deletePhone + " has been deleted\n");
+        }
     }
 
     /**
-     *
+     * Reads name, phoneNumber and newName from System.in , changes name to newName in corresponding record if it exists.
      */
     private static void changeName(Scanner commandScanner, Datastore datastore) {
         String[] parameters = getParameters(commandScanner, 3);
@@ -226,7 +255,8 @@ public class PhonebookDataBase {
     }
 
     /**
-     *
+     * Reads name, phoneNumber and newPhoneNumber from System.in , changes phoneNumber to newPhoneNumber in corresponding
+     * record if it exists.
      */
     private static void changePhone(Scanner commandScanner, Datastore datastore) {
         String[] parameters = getParameters(commandScanner, 3);
@@ -248,7 +278,7 @@ public class PhonebookDataBase {
     }
 
     /**
-     *
+     * Prints to System.out all records in database.
      */
     private static void printAll(Datastore datastore) {
         List<DataRecord> records = datastore.createQuery(DataRecord.class).asList();
@@ -269,7 +299,8 @@ public class PhonebookDataBase {
     }
 
     /**
-     *
+     * Returns Query with exactly one DataRecord --- one that has the same name and phoneNumber as given ones.
+     * Returns null if there is no such record.
      */
     @Nullable
     private static Query<DataRecord> getRecordFromDatastore(Datastore datastore, String name, String phone) {
@@ -280,8 +311,10 @@ public class PhonebookDataBase {
 
         return result;
     }
+
     /**
-     *
+     * Gets one parameter (token seperated by any delimeters) from the scanner.
+     * Returns null if there is no next token in scanner.
      */
     @Nullable
     private static String getParameter(@NotNull Scanner scanner) {
@@ -293,7 +326,8 @@ public class PhonebookDataBase {
     }
 
     /**
-     *
+     * Gets numberOfParameters parameters (tokens seperated by any delimeters) from the scanner.
+     * Returns null if there is no enough tokens in scanner.
      */
     @Nullable
     private static String[] getParameters(@NotNull Scanner scanner, int numberOfParameters) {
