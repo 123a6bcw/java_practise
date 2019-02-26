@@ -15,13 +15,17 @@ public class PhonebookDataBase {
      *
      */
     public static void main(String[] argc) {
-        runInteraction(System.in, System.out);
+        String dataBaseName = "mainDataBase";
+        if (argc.length != 0) {
+            dataBaseName = argc[0];
+        }
+        runInteraction(System.in, System.out, dataBaseName);
     }
 
     /**
      *
      */
-    private static void runInteraction(@NotNull InputStream inputStream, @NotNull OutputStream outputStream) {
+    public static void runInteraction(@NotNull InputStream inputStream, @NotNull OutputStream outputStream, String DataBaseName) {
         var inputScanner = new Scanner(inputStream);
         var printWriter = new PrintWriter(outputStream);
         printWriter.println("Write help to get help");
