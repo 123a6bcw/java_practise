@@ -27,7 +27,7 @@ public class PhonebookDataBase {
         //Hides mongoDB logs from console (too many trash).
         ((LoggerContext) LoggerFactory.getILoggerFactory()).getLogger("org.mongodb.driver").setLevel(Level.ERROR);
 
-        String dataBaseName = null;
+        String dataBaseName;
         if (argc.length != 0) {
             dataBaseName = argc[0];
         } else {
@@ -51,6 +51,10 @@ public class PhonebookDataBase {
             while (!stopInteraction) {
                 if (inputScanner.hasNextLine()) {
                     var commandScanner = new Scanner(inputScanner.nextLine());
+                    if (!commandScanner.hasNext()) {
+                        continue;
+                    }
+
                     switch (commandScanner.next()) {
                         case ("help"):
                             printHelp();
@@ -80,7 +84,7 @@ public class PhonebookDataBase {
                             printAll(datastore);
                             break;
                         case ("clear"):
-                            clear(datastore);
+                            clear(datastore, inputScanner);
                             break;
                         default:
                             System.out.println("Unknown command! Please read help by printing help\n");
@@ -94,9 +98,24 @@ public class PhonebookDataBase {
     /**
      * Deletes all records from datastore
      */
-    private static void clear(Datastore datastore) {
-        datastore.delete(datastore.createQuery(DataRecord.class));
-        System.out.println("Ok! Everything was deleted. It's all gone.\n");
+    private static void clear(Datastore datastore, Scanner inputScanner) {
+        System.out.println("Are you sure?? That will delete everything!\nPlease write yes or no");
+        while (true) {
+            if (inputScanner.hasNextLine()) {
+                String line = inputScanner.nextLine();
+                if (line.equals("yes") || line.equals("Yes") || line.equals("Y") || line.equals("y")) {
+                    datastore.delete(datastore.createQuery(DataRecord.class));
+                    System.out.println("Ok! Everything was deleted. It's all gone.\n");
+                    break;
+                } else if (line.equals("no") || line.equals("No") || line.equals("n") || line.equals("N")) {
+                    System.out.println("Ok! Nothing was deleted!\n");
+                    break;
+                } else {
+                    System.out.println("Please write yes if you want to clear database and no otherwise");
+                }
+            }
+        }
+
     }
 
     /**
@@ -111,7 +130,7 @@ public class PhonebookDataBase {
                 "deleteRecord name phoneNumber                 deletes given record from the base.\n" +
                 "changeName name phoneNumber newName           changes name to newName for given record.\n" +
                 "changePhone name phoneNumber newPhoneNumber   changes phoneNumber to newPhoneNumber for given record.\n" +
-                "printAll                                      prints all record in the base.\n" +
+                "printAll                                      prints all records in the base.\n" +
                 "clear                                         deletes all records from the base. No backup.\n\n" +
                 "Please use only digits, '-', '(' and ')' when adds phone numbers (this will be checked, so don't worry).\n" +
                 "Don't use whitespaces in names or phone numbers!\n" +
@@ -273,7 +292,7 @@ public class PhonebookDataBase {
     private static void changePhone(Scanner commandScanner, Datastore datastore) {
         String[] parameters = getParameters(commandScanner, 3);
         if (parameters == null) {
-            System.out.println("name, phone or newPhone was not specified, no record has been changed\n");
+            System.out.println("name, phone or newPhone not specified, no record has been changed\n");
             return;
         }
 
@@ -281,7 +300,7 @@ public class PhonebookDataBase {
 
         Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
         if (record == null) {
-            System.out.print("No record with given name and phone\n");
+            System.out.println("No record with given name and phone\n");
         } else if (getRecordFromDatastore(datastore, name, newPhone) != null) {
             System.out.println("Nothing has been changed! Record with given name and new phone already exists!\n");
         } else {
