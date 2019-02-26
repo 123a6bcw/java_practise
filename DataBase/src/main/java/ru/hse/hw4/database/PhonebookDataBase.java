@@ -7,6 +7,10 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.query.Query;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Scanner;
 
@@ -19,6 +23,8 @@ public class PhonebookDataBase {
      *
      */
     public static void main(String[] argc) {
+        ((LoggerContext) LoggerFactory.getILoggerFactory()).getLogger("org.mongodb.driver").setLevel(Level.OFF); //TODO
+
         String dataBaseName = null;
         if (argc.length != 0) {
             dataBaseName = argc[0];
