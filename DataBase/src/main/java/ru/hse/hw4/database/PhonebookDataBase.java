@@ -1,9 +1,13 @@
 package ru.hse.hw4.database;
 
+import com.mongodb.MongoClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.Morphia;
 
 import java.io.*;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -15,20 +19,28 @@ public class PhonebookDataBase {
      *
      */
     public static void main(String[] argc) {
-        String dataBaseName = "mainDataBase";
+        String dataBaseName = null;
         if (argc.length != 0) {
             dataBaseName = argc[0];
+        } else {
+            dataBaseName = "mainDataBase";
         }
+
         runInteraction(System.in, System.out, dataBaseName);
     }
 
     /**
      *
      */
-    public static void runInteraction(@NotNull InputStream inputStream, @NotNull OutputStream outputStream, String DataBaseName) {
+    public static void runInteraction(@NotNull InputStream inputStream, @NotNull OutputStream outputStream, @NotNull String DataBaseName) {
         var inputScanner = new Scanner(inputStream);
         var printWriter = new PrintWriter(outputStream);
         printWriter.println("Write help to get help");
+
+        final var morphia = new Morphia();
+        morphia.mapPackage("ru.hse.hw4.database");
+        final Datastore datastore = morphia.createDatastore(new MongoClient(), DataBaseName);
+
         boolean stopInteraction = false; //
         while (!stopInteraction) {
             if (inputScanner.hasNextLine()) {
@@ -61,7 +73,7 @@ public class PhonebookDataBase {
 
                         String name = parameters[0], phone = parameters[1];
 
-                        //TODO
+                        datastore.save(new DataRecord(name, phone));
 
                         break;
                     }
@@ -81,7 +93,15 @@ public class PhonebookDataBase {
                                     break;
                                 }
 
-                                //TODO
+                                List<DataRecord> records = datastore.find(DataRecord.class).field("name").equal(name).asList();
+                                if (records.size() == 0) {
+                                    printWriter.println("no records with given name");
+                                } else {
+                                    for (var record : records) {
+                                        printWriter.print(record.getPhone() + " ");
+                                    }
+                                    printWriter.println();
+                                }
                                 break;
                             default:
                                 printWriter.println("unknown key");
@@ -103,7 +123,15 @@ public class PhonebookDataBase {
                                     printWriter.println("no phone number specified for -byPhone search");
                                 }
 
-                                //TODO
+                                List<DataRecord> records = datastore.find(DataRecord.class).field("phone").equal(phone).asList();
+                                if (records.size() == 0) {
+                                    printWriter.println("no records with given phone");
+                                } else {
+                                    for (var record : records) {
+                                        printWriter.print(record.getName() + " ");
+                                    }
+                                    printWriter.println();
+                                }
                                 break;
                             default:
                                 printWriter.println("unknown key");
@@ -120,7 +148,7 @@ public class PhonebookDataBase {
 
                         String deleteName = parameters[0], deletePhone = parameters[1];
 
-                        //TODO
+                        datastore.delete(new DataRecord(deleteName, deletePhone));
 
                         break;
                     }
