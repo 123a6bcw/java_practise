@@ -79,6 +79,9 @@ public class PhonebookDataBase {
                         case ("printAll"):
                             printAll(datastore);
                             break;
+                        default:
+                            System.out.println("Unknown command! Please read help by printing help\n");
+                            break;
                     }
                 }
             }
@@ -98,10 +101,9 @@ public class PhonebookDataBase {
                 "changeName name phoneNumber newName           changes name to newName for given record\n" +
                 "changePhone name phoneNumber newPhoneNumber   changes phoneNumber to newPhoneNumber for given record\n" +
                 "printAll                                      prints all record in the base\n\n" +
-                "Please use only digits, whitespaces, '-', '(' and ')' in phone numbers (this will be checked, so don't worry)" +
-                "Please note that database does not check your phone number for correctness!\n\n");
-
-        //TODO check number for correctness (symbols)
+                "Please use only digits, '-', '(' and ')' when adds phone numbers (this will be checked, so don't worry)\n" +
+                "Don't use whitespaces in names or phone numbers!\n" +
+                "Please note that database does not check your phone number for correctness! (Too lazy)\n");
     }
 
     /**
@@ -115,16 +117,11 @@ public class PhonebookDataBase {
             return;
         }
 
-        String name = parameters[0];
-        var phoneBuilder = new StringBuilder(parameters[1]);
-        while (commandScanner.hasNext()) {
-            phoneBuilder.append(commandScanner.next());
-        }
-        String phone = phoneBuilder.toString();
-
+        String name = parameters[0], phone = parameters[1];
         for (int i = 0; i < phone.length(); i++) {
-            if (phone.charAt(i) != ' ' && phone.charAt(i) != '-' && phone.charAt(i) != '(' && phone.charAt(i) != ')' && (phone.charAt(i) < '0' || phone.charAt(i) > '9')) {
-                System.out.println("incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'");
+            if (phone.charAt(i) != '-' && phone.charAt(i) != '(' && phone.charAt(i) != ')' && (phone.charAt(i) < '0' || phone.charAt(i) > '9')) {
+                System.out.println("incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'\n");
+                return;
             }
         }
 
@@ -164,7 +161,7 @@ public class PhonebookDataBase {
                         var record = iterator.next();
                         System.out.print(record.getPhone());
                         if (iterator.hasNext()) {
-                            System.out.println(", ");
+                            System.out.print(", ");
                         }
                     }
                     System.out.print("\n\n");
@@ -247,11 +244,13 @@ public class PhonebookDataBase {
         Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
         if (record == null) {
             System.out.println("No record with given name and phone\n");
+        } else if (getRecordFromDatastore(datastore, newName, phone) != null) {
+            System.out.println("Nothing has been changed! Record with new name and given phone already exists!\n");
         } else {
-            datastore.findAndModify(record,
-                    datastore.createUpdateOperations(DataRecord.class).set("name", newName));
-            System.out.println("Ok! " + name + " has been changed to " + newName + "\n");
-        }
+                datastore.findAndModify(record,
+                        datastore.createUpdateOperations(DataRecord.class).set("name", newName));
+                System.out.println("Ok! " + name + " has been changed to " + newName + "\n");
+            }
     }
 
     /**
@@ -270,6 +269,8 @@ public class PhonebookDataBase {
         Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
         if (record == null) {
             System.out.print("No record with given name and phone\n");
+        } else if (getRecordFromDatastore(datastore, name, newPhone) != null) {
+            System.out.println("Nothing has been changed! Record with given name and new phone already exists!\n");
         } else {
             datastore.findAndModify(record,
                     datastore.createUpdateOperations(DataRecord.class).set("phone", newPhone));
