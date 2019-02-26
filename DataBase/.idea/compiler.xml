@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="DataBase" />
         <module name="DataBase (1)" />
+        <module name="PhonebookDataBase" />
       </profile>
     </annotationProcessing>
   </component>

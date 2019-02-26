@@ -12,7 +12,6 @@ import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Scanner;
 
 /**
