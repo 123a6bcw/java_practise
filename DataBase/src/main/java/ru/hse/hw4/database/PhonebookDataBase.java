@@ -79,6 +79,9 @@ public class PhonebookDataBase {
                         case ("printAll"):
                             printAll(datastore);
                             break;
+                        case ("clear"):
+                            clear(datastore);
+                            break;
                         default:
                             System.out.println("Unknown command! Please read help by printing help\n");
                             break;
@@ -89,19 +92,28 @@ public class PhonebookDataBase {
     }
 
     /**
+     * Deletes all records from datastore
+     */
+    private static void clear(Datastore datastore) {
+        datastore.delete(datastore.createQuery(DataRecord.class));
+        System.out.println("Ok! Everything was deleted. It's all gone.\n");
+    }
+
+    /**
      * Prints info about commands supported by this database.
      */
     private static void printHelp() {
         System.out.println("\nPlease use one of the following commands:\n" +
-                "exit                                          exit the program\n" +
-                "addRecord name phoneNumber                    adds new record with given name and phone number\n" +
-                "findPhones {-byName name}                     finds all phones by given parameter\n" +
-                "findNames  {-byPhone phoneNumber}             finds all names by given parameter\n" +
-                "deleteRecord name phoneNumber                 deletes given record from the base\n" +
-                "changeName name phoneNumber newName           changes name to newName for given record\n" +
-                "changePhone name phoneNumber newPhoneNumber   changes phoneNumber to newPhoneNumber for given record\n" +
-                "printAll                                      prints all record in the base\n\n" +
-                "Please use only digits, '-', '(' and ')' when adds phone numbers (this will be checked, so don't worry)\n" +
+                "exit                                          exit the program.\n" +
+                "addRecord name phoneNumber                    adds new record with given name and phone number.\n" +
+                "findPhones {-byName name}                     finds all phones by given parameter.\n" +
+                "findNames  {-byPhone phoneNumber}             finds all names by given parameter.\n" +
+                "deleteRecord name phoneNumber                 deletes given record from the base.\n" +
+                "changeName name phoneNumber newName           changes name to newName for given record.\n" +
+                "changePhone name phoneNumber newPhoneNumber   changes phoneNumber to newPhoneNumber for given record.\n" +
+                "printAll                                      prints all record in the base.\n" +
+                "clear                                         deletes all records from the base. No backup.\n\n" +
+                "Please use only digits, '-', '(' and ')' when adds phone numbers (this will be checked, so don't worry).\n" +
                 "Don't use whitespaces in names or phone numbers!\n" +
                 "Please note that database does not check your phone number for correctness! (Too lazy)\n");
     }
@@ -127,7 +139,7 @@ public class PhonebookDataBase {
 
         Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
         if (record != null) {
-            System.out.println("Given record already exists in data base!");
+            System.out.println("Given record already exists in data base!\n");
             return;
         }
 
@@ -178,7 +190,7 @@ public class PhonebookDataBase {
     private static void findNames(Scanner commandScanner, Datastore datastore) {
         String findNamesKey = getParameter(commandScanner);
         if (findNamesKey == null) {
-            System.out.println("key is missing\n");
+            System.out.println("No key specified for search\n");
             return;
         }
 
@@ -187,6 +199,7 @@ public class PhonebookDataBase {
                 String phone = getParameter(commandScanner);
                 if (phone == null) {
                     System.out.println("no phone number specified for -byPhone search\n");
+                    break;
                 }
 
                 List<DataRecord> records = datastore.find(DataRecord.class).field("phone").equal(phone).asList();
