@@ -5,8 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.query.Query;
 
-import java.io.*;
 import java.util.List;
 import java.util.Scanner;
 
@@ -26,167 +26,224 @@ public class PhonebookDataBase {
             dataBaseName = "mainDataBase";
         }
 
-        runInteraction(System.in, System.out, dataBaseName);
-    }
-
-    /**
-     *
-     */
-    public static void runInteraction(@NotNull InputStream inputStream, @NotNull OutputStream outputStream, @NotNull String DataBaseName) {
-        var inputScanner = new Scanner(inputStream);
-        var printWriter = new PrintWriter(outputStream);
-        printWriter.println("Write help to get help");
-
+        var inputScanner = new Scanner(System.in);
         final var morphia = new Morphia();
         morphia.mapPackage("ru.hse.hw4.database");
-        final Datastore datastore = morphia.createDatastore(new MongoClient(), DataBaseName);
+        final Datastore datastore = morphia.createDatastore(new MongoClient(), dataBaseName);
+
+        System.out.println("Write help to get help");
 
         boolean stopInteraction = false; //
         while (!stopInteraction) {
             if (inputScanner.hasNextLine()) {
                 var commandScanner = new Scanner(inputScanner.nextLine());
                 switch (commandScanner.next()) {
-                    case ("help"): {
-                        printWriter.println("Please use one of the following commands:\n" +
-                                "exit                                          exit the program\n" +
-                                "addRecord name phoneNumber                    adds new record with given name and phone number\n" +
-                                "findPhones {-byName name}                     finds all phones by given parameter\n" +
-                                "findNames  {-byPhone phoneNumber}             finds all names by given parameter\n" +
-                                "deleteRecord name phoneNumber                 deletes given record from the base\n" +
-                                "changeName name phoneNumber newName           changes name to newName for given record\n" +
-                                "changePhone name phoneNumber newPhoneNumber   changes phoneNumber to newPhoneNumber for given record\n" +
-                                "printAll                                      prints all record in the base");
+                    case ("help"):
+                        printHelp();
                         break;
-                    }
-
-                    case ("exit"): {
+                    case ("exit"):
                         stopInteraction = true;
                         break;
-                    }
-
-                    case ("addRecord"): {
-                        String[] parameters = getParameters(commandScanner, 2);
-                        if (parameters == null) {
-                            printWriter.println("name or phone number is missing. No record has been added.");
-                            break;
-                        }
-
-                        String name = parameters[0], phone = parameters[1];
-
-                        datastore.save(new DataRecord(name, phone));
-
+                    case ("addRecord"):
+                        addRecord(commandScanner, datastore);
                         break;
-                    }
-
-                    case ("findPhones"): {
-                        String key = getParameter(commandScanner);
-                        if (key == null) {
-                            printWriter.println("No key specified for search");
-                            break;
-                        }
-
-                        switch (key) {
-                            case ("-byName"):
-                                String name = getParameter(commandScanner);
-                                if (name == null) {
-                                    printWriter.println("no name specified for -byName search");
-                                    break;
-                                }
-
-                                List<DataRecord> records = datastore.find(DataRecord.class).field("name").equal(name).asList();
-                                if (records.size() == 0) {
-                                    printWriter.println("no records with given name");
-                                } else {
-                                    for (var record : records) {
-                                        printWriter.print(record.getPhone() + " ");
-                                    }
-                                    printWriter.println();
-                                }
-                                break;
-                            default:
-                                printWriter.println("unknown key");
-                        }
+                    case ("findPhones"):
+                        findPhones(commandScanner, datastore);
                         break;
-                    }
-
-                    case ("findNames"): {
-                        String findNamesKey = getParameter(commandScanner);
-                        if (findNamesKey == null) {
-                            printWriter.println("key is missing");
-                            break;
-                        }
-
-                        switch (findNamesKey) {
-                            case ("-byPhone"):
-                                String phone = getParameter(commandScanner);
-                                if (phone == null) {
-                                    printWriter.println("no phone number specified for -byPhone search");
-                                }
-
-                                List<DataRecord> records = datastore.find(DataRecord.class).field("phone").equal(phone).asList();
-                                if (records.size() == 0) {
-                                    printWriter.println("no records with given phone");
-                                } else {
-                                    for (var record : records) {
-                                        printWriter.print(record.getName() + " ");
-                                    }
-                                    printWriter.println();
-                                }
-                                break;
-                            default:
-                                printWriter.println("unknown key");
-                        }
+                    case ("findNames"):
+                        findNames(commandScanner, datastore);
                         break;
-                    }
-
-                    case ("deleteRecord"): {
-                        String[] parameters = getParameters(commandScanner, 3);
-                        if (parameters == null) {
-                            printWriter.println("name or phone not specified, no record has been deleted");
-                            break;
-                        }
-
-                        String deleteName = parameters[0], deletePhone = parameters[1];
-
-                        datastore.delete(new DataRecord(deleteName, deletePhone));
-
+                    case ("deleteRecord"):
+                        deleteRecord(commandScanner, datastore);
                         break;
-                    }
-
-                    case ("changeName"): {
-                        String[] parameters = getParameters(commandScanner, 3);
-                        if (parameters == null) {
-                            printWriter.println("name, phone or newName not specified, no record has been changed");
-                            break;
-                        }
-
-                        String name = parameters[0], phone = parameters[1], newName = parameters[2];
-
-                        //TODO
-
+                    case ("changeName"):
+                        changeName(commandScanner, datastore);
                         break;
-                    }
-
-                    case("changePhone"): {
-                        String[] parameters = getParameters(commandScanner, 3);
-                        if (parameters == null) {
-                            printWriter.println("name, phone or newPhone was not specified, no record has been changed");
-                            break;
-                        }
-
-                        String name = parameters[0], phone = parameters[1], newPhone = parameters[2];
-                        //TODO
+                    case("changePhone"):
+                        changePhone(commandScanner, datastore);
                         break;
-                    }
-
-                    case ("printAll"): {
-                        //TODO
-                    }
+                    case ("printAll"):
+                        printAll(datastore);
+                        break;
                 }
             }
         }
     }
 
+    /**
+     *
+     */
+    private static void printHelp() {
+        System.out.println("Please use one of the following commands:\n" +
+                "exit                                          exit the program\n" +
+                "addRecord name phoneNumber                    adds new record with given name and phone number\n" +
+                "findPhones {-byName name}                     finds all phones by given parameter\n" +
+                "findNames  {-byPhone phoneNumber}             finds all names by given parameter\n" +
+                "deleteRecord name phoneNumber                 deletes given record from the base\n" +
+                "changeName name phoneNumber newName           changes name to newName for given record\n" +
+                "changePhone name phoneNumber newPhoneNumber   changes phoneNumber to newPhoneNumber for given record\n" +
+                "printAll                                      prints all record in the base");
+    }
+
+    /**
+     *
+     */
+    private static void addRecord(Scanner commandScanner, Datastore datastore) {
+        String[] parameters = getParameters(commandScanner, 2);
+        if (parameters == null) {
+            System.out.println("name or phone number is missing. No record has been added.");
+            return;
+        }
+
+        String name = parameters[0], phone = parameters[1];
+
+        datastore.save(new DataRecord(name, phone));
+    }
+
+    /**
+     *
+     */
+    private static void findPhones(Scanner commandScanner, Datastore datastore) {
+        String key = getParameter(commandScanner);
+        if (key == null) {
+            System.out.println("No key specified for search");
+            return;
+        }
+
+        switch (key) {
+            case ("-byName"):
+                String name = getParameter(commandScanner);
+                if (name == null) {
+                    System.out.println("no name specified for -byName search");
+                    break;
+                }
+
+                List<DataRecord> records = datastore.find(DataRecord.class).field("name").equal(name).asList();
+                if (records.size() == 0) {
+                    System.out.println("no records with given name");
+                } else {
+                    for (var record : records) {
+                        System.out.print(record.getPhone() + " ");
+                    }
+                    System.out.println();
+                }
+                break;
+            default:
+                System.out.println("unknown key");
+        }
+    }
+
+    /**
+     *
+     */
+    private static void findNames(Scanner commandScanner, Datastore datastore) {
+        String findNamesKey = getParameter(commandScanner);
+        if (findNamesKey == null) {
+            System.out.println("key is missing");
+            return;
+        }
+
+        switch (findNamesKey) {
+            case ("-byPhone"):
+                String phone = getParameter(commandScanner);
+                if (phone == null) {
+                    System.out.println("no phone number specified for -byPhone search");
+                }
+
+                List<DataRecord> records = datastore.find(DataRecord.class).field("phone").equal(phone).asList();
+                if (records.size() == 0) {
+                    System.out.println("no records with given phone");
+                } else {
+                    for (var record : records) {
+                        System.out.print(record.getName() + " ");
+                    }
+                    System.out.println();
+                }
+                break;
+            default:
+                System.out.println("unknown key");
+        }
+    }
+
+    /**
+     *
+     */
+    private static void deleteRecord(Scanner commandScanner, Datastore datastore) {
+        String[] parameters = getParameters(commandScanner, 3);
+        if (parameters == null) {
+            System.out.println("name or phone not specified, no record has been deleted");
+            return;
+        }
+
+        String deleteName = parameters[0], deletePhone = parameters[1];
+
+        datastore.delete(new DataRecord(deleteName, deletePhone));
+    }
+
+    /**
+     *
+     */
+    private static void changeName(Scanner commandScanner, Datastore datastore) {
+        String[] parameters = getParameters(commandScanner, 3);
+        if (parameters == null) {
+            System.out.println("name, phone or newName not specified, no record has been changed");
+            return;
+        }
+
+        String name = parameters[0], phone = parameters[1], newName = parameters[2];
+
+        Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
+        if (record == null) {
+            System.out.print("No record with given name and phone");
+        } else {
+            datastore.findAndModify(record,
+                    datastore.createUpdateOperations(DataRecord.class).set("name", newName));
+        }
+    }
+
+    /**
+     *
+     */
+    private static void changePhone(Scanner commandScanner, Datastore datastore) {
+        String[] parameters = getParameters(commandScanner, 3);
+        if (parameters == null) {
+            System.out.println("name, phone or newPhone was not specified, no record has been changed");
+            return;
+        }
+
+        String name = parameters[0], phone = parameters[1], newPhone = parameters[2];
+
+        Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
+        if (record == null) {
+            System.out.print("No record with given name and phone");
+        } else {
+            datastore.findAndModify(record,
+                    datastore.createUpdateOperations(DataRecord.class).set("phone", newPhone));
+        }
+    }
+
+    /**
+     *
+     */
+    private static void printAll(Datastore datastore) {
+        for (var record : datastore.createQuery(DataRecord.class)) {
+            System.out.print(record.getName() + record.getPhone() + ", ");
+        }
+        System.out.println();
+    }
+
+    /**
+     *
+     */
+    @Nullable
+    private static Query<DataRecord> getRecordFromDatastore(Datastore datastore, String name, String phone) {
+        var result = datastore.find(DataRecord.class).field("name").equal(name).field("phone").equal(phone);
+        if (result.get() == null) {
+            return null;
+        }
+
+        return result;
+    }
     /**
      *
      */
