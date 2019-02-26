@@ -149,11 +149,8 @@ public class PhonebookDataBase {
         }
 
         String name = parameters[0], phone = parameters[1];
-        for (int i = 0; i < phone.length(); i++) {
-            if (phone.charAt(i) != '-' && phone.charAt(i) != '(' && phone.charAt(i) != ')' && (phone.charAt(i) < '0' || phone.charAt(i) > '9')) {
-                System.out.println("incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'\n");
-                return;
-            }
+        if (wrongPhone(phone)) {
+            return;
         }
 
         Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
@@ -297,6 +294,9 @@ public class PhonebookDataBase {
         }
 
         String name = parameters[0], phone = parameters[1], newPhone = parameters[2];
+        if (wrongPhone(newPhone)) {
+            return;
+        }
 
         Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
         if (record == null) {
@@ -329,6 +329,20 @@ public class PhonebookDataBase {
             }
         }
         System.out.print("\n\n");
+    }
+
+    /**
+     * Returns false if given phone is correct phone number (contains only digits, '-', '(' and ')').
+     * If phone is not correct, writes corresponding message to System.out
+     */
+    private static boolean wrongPhone(String phone) {
+        for (int i = 0; i < phone.length(); i++) {
+            if (phone.charAt(i) != '-' && phone.charAt(i) != '(' && phone.charAt(i) != ')' && (phone.charAt(i) < '0' || phone.charAt(i) > '9')) {
+                System.out.println("incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'\n");
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

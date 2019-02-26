@@ -329,6 +329,7 @@ class PhonebookDataBaseTest {
         setCommands("changePhone\n" +
                 "changePhone s\n" +
                 "changePhone s 6\n" +
+                "changePhone s 6 s\n" +
                 "exit\n");
 
         PhonebookDataBase.main(argc);
@@ -336,7 +337,8 @@ class PhonebookDataBaseTest {
         assertEquals(intro +
                 "name, phone or newPhone not specified, no record has been changed\n\n" +
                 "name, phone or newPhone not specified, no record has been changed\n\n" +
-                "name, phone or newPhone not specified, no record has been changed\n\n", result);
+                "name, phone or newPhone not specified, no record has been changed\n\n" +
+                "incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'\n\n", result);
     }
 
     @Test
@@ -378,6 +380,83 @@ class PhonebookDataBaseTest {
                 addRecordMessage("a", "6") +
                 addRecordMessage("a", "9") +
                 "Ok! 6 has been changed to 8\n\n", result);
+    }
+
+    @Test
+    void printAllEmptyDatabase() {
+        setCommands("printAll\n" +
+                "exit\n");
+
+        PhonebookDataBase.main(argc);
+        String result = getResult();
+        assertEquals(intro +
+                "no records in database\n\n", result);
+    }
+
+    @Test
+    void printAllOneElement() {
+        setCommands("addRecord s 5\n" +
+                "printAll\n" +
+                "exit\n");
+
+        PhonebookDataBase.main(argc);
+        String result = getResult();
+        assertEquals(intro +
+                addRecordMessage("s", "5") +
+                "s 5\n\n", result);
+    }
+
+    @Test
+    void printAllSeveralElements() {
+        setCommands("addRecord s 5\n" +
+                "addRecord b 9\n" +
+                "addRecord c 10\n" +
+                "printAll\n" +
+                "exit\n");
+
+        PhonebookDataBase.main(argc);
+        String result = getResult();
+        assertEquals(intro +
+                addRecordMessage("s", "5") +
+                addRecordMessage("b", "9") +
+                addRecordMessage("c", "10") +
+                "s 5, b 9, c 10\n\n", result);
+    }
+
+    @Test
+    void clearWrongReplyAndNo() {
+        setCommands("clear\n" +
+                "????\n" +
+                "exit\n" +
+                "no\n" +
+                "exit\n");
+
+        PhonebookDataBase.main(argc);
+        String result = getResult();
+        assertEquals(intro +
+                "Are you sure?? That will delete everything!\nPlease write yes or no\n" +
+                "Please write yes if you want to clear database and no otherwise\n" +
+                "Please write yes if you want to clear database and no otherwise\n" +
+                "Ok! Nothing was deleted!\n\n", result);
+    }
+
+    @Test
+    void clearYesClearsDataBase() {
+        setCommands("addRecord s 6\n" +
+                "addRecord l 9\n" +
+                "clear\n" +
+                "yes\n" +
+                "printAll\n" +
+                "exit\n");
+
+        PhonebookDataBase.main(argc);
+        String result = getResult();
+        assertEquals(intro +
+                addRecordMessage("s", "6") +
+                addRecordMessage("l", "9") +
+                "Are you sure?? That will delete everything!\nPlease write yes or no\n" +
+                "Ok! Everything was deleted. It's all gone.\n\n" +
+                "no records in database\n\n", result);
     }
 
     /**
