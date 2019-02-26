@@ -39,6 +39,7 @@ public class PhonebookDataBase {
 
             final var morphia = new Morphia();
             morphia.mapPackage("ru.hse.hw4.database");
+            morphia.map(DataRecord.class);
 
             final Datastore datastore = morphia.createDatastore(mongoClient, dataBaseName);
 
@@ -250,9 +251,15 @@ public class PhonebookDataBase {
      *
      */
     private static void printAll(Datastore datastore) {
-        for (var iterator = datastore.createQuery(DataRecord.class).iterator(); iterator.hasNext();) {
+        List<DataRecord> records = datastore.createQuery(DataRecord.class).asList();
+        if (records.size() == 0) {
+            System.out.println("no records in database\n");
+            return;
+        }
+
+        for (var iterator = records.iterator(); iterator.hasNext();) {
             var record = iterator.next();
-            System.out.print(record.getName() + record.getPhone());
+            System.out.print(record.getName() + " " + record.getPhone());
 
             if (iterator.hasNext()) {
                 System.out.print(", ");
