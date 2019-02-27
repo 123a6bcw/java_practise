@@ -1,6 +1,10 @@
 package ru.hse.hw4.database;
 
+import com.mongodb.DB;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.ServerAddress;
+import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mongodb.morphia.Datastore;
@@ -11,6 +15,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -38,19 +43,25 @@ public class PhonebookDataBase {
         }
 
         /*
-        Host and port is parameters of connections to MongoDB. If not specified, tries to connect to localhost.
+        If exists, argc[1] is host of connections to MongoDB, argc[2] --- port.
+        If not specified, tries to connect to localhost.
          */
-        String host = null;
-        int port = -1;
+        List<ServerAddress> addresses = new ArrayList<ServerAddress>();
         if (argc.length >= 3) {
-            host = argc[1];
-            port = Integer.parseInt(argc[2]);
+            addresses.add(new ServerAddress(argc[1], Integer.parseInt(argc[2])));
+        } else {
+            addresses.add(new ServerAddress("localhost"));
         }
+
+        var mongoClientOptions = MongoClientOptions.builder()
+                .serverSelectionTimeout(500)
+                .socketTimeout(500)
+                .connectTimeout(500)
+                .build();
 
         //Google says I'm not suppose to explicitly close MongoClient, but it does not work otherwise.
         try (var inputScanner = new Scanner(System.in);
-             var mongoClient = (host == null) ? new MongoClient() : new MongoClient(host, port)) {
-
+             var mongoClient = new MongoClient(addresses, mongoClientOptions)) {
             final var morphia = new Morphia();
             morphia.mapPackage("ru.hse.hw4.database");
             morphia.map(DataRecord.class);
@@ -105,6 +116,12 @@ public class PhonebookDataBase {
                     }
                 }
             }
+        } catch (com.mongodb.MongoTimeoutException | com.mongodb.MongoSocketOpenException e) {
+            /*
+            For some reason it does work in IDEA but does not work when executing in maven. Don't know why.
+             */
+            System.out.println("Failed to connect to database (timeout). Please try to specify host and port in second and third line arguments"
+                    + ", or check your internet connection.\n Aborting.\n\n");
         }
     }
 
