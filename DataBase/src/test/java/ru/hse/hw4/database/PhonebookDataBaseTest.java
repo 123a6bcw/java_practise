@@ -13,7 +13,6 @@ import org.junit.jupiter.api.*;
 
 import java.io.*;
 import java.util.Scanner;
-import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,12 +40,9 @@ class PhonebookDataBaseTest {
     static void createEmbeddedMongo() throws Exception {
         /*
         Suppress logging.
-        defaultWithLogger() is deprecated. However, this is method that described in the documentation.
          */
-        Logger logger = Logger.getLogger(PhonebookDataBaseTest.class.getName());
-
         IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
-                .defaultsWithLogger(Command.MongoD, logger)
+                .defaults(Command.MongoD)
                 .processOutput(ProcessOutput.getDefaultInstanceSilent())
                 .build();
 
