@@ -34,9 +34,19 @@ public class PhonebookDataBase {
             dataBaseName = "mainDataBase";
         }
 
+        /*
+        Host and port is parameters of connections to MongoDB. If not specified, tries to connect to localhost.
+         */
+        String host = null;
+        int port = -1;
+        if (argc.length >= 3) {
+            host = argc[1];
+            port = Integer.parseInt(argc[2]);
+        }
+
         //Google says I'm not suppose to explicitly close MongoClient, but it does not work otherwise.
         try (var inputScanner = new Scanner(System.in);
-             var mongoClient = new MongoClient()) {
+             var mongoClient = (host == null) ? new MongoClient() : new MongoClient(host, port)) {
 
             final var morphia = new Morphia();
             morphia.mapPackage("ru.hse.hw4.database");

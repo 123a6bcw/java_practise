@@ -1,13 +1,77 @@
 package ru.hse.hw4.database;
 
+import de.flapdoodle.embed.mongo.Command;
+import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodProcess;
+import de.flapdoodle.embed.mongo.MongodStarter;
+import de.flapdoodle.embed.mongo.config.*;
+import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.config.IRuntimeConfig;
+import de.flapdoodle.embed.process.config.io.ProcessOutput;
+import de.flapdoodle.embed.process.runtime.Network;
 import org.junit.jupiter.api.*;
 
 import java.io.*;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class PhonebookDataBaseTest {
+
+    /**
+     * Embedded MongoDB implementation to test class without running external server.
+     * Look for documentation here:
+     * https://github.com/flapdoodle-oss/de.flapdoodle.embed.mongo.
+     *
+     * Saves this objects in order to close them after tests finished.
+     */
+    static private MongodExecutable mongodExe;
+    static private MongodProcess mongod;
+
+    /**
+     * Static in optimization purposes (see documentation).
+     */
+    static private MongodStarter starter;
+
+    /**
+     * Creates embedded mongoDB server before all tests started.
+     */
+    @BeforeAll
+    static void createEmbeddedMongo() throws Exception {
+        /*
+        Suppress logging.
+        defaultWithLogger() is deprecated. However, this is method that described in the documentation.
+         */
+        Logger logger = Logger.getLogger(PhonebookDataBaseTest.class.getName());
+
+        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
+                .defaultsWithLogger(Command.MongoD, logger)
+                .processOutput(ProcessOutput.getDefaultInstanceSilent())
+                .build();
+
+        starter = MongodStarter.getInstance(runtimeConfig);
+
+        /*
+        Start mongoDB embedded server
+        host "localhost" and port "12345" will be given as command line arguments to PhonebookDataBase.
+         */
+        mongodExe = starter.prepare(new MongodConfigBuilder()
+                .version(Version.Main.PRODUCTION)
+                .net(new Net("localhost", 12345, Network.localhostIsIPv6()))
+                .build());
+        mongod = mongodExe.start();
+    }
+
+    /**
+     * CLoses mongoDB server after all tests finish.
+     */
+    @AfterAll
+    static void closeEmbeddedMongo() {
+        mongodExe.stop();
+        mongod.stop();
+    }
+
     /**
      * Stream to which will be redirected System.out in order to read it.
      */
@@ -16,7 +80,7 @@ class PhonebookDataBaseTest {
     /**
      * Arguments for PhoneBookDataBase.main(String[]);
      */
-    private String[] argc = {"testBase"};
+    private String[] argc = {"testBase", "localhost", "12345"};
 
     /**
      * The very first line in any database interaction.
@@ -30,10 +94,10 @@ class PhonebookDataBaseTest {
         Everywhere I'm accessing only byte array streams so I don't bother closing it.
          */
         setCommands("clear\nyes\nexit\n");
-        System.setOut(new PrintStream(new ByteArrayOutputStream(100)));
+        System.setOut(new PrintStream(new ByteArrayOutputStream(1000)));
         PhonebookDataBase.main(argc);
 
-        outputStream = new ByteArrayOutputStream(200);
+        outputStream = new ByteArrayOutputStream(2000);
         System.setOut(new PrintStream(outputStream));
     }
 
@@ -485,7 +549,9 @@ class PhonebookDataBaseTest {
         var scanner = new Scanner(new ByteArrayInputStream(outputStream.toByteArray()));
         var result = new StringBuilder();
         while (scanner.hasNextLine()) {
-            result.append(scanner.nextLine()).append("\n");
+            String line = scanner.nextLine();
+
+            result.append(line).append("\n");
         }
         return result.toString();
     }
