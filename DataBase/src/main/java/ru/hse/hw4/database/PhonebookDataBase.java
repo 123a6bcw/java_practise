@@ -172,6 +172,10 @@ public class PhonebookDataBase {
             return;
         }
 
+        /*
+        IDEA tells me there is too few cases and I probable should change switch to if statement.
+        But the point is, where COULD be more cases, so I want to leave it as it is.
+         */
         switch (key) {
             case ("-byName"):
                 String name = getParameter(commandScanner);
