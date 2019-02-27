@@ -455,6 +455,19 @@ class PhonebookDataBaseTest {
                 + "No records in database.\n\n", result);
     }
 
+    @Test
+    void mainCheckEmptyStringsAndWrongCommand() {
+        setCommands("\n"
+                + "\n\n\n"
+                + "doSomething\n"
+                + "exit\n");
+
+        PhonebookDataBase.main(argc);
+        String result = getResult();
+        assertEquals(intro
+                + "Unknown command! Please read help by printing help.\n\n", result);
+    }
+
     /**
      * Prints given commands to System.in in order for database to read those commands.
      */
