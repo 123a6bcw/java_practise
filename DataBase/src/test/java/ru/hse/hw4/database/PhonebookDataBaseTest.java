@@ -25,7 +25,7 @@ class PhonebookDataBaseTest {
     /**
      * The very first line in any database interaction.
      */
-    private String intro = "\nWrite help to get help\n";
+    private String intro = "\nWrite help to get help.\n";
 
     @BeforeEach
     void setUp() {
@@ -34,10 +34,10 @@ class PhonebookDataBaseTest {
         Everywhere I'm accessing only byte array streams so I don't bother closing it.
          */
         setCommands("clear\nyes\nexit\n");
-        System.setOut(new PrintStream(new ByteArrayOutputStream(1000)));
+        System.setOut(new PrintStream(new ByteArrayOutputStream(100)));
         PhonebookDataBase.main(argc);
 
-        outputStream = new ByteArrayOutputStream(2000);
+        outputStream = new ByteArrayOutputStream(200);
         System.setOut(new PrintStream(outputStream));
     }
 
@@ -49,15 +49,15 @@ class PhonebookDataBaseTest {
 
         String result = getResult();
         assertEquals(intro + "\nPlease use one of the following commands:\n" +
-                "exit                                          exit the program.\n" +
-                "addRecord name phoneNumber                    adds new record with given name and phone number.\n" +
-                "findPhones {-byName name}                     finds all phones by given parameter.\n" +
-                "findNames  {-byPhone phoneNumber}             finds all names by given parameter.\n" +
-                "deleteRecord name phoneNumber                 deletes given record from the base.\n" +
-                "changeName name phoneNumber newName           changes name to newName for given record.\n" +
-                "changePhone name phoneNumber newPhoneNumber   changes phoneNumber to newPhoneNumber for given record.\n" +
-                "printAll                                      prints all records in the base.\n" +
-                "clear                                         deletes all records from the base. No backup.\n\n" +
+                "exit                                          Exit the program.\n" +
+                "addRecord name phoneNumber                    Adds new record with given name and phone number.\n" +
+                "findPhones {-byName name}                     Finds all phones by given parameter.\n" +
+                "findNames  {-byPhone phoneNumber}             Finds all names by given parameter.\n" +
+                "deleteRecord name phoneNumber                 Deletes given record from the base.\n" +
+                "changeName name phoneNumber newName           Changes name to newName for given record.\n" +
+                "changePhone name phoneNumber newPhoneNumber   Changes phoneNumber to newPhoneNumber for given record.\n" +
+                "printAll                                      Prints all records in the base.\n" +
+                "clear                                         Deletes all records from the base. No backup.\n\n" +
                 "Please use only digits, '-', '(' and ')' when adds phone numbers (this will be checked, so don't worry).\n" +
                 "Don't use whitespaces in names or phone numbers!\n" +
                 "Please note that database does not check your phone number for correctness! (Too lazy)\n\n", result);
@@ -86,9 +86,9 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "name or phone number is missing. No record has been added.\n\n" +
-                "name or phone number is missing. No record has been added.\n\n" +
-                "no records in database\n\n", result);
+                "Name or phone number is missing. No record has been added.\n\n" +
+                "Name or phone number is missing. No record has been added.\n\n" +
+                "No records in database.\n\n", result);
     }
 
     @Test
@@ -101,9 +101,9 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'\n\n" +
-                "incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'\n\n" +
-                "no records in database\n\n", result);
+                "Incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'.\n\n" +
+                "Incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'.\n\n" +
+                "No records in database.\n\n", result);
     }
 
     @Test
@@ -131,9 +131,9 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "No key specified for search\n\n" +
-                "unknown key\n\n" +
-                "no name specified for -byName search\n\n", result);
+                "No key specified for search.\n\n" +
+                "Unknown key.\n\n" +
+                "No name specified for -byName search.\n\n", result);
     }
 
     @Test
@@ -144,7 +144,7 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "no records with given name\n\n", result);
+                "No records with given name.\n\n", result);
     }
 
     @Test
@@ -176,9 +176,9 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "No key specified for search\n\n" +
-                "unknown key\n\n" +
-                "no phone number specified for -byPhone search\n\n", result);
+                "No key specified for search.\n\n" +
+                "Unknown key.\n\n" +
+                "No phone number specified for -byPhone search.\n\n", result);
     }
 
     @Test
@@ -189,7 +189,7 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "no records with given phone\n\n", result);
+                "No records with given phone.\n\n", result);
     }
 
     @Test
@@ -220,8 +220,8 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "name or phone not specified, no record has been deleted\n\n" +
-                "name or phone not specified, no record has been deleted\n\n", result);
+                "Name or phone not specified, no record has been deleted.\n\n" +
+                "Name or phone not specified, no record has been deleted.\n\n", result);
     }
 
     @Test
@@ -261,11 +261,11 @@ class PhonebookDataBaseTest {
                 addRecordMessage("a", "5") +
                 addRecordMessage("b", "7") +
                 addRecordMessage("a", "9") +
-                "Ok! Record a 5 has been deleted\n\n" +
+                "Ok! Record a 5 has been deleted.\n\n" +
                 "b 7, a 9\n\n" +
-                "Ok! Record a 9 has been deleted\n\n" +
-                "Ok! Record b 7 has been deleted\n\n" +
-                "no records in database\n\n", result);
+                "Ok! Record a 9 has been deleted.\n\n" +
+                "Ok! Record b 7 has been deleted.\n\n" +
+                "No records in database.\n\n", result);
     }
 
     @Test
@@ -278,9 +278,9 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "name, phone or newName not specified, no record has been changed\n\n" +
-                "name, phone or newName not specified, no record has been changed\n\n" +
-                "name, phone or newName not specified, no record has been changed\n\n", result);
+                "Name, phone or newName not specified, no record has been changed.\n\n" +
+                "Name, phone or newName not specified, no record has been changed.\n\n" +
+                "Name, phone or newName not specified, no record has been changed.\n\n", result);
     }
 
     @Test
@@ -291,7 +291,7 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "No record with given name and phone\n\n", result);
+                "No record with given name and phone.\n\n", result);
     }
 
     @Test
@@ -321,7 +321,7 @@ class PhonebookDataBaseTest {
         assertEquals(intro +
                 addRecordMessage("a", "6") +
                 addRecordMessage("b", "9") +
-                "Ok! a has been changed to b\n\n", result);
+                "Ok! a has been changed to b.\n\n", result);
     }
 
     @Test
@@ -335,10 +335,10 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "name, phone or newPhone not specified, no record has been changed\n\n" +
-                "name, phone or newPhone not specified, no record has been changed\n\n" +
-                "name, phone or newPhone not specified, no record has been changed\n\n" +
-                "incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'\n\n", result);
+                "Name, phone or newPhone not specified, no record has been changed.\n\n" +
+                "Name, phone or newPhone not specified, no record has been changed.\n\n" +
+                "Name, phone or newPhone not specified, no record has been changed.\n\n" +
+                "Incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'.\n\n", result);
     }
 
     @Test
@@ -349,7 +349,7 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "No record with given name and phone\n\n", result);
+                "No record with given name and phone.\n\n", result);
     }
 
     @Test
@@ -379,7 +379,7 @@ class PhonebookDataBaseTest {
         assertEquals(intro +
                 addRecordMessage("a", "6") +
                 addRecordMessage("a", "9") +
-                "Ok! 6 has been changed to 8\n\n", result);
+                "Ok! 6 has been changed to 8.\n\n", result);
     }
 
     @Test
@@ -390,7 +390,7 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "no records in database\n\n", result);
+                "No records in database.\n\n", result);
     }
 
     @Test
@@ -434,9 +434,9 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro +
-                "Are you sure?? That will delete everything!\nPlease write yes or no\n" +
-                "Please write yes if you want to clear database and no otherwise\n" +
-                "Please write yes if you want to clear database and no otherwise\n" +
+                "Are you sure?? That will delete everything!\nPlease write yes or no.\n" +
+                "Please write yes if you want to clear database and no otherwise.\n" +
+                "Please write yes if you want to clear database and no otherwise.\n" +
                 "Ok! Nothing was deleted!\n\n", result);
     }
 
@@ -454,9 +454,9 @@ class PhonebookDataBaseTest {
         assertEquals(intro +
                 addRecordMessage("s", "6") +
                 addRecordMessage("l", "9") +
-                "Are you sure?? That will delete everything!\nPlease write yes or no\n" +
+                "Are you sure?? That will delete everything!\nPlease write yes or no.\n" +
                 "Ok! Everything was deleted. It's all gone.\n\n" +
-                "no records in database\n\n", result);
+                "No records in database.\n\n", result);
     }
 
     /**
@@ -485,11 +485,6 @@ class PhonebookDataBaseTest {
      * Returns message after correct adding record with given name and phone.
      */
     private String addRecordMessage(String name, String phone) {
-        return "Ok! Record " + name + " " + phone + " has been added\n\n";
-    }
-
-    @AfterEach
-    void tearDown() throws IOException {
-        outputStream.close();
+        return "Ok! Record " + name + " " + phone + " has been added.\n\n";
     }
 }

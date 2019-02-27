@@ -21,7 +21,7 @@ public class PhonebookDataBase {
 
     /**
      * Runs infinitive loop which reads user's command and updates database.
-     * If args length is more than 0, the first argument is the name of the database. Otherwise it's name is "mainDataBase"
+     * If args length is more than 0, the first argument is the name of the database. Otherwise it's name is "mainDataBase".
      */
     public static void main(String[] argc) {
         //Hides mongoDB logs from console (too many trash).
@@ -45,7 +45,7 @@ public class PhonebookDataBase {
             final Datastore datastore = morphia.createDatastore(mongoClient, dataBaseName);
 
             //See printHelp() to read help!
-            System.out.println("\nWrite help to get help");
+            System.out.println("\nWrite help to get help.");
 
             boolean stopInteraction = false;
             while (!stopInteraction) {
@@ -87,7 +87,7 @@ public class PhonebookDataBase {
                             clear(datastore, inputScanner);
                             break;
                         default:
-                            System.out.println("Unknown command! Please read help by printing help\n");
+                            System.out.println("Unknown command! Please read help by printing help.\n");
                             break;
                     }
                 }
@@ -96,10 +96,10 @@ public class PhonebookDataBase {
     }
 
     /**
-     * Deletes all records from datastore
+     * Deletes all records from datastore.
      */
     private static void clear(Datastore datastore, Scanner inputScanner) {
-        System.out.println("Are you sure?? That will delete everything!\nPlease write yes or no");
+        System.out.println("Are you sure?? That will delete everything!\nPlease write yes or no.");
         while (true) {
             if (inputScanner.hasNextLine()) {
                 String line = inputScanner.nextLine();
@@ -111,11 +111,10 @@ public class PhonebookDataBase {
                     System.out.println("Ok! Nothing was deleted!\n");
                     break;
                 } else {
-                    System.out.println("Please write yes if you want to clear database and no otherwise");
+                    System.out.println("Please write yes if you want to clear database and no otherwise.");
                 }
             }
         }
-
     }
 
     /**
@@ -123,15 +122,15 @@ public class PhonebookDataBase {
      */
     private static void printHelp() {
         System.out.println("\nPlease use one of the following commands:\n" +
-                "exit                                          exit the program.\n" +
-                "addRecord name phoneNumber                    adds new record with given name and phone number.\n" +
-                "findPhones {-byName name}                     finds all phones by given parameter.\n" +
-                "findNames  {-byPhone phoneNumber}             finds all names by given parameter.\n" +
-                "deleteRecord name phoneNumber                 deletes given record from the base.\n" +
-                "changeName name phoneNumber newName           changes name to newName for given record.\n" +
-                "changePhone name phoneNumber newPhoneNumber   changes phoneNumber to newPhoneNumber for given record.\n" +
-                "printAll                                      prints all records in the base.\n" +
-                "clear                                         deletes all records from the base. No backup.\n\n" +
+                "exit                                          Exit the program.\n" +
+                "addRecord name phoneNumber                    Adds new record with given name and phone number.\n" +
+                "findPhones {-byName name}                     Finds all phones by given parameter.\n" +
+                "findNames  {-byPhone phoneNumber}             Finds all names by given parameter.\n" +
+                "deleteRecord name phoneNumber                 Deletes given record from the base.\n" +
+                "changeName name phoneNumber newName           Changes name to newName for given record.\n" +
+                "changePhone name phoneNumber newPhoneNumber   Changes phoneNumber to newPhoneNumber for given record.\n" +
+                "printAll                                      Prints all records in the base.\n" +
+                "clear                                         Deletes all records from the base. No backup.\n\n" +
                 "Please use only digits, '-', '(' and ')' when adds phone numbers (this will be checked, so don't worry).\n" +
                 "Don't use whitespaces in names or phone numbers!\n" +
                 "Please note that database does not check your phone number for correctness! (Too lazy)\n");
@@ -144,7 +143,7 @@ public class PhonebookDataBase {
     private static void addRecord(Scanner commandScanner, Datastore datastore) {
         String[] parameters = getParameters(commandScanner, 2);
         if (parameters == null) {
-            System.out.println("name or phone number is missing. No record has been added.\n");
+            System.out.println("Name or phone number is missing. No record has been added.\n");
             return;
         }
 
@@ -160,7 +159,7 @@ public class PhonebookDataBase {
         }
 
         datastore.save(new DataRecord(name, phone));
-        System.out.println("Ok! Record " + name + " " + phone + " has been added\n");
+        System.out.println("Ok! Record " + name + " " + phone + " has been added.\n");
     }
 
     /**
@@ -169,7 +168,7 @@ public class PhonebookDataBase {
     private static void findPhones(Scanner commandScanner, Datastore datastore) {
         String key = getParameter(commandScanner);
         if (key == null) {
-            System.out.println("No key specified for search\n");
+            System.out.println("No key specified for search.\n");
             return;
         }
 
@@ -177,13 +176,13 @@ public class PhonebookDataBase {
             case ("-byName"):
                 String name = getParameter(commandScanner);
                 if (name == null) {
-                    System.out.println("no name specified for -byName search\n");
+                    System.out.println("No name specified for -byName search.\n");
                     break;
                 }
 
                 List<DataRecord> records = datastore.find(DataRecord.class).field("name").equal(name).asList();
                 if (records.size() == 0) {
-                    System.out.println("no records with given name\n");
+                    System.out.println("No records with given name.\n");
                 } else {
                     for (var iterator = records.iterator(); iterator.hasNext();) {
                         var record = iterator.next();
@@ -196,7 +195,7 @@ public class PhonebookDataBase {
                 }
                 break;
             default:
-                System.out.println("unknown key\n");
+                System.out.println("Unknown key.\n");
         }
     }
 
@@ -206,7 +205,7 @@ public class PhonebookDataBase {
     private static void findNames(Scanner commandScanner, Datastore datastore) {
         String findNamesKey = getParameter(commandScanner);
         if (findNamesKey == null) {
-            System.out.println("No key specified for search\n");
+            System.out.println("No key specified for search.\n");
             return;
         }
 
@@ -214,13 +213,13 @@ public class PhonebookDataBase {
             case ("-byPhone"):
                 String phone = getParameter(commandScanner);
                 if (phone == null) {
-                    System.out.println("no phone number specified for -byPhone search\n");
+                    System.out.println("No phone number specified for -byPhone search.\n");
                     break;
                 }
 
                 List<DataRecord> records = datastore.find(DataRecord.class).field("phone").equal(phone).asList();
                 if (records.size() == 0) {
-                    System.out.println("no records with given phone\n");
+                    System.out.println("No records with given phone.\n");
                 } else {
                     for (var iterator = records.iterator(); iterator.hasNext();) {
                         var record = iterator.next();
@@ -233,7 +232,7 @@ public class PhonebookDataBase {
                 }
                 break;
             default:
-                System.out.println("unknown key\n");
+                System.out.println("Unknown key.\n");
         }
     }
 
@@ -243,7 +242,7 @@ public class PhonebookDataBase {
     private static void deleteRecord(Scanner commandScanner, Datastore datastore) {
         String[] parameters = getParameters(commandScanner, 2);
         if (parameters == null) {
-            System.out.println("name or phone not specified, no record has been deleted\n");
+            System.out.println("Name or phone not specified, no record has been deleted.\n");
             return;
         }
 
@@ -254,7 +253,7 @@ public class PhonebookDataBase {
             System.out.println("No given record found in database.\n");
         } else {
             datastore.findAndDelete(record);
-            System.out.println("Ok! Record " + deleteName + " " + deletePhone + " has been deleted\n");
+            System.out.println("Ok! Record " + deleteName + " " + deletePhone + " has been deleted.\n");
         }
     }
 
@@ -264,7 +263,7 @@ public class PhonebookDataBase {
     private static void changeName(Scanner commandScanner, Datastore datastore) {
         String[] parameters = getParameters(commandScanner, 3);
         if (parameters == null) {
-            System.out.println("name, phone or newName not specified, no record has been changed\n");
+            System.out.println("Name, phone or newName not specified, no record has been changed.\n");
             return;
         }
 
@@ -272,13 +271,13 @@ public class PhonebookDataBase {
 
         Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
         if (record == null) {
-            System.out.println("No record with given name and phone\n");
+            System.out.println("No record with given name and phone.\n");
         } else if (getRecordFromDatastore(datastore, newName, phone) != null) {
             System.out.println("Nothing has been changed! Record with new name and given phone already exists!\n");
         } else {
                 datastore.findAndModify(record,
                         datastore.createUpdateOperations(DataRecord.class).set("name", newName));
-                System.out.println("Ok! " + name + " has been changed to " + newName + "\n");
+                System.out.println("Ok! " + name + " has been changed to " + newName + ".\n");
             }
     }
 
@@ -289,7 +288,7 @@ public class PhonebookDataBase {
     private static void changePhone(Scanner commandScanner, Datastore datastore) {
         String[] parameters = getParameters(commandScanner, 3);
         if (parameters == null) {
-            System.out.println("name, phone or newPhone not specified, no record has been changed\n");
+            System.out.println("Name, phone or newPhone not specified, no record has been changed.\n");
             return;
         }
 
@@ -300,13 +299,13 @@ public class PhonebookDataBase {
 
         Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
         if (record == null) {
-            System.out.println("No record with given name and phone\n");
+            System.out.println("No record with given name and phone.\n");
         } else if (getRecordFromDatastore(datastore, name, newPhone) != null) {
             System.out.println("Nothing has been changed! Record with given name and new phone already exists!\n");
         } else {
             datastore.findAndModify(record,
                     datastore.createUpdateOperations(DataRecord.class).set("phone", newPhone));
-            System.out.println("Ok! " + phone + " has been changed to " + newPhone + "\n");
+            System.out.println("Ok! " + phone + " has been changed to " + newPhone + ".\n");
         }
     }
 
@@ -316,7 +315,7 @@ public class PhonebookDataBase {
     private static void printAll(Datastore datastore) {
         List<DataRecord> records = datastore.createQuery(DataRecord.class).asList();
         if (records.size() == 0) {
-            System.out.println("no records in database\n");
+            System.out.println("No records in database.\n");
             return;
         }
 
@@ -333,12 +332,12 @@ public class PhonebookDataBase {
 
     /**
      * Returns false if given phone is correct phone number (contains only digits, '-', '(' and ')').
-     * If phone is not correct, writes corresponding message to System.out
+     * If phone is not correct, writes corresponding message to System.out.
      */
     private static boolean wrongPhone(String phone) {
         for (int i = 0; i < phone.length(); i++) {
             if (phone.charAt(i) != '-' && phone.charAt(i) != '(' && phone.charAt(i) != ')' && (phone.charAt(i) < '0' || phone.charAt(i) > '9')) {
-                System.out.println("incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'\n");
+                System.out.println("Incorrect symbols in phone number! Please use only whitespaces, digits, '-', '(' and ')'.\n");
                 return true;
             }
         }
