@@ -17,6 +17,9 @@ import java.util.Scanner;
 /**
  * A simple phonebook database with console interface.
  */
+/*
+Oh, also, I know about red warnings. I haven't found any solution to fix that.
+ */
 public class PhonebookDataBase {
 
     /**
