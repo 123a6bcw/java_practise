@@ -121,19 +121,19 @@ public class PhonebookDataBase {
      * Prints info about commands supported by this database.
      */
     private static void printHelp() {
-        System.out.println("\nPlease use one of the following commands:\n" +
-                "exit                                          Exit the program.\n" +
-                "addRecord name phoneNumber                    Adds new record with given name and phone number.\n" +
-                "findPhones {-byName name}                     Finds all phones by given parameter.\n" +
-                "findNames  {-byPhone phoneNumber}             Finds all names by given parameter.\n" +
-                "deleteRecord name phoneNumber                 Deletes given record from the base.\n" +
-                "changeName name phoneNumber newName           Changes name to newName for given record.\n" +
-                "changePhone name phoneNumber newPhoneNumber   Changes phoneNumber to newPhoneNumber for given record.\n" +
-                "printAll                                      Prints all records in the base.\n" +
-                "clear                                         Deletes all records from the base. No backup.\n\n" +
-                "Please use only digits, '-', '(' and ')' when adds phone numbers (this will be checked, so don't worry).\n" +
-                "Don't use whitespaces in names or phone numbers!\n" +
-                "Please note that database does not check your phone number for correctness! (Too lazy)\n");
+        System.out.println("\nPlease use one of the following commands:\n"
+                + "exit                                          Exit the program.\n"
+                + "addRecord name phoneNumber                    Adds new record with given name and phone number.\n"
+                + "findPhones {-byName name}                     Finds all phones by given parameter.\n"
+                + "findNames  {-byPhone phoneNumber}             Finds all names by given parameter.\n"
+                + "deleteRecord name phoneNumber                 Deletes given record from the base.\n"
+                + "changeName name phoneNumber newName           Changes name to newName for given record.\n"
+                + "changePhone name phoneNumber newPhoneNumber   Changes phoneNumber to newPhoneNumber for given record.\n"
+                + "printAll                                      Prints all records in the base.\n"
+                + "clear                                         Deletes all records from the base. No backup.\n\n"
+                + "Please use only digits, '-', '(' and ')' when adds phone numbers (this will be checked, so don't worry).\n"
+                + "Don't use whitespaces in names or phone numbers!\n"
+                + "Please note that database does not check your phone number for correctness! (Too lazy)\n");
     }
 
     /**
@@ -246,7 +246,8 @@ public class PhonebookDataBase {
             return;
         }
 
-        String deleteName = parameters[0], deletePhone = parameters[1];
+        String deleteName = parameters[0];
+        String deletePhone = parameters[1];
 
         Query<DataRecord> record = getRecordFromDatastore(datastore, deleteName, deletePhone);
         if (record == null) {
@@ -267,7 +268,9 @@ public class PhonebookDataBase {
             return;
         }
 
-        String name = parameters[0], phone = parameters[1], newName = parameters[2];
+        String name = parameters[0];
+        String phone = parameters[1];
+        String newName = parameters[2];
 
         Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
         if (record == null) {
@@ -275,10 +278,10 @@ public class PhonebookDataBase {
         } else if (getRecordFromDatastore(datastore, newName, phone) != null) {
             System.out.println("Nothing has been changed! Record with new name and given phone already exists!\n");
         } else {
-                datastore.findAndModify(record,
-                        datastore.createUpdateOperations(DataRecord.class).set("name", newName));
-                System.out.println("Ok! " + name + " has been changed to " + newName + ".\n");
-            }
+            datastore.findAndModify(record,
+                    datastore.createUpdateOperations(DataRecord.class).set("name", newName));
+            System.out.println("Ok! " + name + " has been changed to " + newName + ".\n");
+        }
     }
 
     /**
@@ -292,7 +295,9 @@ public class PhonebookDataBase {
             return;
         }
 
-        String name = parameters[0], phone = parameters[1], newPhone = parameters[2];
+        String name = parameters[0];
+        String phone = parameters[1];
+        String newPhone = parameters[2];
         if (wrongPhone(newPhone)) {
             return;
         }
