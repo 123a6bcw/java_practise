@@ -20,11 +20,6 @@ class UnbalancedTreeSetTest {
         emptySet  = new UnbalancedTreeSet<>(Comparator.naturalOrder());
         filledSet = new UnbalancedTreeSet<>(Comparator.naturalOrder());
 
-        /*
-        Is it okay to initialise that way?
-        Cause if add() or remove fails (throws exceptions or something), all my tests would fail.
-        And I want to have remove here so I would sure that everything works not just for just created tree.
-         */
         filledSet.addAll(Arrays.asList(values));
         filledSet.remove(2);
         filledSet.add(22);
@@ -37,12 +32,7 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void addAll() {
-        assertEquals(9, filledSet.size());
-    }
-
-    @Test
-    void add() {
+    void addSeveralElementsGivesCorrectSize() {
         emptySet.add(5);
         emptySet.add(10);
         emptySet.add(12);
@@ -50,13 +40,13 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void addExistingObject() {
+    void addExistingObjectDoesNothing() {
         filledSet.add(6);
         assertEquals(9, filledSet.size());
     }
 
     @Test
-    void addRemovedObject() {
+    void addRemovedObjectReturnsIt() {
         filledSet.remove(6);
         filledSet.add(6);
         assertEquals(9, filledSet.size());
@@ -68,14 +58,14 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void iteratorOnEmptySet() {
+    void iteratorOnEmptySetThrowsExceptionOnNext() {
         var iterator = emptySet.iterator();
         assertFalse(iterator.hasNext());
         assertThrows(NoSuchElementException.class, iterator::next);
     }
 
     @Test
-    void iteratorOnFilledSet() {
+    void iteratorOnFilledSetWorksCorrect() {
         var iterator = filledSet.iterator();
         for (int i = 0; i <= 16; i += 2) {
             assertTrue(iterator.hasNext());
@@ -122,7 +112,7 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void descendingIterator() {
+    void descendingIteratorOnFilledSetReturnsObjectInDescendOrder() {
         var iterator = filledSet.descendingIterator();
         for (int i = 16; i >= 0; i -= 2) {
             assertTrue(iterator.hasNext());
@@ -132,7 +122,7 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void descendingIteratorInvalidation() {
+    void descendingIteratorInvalidatesAfterModifications() {
         var iterator = filledSet.descendingIterator();
         filledSet.add(1);
         assertThrows(ConcurrentModificationException.class, iterator::next);
@@ -157,7 +147,7 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void sizeOfFilledSet() {
+    void sizeOfFilledSetIsNotZero() {
         emptySet.add(5);
         assertEquals(1, emptySet.size());
         emptySet.add(6);
@@ -183,12 +173,12 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void firstOfFilledSet() {
+    void firstOfFilledSetReturnsFirstObject() {
         assertEquals(0, filledSet.first());
     }
 
     @Test
-    void firstOfOneObjectSet() {
+    void firstOfOneObjectSetReturnThisObject() {
         emptySet.add(5);
         assertEquals(5, emptySet.first());
     }
@@ -199,12 +189,12 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void LastOfFilledSet() {
+    void LastOfFilledSetReturnsLastObject() {
         assertEquals(16, filledSet.last());
     }
 
     @Test
-    void LastOfOneObjectSet() {
+    void LastOfOneObjectSetReturnsThisObject() {
         emptySet.add(7);
         assertEquals(7, emptySet.last());
     }
@@ -228,7 +218,7 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void lowerOfFilledSet() {
+    void lowerOfFilledSetReturnsLowerObjects() {
         assertNull(filledSet.lower(-1));
         assertNull(filledSet.lower(0));
         for (int i = 1; i <= 16; i += 2) {
@@ -248,7 +238,7 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void floorOnOneElementSet() {
+    void floorOnOneElementSetReturnsFloorObject() {
         emptySet.add(2);
         assertEquals(2, emptySet.floor(2));
         assertEquals(2, emptySet.floor(3));
@@ -256,7 +246,7 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void floorOfFilledSet() {
+    void floorOfFilledSetReturnsFloorObject() {
         assertNull(filledSet.floor(-1));
         for (int i = 0; i <= 16; i += 2) {
             assertEquals(i, filledSet.floor(i));
@@ -275,7 +265,7 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void CeilingOnOneElementSet() {
+    void CeilingOnOneElementSetReturnsCeiling() {
         emptySet.add(2);
         assertEquals(2, emptySet.ceiling(1));
         assertEquals(2, emptySet.ceiling(2));
@@ -283,7 +273,7 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void ceilingOfFilledSet() {
+    void ceilingOfFilledSetReturnsCeiling() {
         assertNull(filledSet.ceiling(17));
         for (int i = -1; i <= 16; i += 2) {
             assertEquals(i+1, filledSet.ceiling(i));
@@ -297,7 +287,7 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void higherOnOneElementSet() {
+    void higherOnOneElementSetReturnsHigher() {
         emptySet.add(2);
         assertNull(emptySet.higher(3));
         assertEquals(2, emptySet.higher(1));
@@ -310,7 +300,7 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void higherOfFilledSet() {
+    void higherOfFilledSetReturnsHigher() {
         assertNull(filledSet.higher(16));
         assertNull(filledSet.higher(17));
         for (int i = 15; i >= -1; i -= 2) {
@@ -325,25 +315,25 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void containsInOneElementSet() {
+    void containsInOneElementSetReturnsTrue() {
         emptySet.add(4);
         assertTrue(emptySet.contains(4));
     }
 
     @Test
-    void containsInFilledSet() {
+    void containsInFilledSetReturnsTrue() {
         for (int i = 2; i <= 8; i += 2) {
             assertTrue(filledSet.contains(i));
         }
     }
 
     @Test
-    void sizeOfEmptySet() {
+    void sizeOfEmptySetIsNull() {
         assertEquals(0, emptySet.size());
     }
 
     @Test
-    void sizeAfterAddsAndRemoving() {
+    void sizeAfterAddsAndRemovingReturnsCorrectSize() {
         assertEquals(9, filledSet.size());
         filledSet.add(10);
         filledSet.add(12);
@@ -359,13 +349,13 @@ class UnbalancedTreeSetTest {
     }
 
     @Test
-    void clearOfEmptySet() {
+    void clearOfEmptySetDoesNothing() {
         emptySet.clear();
         assertEquals(0, emptySet.size());
     }
 
     @Test
-    void clearOfFilledSet() {
+    void clearOfFilledSetClears() {
         filledSet.clear();
         assertEquals(0, filledSet.size());
     }
