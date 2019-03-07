@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Elements of type E set collection based on Heap data structure
+ * Elements of type E set collection based on BST data structure
  * All values in the right subtree of the node is always strictly greater than value in the node, all values in the left
  * subtree is always strictly less.
  */
@@ -171,7 +171,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      */
     @Override
     public int size() {
-        return getSize();
+        return treeState.size;
     }
 
     /**
@@ -243,10 +243,6 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /**
      * findVectoredValue started from the root, other parameters is the same.
      */
-    /*
-    Here and below I could copypast JavaDoc from another findVectoredNode method, but that would be terrible in size.
-    Am I supposed to do that anyway?
-     */
     @Nullable
     private E findVectoredValue(@NotNull Object value, @NotNull Vector vector) {
         return findVectoredValue(getRoot(), value, vector);
@@ -278,11 +274,33 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      */
     @Nullable
     private E findVectoredOrExactValue(@Nullable Node<E> node, @NotNull Object value, @NotNull Vector vector) {
-        Node<E> nodeResult = findVectoredOrExactNodeWithQualification(node, value, vector).getKey();
+        Node<E> nodeResult = findVectoredOrExactNodeWithQualification(node, value, vector).getNode();
         if (nodeResult == null) {
             return null;
         }
         return nodeResult.getValue();
+    }
+
+    /**
+     * Class for storing qualified results of finding nodes, there isEqual is true when found Node has value equal to
+     * requested
+     */
+    private static class QualifiedResult<E> {
+        private Node<E> node;
+        private boolean isEqual;
+
+        QualifiedResult(Node<E> node, boolean isEqual) {
+            this.node = node;
+            this.isEqual = isEqual;
+        }
+
+        private Node<E> getNode() {
+            return node;
+        }
+
+        private boolean isEqual() {
+            return isEqual;
+        }
     }
 
     /**
@@ -294,11 +312,11 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      */
     @Nullable
     private Node<E> findVectoredNode(@Nullable Node<E> node, @NotNull Object value, @NotNull Vector vector) {
-        AbstractMap.SimpleEntry<Node<E>, Boolean> qualifiedResult = findVectoredOrExactNodeWithQualification(node, value, vector);
-        if (!qualifiedResult.getValue()) {
-            return qualifiedResult.getKey();
+        QualifiedResult<E> qualifiedResult = findVectoredOrExactNodeWithQualification(node, value, vector);
+        if (!qualifiedResult.isEqual()) {
+            return qualifiedResult.getNode();
         }
-        return qualifiedResult.getKey().getNextNode(vector);
+        return qualifiedResult.getNode().getNextNode(vector);
     }
 
     /**
@@ -310,32 +328,29 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * Second element in pair is true if value in found node is equal to given one, false if found node is null or have
      * not equal value.
      */
-    /*
-    Is it okay to use that type of pairs or I should better implement my own every time? (second option is kinda gross).
-     */
     @NotNull
-    private AbstractMap.SimpleEntry<Node<E>, Boolean> findVectoredOrExactNodeWithQualification
+    private QualifiedResult<E> findVectoredOrExactNodeWithQualification
             (@Nullable Node<E> node, @NotNull Object value, @NotNull Vector vector) {
         if (node == null) {
-            return new AbstractMap.SimpleEntry<>(null, false);
+            return new QualifiedResult<>(null, false);
         }
 
         int compareResult = compare(node.getValue(), value);
         if (compareResult == 0) {
-            return new AbstractMap.SimpleEntry<>(node, true);
+            return new QualifiedResult<>(node, true);
         }
 
         boolean isVectoredValue = (getVectorByCompareResult(compareResult) == vector.opposite());
-        AbstractMap.SimpleEntry<Node<E>, Boolean> vectoredNode =
+        QualifiedResult<E> vectoredNode =
                 findVectoredOrExactNodeWithQualification(node.getVectorSon(getVectorByCompareResult(compareResult).opposite()), value, vector);
-        if (vectoredNode.getKey() != null) {
+        if (vectoredNode.getNode() != null) {
             return vectoredNode;
         }
         if (!isVectoredValue) {
-            return new AbstractMap.SimpleEntry<>(node, false);
+            return new QualifiedResult<>(node, false);
         }
 
-        return new AbstractMap.SimpleEntry<>(null, false);
+        return new QualifiedResult<>(null, false);
     }
 
     /**
@@ -343,9 +358,9 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      */
     @Nullable
     private Node<E> findExactNode(@NotNull Object value) {
-        AbstractMap.SimpleEntry<Node<E>, Boolean> result = findVectoredOrExactNodeWithQualification(getRoot(), value, Vector.LEFT);
-        if (result.getValue()) {
-            return result.getKey();
+        QualifiedResult<E> result = findVectoredOrExactNodeWithQualification(getRoot(), value, Vector.LEFT);
+        if (result.isEqual()) {
+            return result.getNode();
         } else {
             return null;
         }
@@ -669,13 +684,6 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     /*
     I implemented all (necessary) setters and getters so I wouldn't have to write treeState.something each time I want to use fields.
      */
-
-    /**
-     * Returns number of elements in tree
-     */
-    private int getSize() {
-        return treeState.size;
-    }
 
     /**
      * Changes size to zero.
