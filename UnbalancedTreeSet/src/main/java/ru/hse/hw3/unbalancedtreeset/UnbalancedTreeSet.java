@@ -181,7 +181,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
     @NotNull
     @Override
     public UnbalancedTreeSet<E> descendingSet() {
-        return new DescendingTreeSet<>(this);
+        return new DescendingTreeSet();
     }
 
     /**
@@ -653,25 +653,13 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * reversed order to the original set. It is achieved by reversing corresponding way vector and sharing the same
      * state of the tree between two sets.
      */
-    /*
-    What is better: to make this class non-static and use super-class setters and getters
-    (which is stupid because I use the reference to the super set as a parameter) or to make necessary setters/getters protected?
-    (You made me being afraid of using 'protected' and lose my scores :( ).
-     */
-    private static class DescendingTreeSet<E> extends UnbalancedTreeSet<E> {
-        /**
-         * Original ascending set this set was created from. Saving, so we could return it using DescendingSet();
-         */
-        @NotNull
-        UnbalancedTreeSet<E> superSet;
-
+    private class DescendingTreeSet extends UnbalancedTreeSet<E> {
         /**
          * Creates set that shares treeState of the original tree, but changes way vector in viewing options.
          */
-        private DescendingTreeSet(@NotNull UnbalancedTreeSet<E> ascendingSet) {
-            superSet = ascendingSet;
-            setTreeState(superSet.getTreeState());
-            setLowerVector(Vector.RIGHT);
+        private DescendingTreeSet() {
+            this.setTreeState(getTreeState());
+            this.setLowerVector(Vector.RIGHT);
         }
 
         /**
@@ -680,15 +668,12 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         @Override
         @NotNull
         public UnbalancedTreeSet<E> descendingSet() {
-            return superSet;
+            return UnbalancedTreeSet.this;
         }
     }
 
     /**
      * Changes the way tree assumes the lower element is relatively to the parent node
-     */
-    /*
-    Protected, so we could use it in DescendingTreeSet
      */
     protected void setLowerVector(@NotNull Vector vector) {
         lowerVector = vector;
@@ -768,7 +753,7 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
      * Returns state of the tree.
      */
     @NotNull
-    protected TreeState<E> getTreeState() {
+    private TreeState<E> getTreeState() {
         return treeState;
     }
 
