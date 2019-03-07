@@ -506,12 +506,14 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         /**
          * Left son Node in tree
          */
-        /*
-        Creating an array parametrized by generic type is unchecked cast???? Well, too bad...
-         */
-        @SuppressWarnings("unchecked")
         @Nullable
-        private Node<E>[] sons = (Node<E>[]) new Node[2];
+        private Node<E> leftSon;
+
+        /**
+         * Right son Node in tree
+         */
+        @Nullable
+        private Node<E> rightSon;
 
         /**
          * Parent Node in tree
@@ -523,6 +525,8 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
         private Node(@NotNull E value, @Nullable Node<E> parent) {
             this.value = value;
             this.parent = parent;
+            leftSon = null;
+            rightSon = null;
         }
 
         /**
@@ -582,11 +586,12 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
          */
         @Nullable
         private Node<E> getVectorSon(@NotNull Vector vector) {
-            /*
-            Sons always not null, actually, but I cannot annotate it with @NotNull because it annotates it's content
-            as NotNull which is false
-             */
-            return Objects.requireNonNull(sons)[vector.ordinal()];
+            switch (vector) {
+                case LEFT:
+                    return leftSon;
+                case RIGHT: default:
+                    return rightSon;
+            }
         }
 
         /**
@@ -628,7 +633,15 @@ public class UnbalancedTreeSet<E> extends AbstractCollection<E> implements MyTre
          * Set son of direction of vector
          */
         private void setSon(@Nullable Node<E> son, @NotNull Vector vector) {
-            Objects.requireNonNull(sons)[vector.ordinal()] = son;
+            switch (vector) {
+                case LEFT:
+                    leftSon = son;
+                    break;
+                case RIGHT: default:
+                    rightSon = son;
+                    break;
+            }
+
             if (son != null) {
                 son.setParent(this);
             }
