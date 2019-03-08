@@ -6,4 +6,5 @@ os:
 env:
 - PROJECT_DIR=GladkovHashTable
 - PROJECT_DIR=trie
+- PROJECT_DIR=UnbalancedTreeSet
 script: cd $PROJECT_DIR && mvn install
