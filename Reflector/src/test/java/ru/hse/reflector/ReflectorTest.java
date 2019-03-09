@@ -13,11 +13,17 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ReflectorTest {
+    /**
+     * Empty classes
+     */
     private static class EmptyClassA {
     }
     private static class EmptyClassB {
     }
 
+    /**
+     * Two classes with equal fields.
+     */
     private static class SameFieldsA {
         private static int a;
         public static transient volatile Integer b;
@@ -31,6 +37,9 @@ class ReflectorTest {
         final List<? extends Object> c = null;
     }
 
+    /**
+     * Two classes with different fields.
+     */
     private static class DifferentFieldsA {
         public int a;
         protected transient Integer b;
@@ -46,6 +55,9 @@ class ReflectorTest {
         DifferentFieldsB e;
     }
 
+    /**
+     * Two classes with equal methods.
+     */
     private abstract static class SameMethodsA {
         private static <E extends Object, R>  void a(List<? extends Object> list) {
         }
@@ -67,6 +79,9 @@ class ReflectorTest {
         abstract int c();
     }
 
+    /**
+     * Two classes with different methods.
+     */
     private static class DifferentMethodsA {
         private void a() {}
 
@@ -90,6 +105,10 @@ class ReflectorTest {
         public void e(int a, Integer b) {}
     }
 
+    /**
+     * Two classes with either equal inner classes (contains either equal and non-equal fields and methods) and non-equal
+     * inner classes.
+     */
     private static class InnerClassesA {
         class InnerClass {
             public int a;

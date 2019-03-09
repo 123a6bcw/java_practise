@@ -2,13 +2,18 @@ package ru.hse.reflector;
 
 import java.io.*;
 import java.lang.reflect.*;
-import java.sql.Array;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+/**
+ * Class for printing structure of class to file and getting difference between two classes.
+ */
 public class Reflector {
     private static String defaultIndent = "    ";
 
+    /**
+     * Printing structure of class, basically printing everything as in source code except for method's realisation.
+     */
     public static void printStructure(Class<?> someClass) throws IOException {
         var file = new File("someClass.java");
         var wasCreated = file.createNewFile();
@@ -21,10 +26,16 @@ public class Reflector {
         }
     }
 
+    /**
+     * Returns string with all fields and methods that differs in this classes.
+     */
     public static String diffClasses(Class<?> a, Class<?> b) {
         return diffBaseClass(a, b) + diffBaseClass(b, a);
     }
 
+    /**
+     * Returns string with all fields and methods that base class contains but target class does not.
+     */
     private static String diffBaseClass(Class<?> base, Class<?> target) {
         var result = new StringBuilder();
 
@@ -78,12 +89,18 @@ public class Reflector {
         return result.toString();
     }
 
+    /**
+     * Returns true if baseField is equal to targetField.
+     */
     private static boolean equalFields(Field baseField, Field targetField) {
         return baseField.getName().equals(targetField.getName())
                && baseField.getModifiers() == targetField.getModifiers()
                && baseField.getGenericType().equals(targetField.getGenericType());
     }
 
+    /**
+     * Returns true if baseMethod is equal to targetMethod.
+     */
     private static boolean equalMethods(Method baseMethod, Method targetMethod) {
         return baseMethod.getModifiers() == targetMethod.getModifiers()
                 && baseMethod.getName().equals(targetMethod.getName())
@@ -91,6 +108,9 @@ public class Reflector {
                 && baseMethod.getGenericReturnType().equals(targetMethod.getGenericReturnType());
     }
 
+    /**
+     * Returns true if baseClass is equal to targetClass.
+     */
     private static boolean equalClasses(Class<?> baseClass, Class<?> targetClass) {
         return baseClass.getModifiers() == targetClass.getModifiers()
                 && baseClass.getSimpleName().equals(targetClass.getSimpleName())
@@ -98,6 +118,9 @@ public class Reflector {
                 && Arrays.equals(baseClass.getGenericInterfaces(), targetClass.getGenericInterfaces());
     }
 
+    /**
+     * Prints class content with given indent.
+     */
     private static void printClass(Class<?> someClass, FileWriter writer, String indent) throws IOException {
         printHeading(someClass, writer, indent);
         writer.write(" {\n");
@@ -112,6 +135,9 @@ public class Reflector {
         writer.write(indent + "}");
     }
 
+    /**
+     * Prints class fields.
+     */
     private static void printFields(Class<?> someClass, FileWriter writer, String indent) throws IOException {
         for (var field : someClass.getDeclaredFields()) {
             if (!field.getName().matches("this[$][0-9]+")) {
@@ -122,6 +148,9 @@ public class Reflector {
         }
     }
 
+    /**
+     * Prints class methods.
+     */
     private static void printMethods(Class<?> someClass, FileWriter writer, String indent) throws IOException {
         for (var method : someClass.getDeclaredMethods()) {
             writer.write(indent);
@@ -146,6 +175,9 @@ public class Reflector {
         }
     }
 
+    /**
+     * Prints class inner (and nested) classes.
+     */
     private static void printClasses(Class<?> someClass, FileWriter writer, String indent) throws IOException {
         for (var subClass : someClass.getDeclaredClasses()) {
             printClass(subClass, writer, indent);
@@ -153,6 +185,9 @@ public class Reflector {
         }
     }
 
+    /**
+     * Prints the very first line in class definition.
+     */
     private static void printHeading(Class<?> someClass, FileWriter writer, String indent) throws IOException {
         writer.write(indent);
         writer.write(someClass.toGenericString());
