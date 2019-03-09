@@ -2,11 +2,15 @@ package ru.hse.reflector;
 
 import java.io.*;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class Reflector {
+    static String defaultIndent = "    ";
+
     public static void printStructure(Class<?> someClass) throws IOException {
         var file = new File("someClass.java");
         var wasCreated = file.createNewFile();
@@ -23,9 +27,10 @@ public class Reflector {
         printHeading(someClass, writer, indent);
         writer.write(" {\n");
 
-        printFields(someClass, writer, indent + "    ");
-        printMethods(someClass, writer, indent + "    ");
-        printClasses(someClass, writer, indent + "    ");
+        printFields(someClass, writer, indent + defaultIndent);
+        writer.write("\n");
+        printMethods(someClass, writer, indent + defaultIndent);
+        printClasses(someClass, writer, indent + defaultIndent);
 
         writer.write(indent + "}");
     }
@@ -34,8 +39,8 @@ public class Reflector {
         for (var field : someClass.getDeclaredFields()) {
             writer.write(indent);
 
+            /*
             int fieldMofidier = field.getModifiers();
-
             if (Modifier.isPublic(fieldMofidier)) {
                 writer.write("public ");
             } else if (Modifier.isProtected(fieldMofidier)) {
@@ -59,14 +64,35 @@ public class Reflector {
             if (Modifier.isFinal(fieldMofidier)) {
                 writer.write("final ");
             }
-
-            writer.write(field.getGenericType().getTypeName() + " ");
-            writer.write(field.getName());
+*/
+            writer.write(field.toGenericString());
+            //writer.write(field.getName());
             writer.write(";\n");
         }
     }
 
-    private static void printMethods(Class<?> someClass, FileWriter writer, String indent) {
+    private static void printMethods(Class<?> someClass, FileWriter writer, String indent) throws IOException {
+        for (var method : someClass.getDeclaredMethods()) {
+            writer.write(indent);
+
+            writer.write(method.toGenericString().
+                    replaceFirst("[(].*[)]",
+                            "("
+                            + Arrays.stream(method.getParameters()).map(Parameter::toString).collect(Collectors.joining(", "))
+                            + ")")
+                    + " {\n");
+
+            if (!method.getReturnType().toString().equals("void")) {
+                writer.write(indent + defaultIndent);
+                if (method.getReturnType().isPrimitive()) {
+                    writer.write("return 0; \n");
+                } else {
+                    writer.write("return null;\n");
+                }
+            }
+
+            writer.write(indent + "}\n\n");
+        }
     }
 
     private static void printClasses(Class<?> someClass, FileWriter writer, String indent) {
@@ -120,7 +146,11 @@ public class Reflector {
         private closs<E> closa;
         protected String strong;
 
-        public static <E> int doSomething() {
+        public static <E> int doSomethingElse(Integer integer) {
+            return 0;
+        }
+
+        public static <E> int doSomething(Class<? extends E> pokazuha, Class<E> pomoshnik) {
             return test1;
         }
 
