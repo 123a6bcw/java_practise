@@ -155,8 +155,8 @@ public class Reflector {
         for (var method : someClass.getDeclaredMethods()) {
             writer.write(indent);
 
-            writer.write(method.toGenericString().
-                    replaceFirst("[(].*[)]",
+            writer.write(method.toGenericString()
+                    .replaceFirst("[(].*[)]",
                             "("
                             + Arrays.stream(method.getParameters()).map(Parameter::toString).collect(Collectors.joining(", "))
                             + ")")
