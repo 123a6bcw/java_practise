@@ -37,37 +37,11 @@ public class Reflector {
 
     private static void printFields(Class<?> someClass, FileWriter writer, String indent) throws IOException {
         for (var field : someClass.getDeclaredFields()) {
-            writer.write(indent);
-
-            /*
-            int fieldMofidier = field.getModifiers();
-            if (Modifier.isPublic(fieldMofidier)) {
-                writer.write("public ");
-            } else if (Modifier.isProtected(fieldMofidier)) {
-                writer.write("protected ");
-            } else if (Modifier.isPrivate(fieldMofidier)) {
-                writer.write("private ");
+            if (!field.getName().matches("this[$][0-9]+")) {
+                writer.write(indent);
+                writer.write(field.toGenericString());
+                writer.write(";\n");
             }
-
-            if (Modifier.isTransient(fieldMofidier)) {
-                writer.write("transient ");
-            }
-
-            if (Modifier.isVolatile(fieldMofidier)) {
-                writer.write("volatile ");
-            }
-
-            if (Modifier.isStatic(fieldMofidier)) {
-                writer.write("static ");
-            }
-
-            if (Modifier.isFinal(fieldMofidier)) {
-                writer.write("final ");
-            }
-*/
-            writer.write(field.toGenericString());
-            //writer.write(field.getName());
-            writer.write(";\n");
         }
     }
 
@@ -95,46 +69,22 @@ public class Reflector {
         }
     }
 
-    private static void printClasses(Class<?> someClass, FileWriter writer, String indent) {
+    private static void printClasses(Class<?> someClass, FileWriter writer, String indent) throws IOException {
+        for (var subClass : someClass.getDeclaredClasses()) {
+            printClass(subClass, writer, indent);
+            writer.write("\n");
+        }
     }
 
     private static void printHeading(Class<?> someClass, FileWriter writer, String indent) throws IOException {
         writer.write(indent);
-
-        int classModifier = someClass.getModifiers();
-        /*if (Modifier.isPublic(classModifier)) {
-            writer.write("public ");
-        } else if (Modifier.isPrivate(classModifier)) {
-            writer.write("private ");
-        } else if (Modifier.isProtected(classModifier)) {
-            writer.write("protected ");
-        }
-
-        if (Modifier.isAbstract(classModifier)) {
-            writer.write("abstract ");
-        }
-
-        if (Modifier.isStatic(classModifier)) {
-            writer.write("static ");
-        }
-
-        if (Modifier.isFinal(classModifier)) {
-            writer.write("final ");
-        }
-
-        if (Modifier.isStrict(classModifier)) {
-            writer.write("strictfp ");
-        }
-
-        writer.write("class ");
-        */
         writer.write(someClass.toGenericString());
 
         if (someClass.getSuperclass() != null) {
             writer.write(" extends " + someClass.getGenericSuperclass().getTypeName());
         }
 
-        if (someClass.getInterfaces() != null) {
+        if (someClass.getInterfaces().length > 0) {
             writer.write(" implements ");
             writer.write(Arrays.stream(someClass.getGenericInterfaces()).map(Type::getTypeName).collect(Collectors.joining(", ")));
         }
@@ -154,8 +104,17 @@ public class Reflector {
             return test1;
         }
 
-        @Override
         public void close() throws IOException {
+        }
+
+        public class iLikeEatMeat<R> {
+            private int test2;
+
+            private class ILikeAnimanls<O> implements Closeable {
+                public void close() throws IOException {
+
+                }
+            }
         }
     }
 
