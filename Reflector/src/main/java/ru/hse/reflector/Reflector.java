@@ -2,9 +2,8 @@ package ru.hse.reflector;
 
 import java.io.*;
 import java.lang.reflect.*;
-import java.util.ArrayList;
+import java.sql.Array;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class Reflector {
@@ -30,6 +29,10 @@ public class Reflector {
         var result = new StringBuilder();
 
         for (var baseField : base.getDeclaredFields()) {
+            if (baseField.getName().matches("this[$][0-9]+")) {
+                continue;
+            }
+
             boolean matches = false;
             for (var targetField : target.getDeclaredFields()) {
                 if (equalFields(baseField, targetField)) {
@@ -42,8 +45,6 @@ public class Reflector {
                 result.append(baseField.toGenericString()).append("\n");
             }
         }
-
-        result.append("\n");
 
         for (var baseMethod : base.getDeclaredMethods()) {
             boolean matches = false;
@@ -59,8 +60,6 @@ public class Reflector {
             }
         }
 
-        result.append("\n");
-
         for (var baseClass : base.getDeclaredClasses()) {
             boolean matches = false;
             for (var targetClass : target.getDeclaredClasses()) {
@@ -75,8 +74,6 @@ public class Reflector {
                 result.append(baseClass.toGenericString()).append("\n");
             }
         }
-
-        result.append("\n");
 
         return result.toString();
     }
@@ -96,10 +93,9 @@ public class Reflector {
 
     private static boolean equalClasses(Class<?> baseClass, Class<?> targetClass) {
         return baseClass.getModifiers() == targetClass.getModifiers()
-                && baseClass.getCanonicalName().equals(targetClass.getCanonicalName())
+                && baseClass.getSimpleName().equals(targetClass.getSimpleName())
                 && baseClass.getGenericSuperclass().equals(targetClass.getGenericSuperclass())
-                && Arrays.equals(baseClass.getGenericInterfaces(), targetClass.getGenericInterfaces())
-                && baseClass.getTypeName().equals(targetClass.getTypeName());
+                && Arrays.equals(baseClass.getGenericInterfaces(), targetClass.getGenericInterfaces());
     }
 
     private static void printClass(Class<?> someClass, FileWriter writer, String indent) throws IOException {
