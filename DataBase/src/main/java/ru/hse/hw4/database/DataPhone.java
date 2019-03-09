@@ -50,4 +50,22 @@ public class DataPhone {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    public boolean addOwner(DataPerson owner) {
+        return owners.add(owner);
+    }
+
+    public boolean removeOwner(DataPerson owner) {
+        return owners.remove(owner);
+    }
+
+    public boolean changeOwner(DataPerson oldOwner, DataPerson newOwner) {
+        if (!owners.contains(oldOwner) || owners.contains(newOwner)) {
+            return false;
+        }
+
+        owners.remove(oldOwner);
+        owners.add(newOwner);
+        return true;
+    }
 }
