@@ -1,10 +1,8 @@
 package ru.hse.hw4.database;
 
-import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
-import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mongodb.morphia.Datastore;
@@ -64,7 +62,7 @@ public class PhonebookDataBase {
              var mongoClient = new MongoClient(addresses, mongoClientOptions)) {
             final var morphia = new Morphia();
             morphia.mapPackage("ru.hse.hw4.database");
-            morphia.map(DataRecord.class);
+            morphia.map(DataPerson.class);
 
             final Datastore datastore = morphia.createDatastore(mongoClient, dataBaseName);
 
@@ -134,7 +132,7 @@ public class PhonebookDataBase {
             if (inputScanner.hasNextLine()) {
                 String line = inputScanner.nextLine();
                 if (line.equals("yes") || line.equals("Yes") || line.equals("Y") || line.equals("y")) {
-                    datastore.delete(datastore.createQuery(DataRecord.class));
+                    datastore.delete(datastore.createQuery(DataPerson.class));
                     System.out.println("Ok! Everything was deleted. It's all gone.\n");
                     break;
                 } else if (line.equals("no") || line.equals("No") || line.equals("n") || line.equals("N")) {
@@ -182,13 +180,13 @@ public class PhonebookDataBase {
             return;
         }
 
-        Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
+        Query<DataPerson> record = getRecordFromDatastore(datastore, name, phone);
         if (record != null) {
             System.out.println("Given record already exists in data base!\n");
             return;
         }
 
-        datastore.save(new DataRecord(name, phone));
+        datastore.save(new DataPerson(name, phone));
         System.out.println("Ok! Record " + name + " " + phone + " has been added.\n");
     }
 
@@ -214,7 +212,7 @@ public class PhonebookDataBase {
                     break;
                 }
 
-                List<DataRecord> records = datastore.find(DataRecord.class).field("name").equal(name).asList();
+                List<DataPerson> records = datastore.find(DataPerson.class).field("name").equal(name).asList();
                 if (records.size() == 0) {
                     System.out.println("No records with given name.\n");
                 } else {
@@ -251,7 +249,7 @@ public class PhonebookDataBase {
                     break;
                 }
 
-                List<DataRecord> records = datastore.find(DataRecord.class).field("phone").equal(phone).asList();
+                List<DataPerson> records = datastore.find(DataPerson.class).field("phone").equal(phone).asList();
                 if (records.size() == 0) {
                     System.out.println("No records with given phone.\n");
                 } else {
@@ -283,7 +281,7 @@ public class PhonebookDataBase {
         String deleteName = parameters[0];
         String deletePhone = parameters[1];
 
-        Query<DataRecord> record = getRecordFromDatastore(datastore, deleteName, deletePhone);
+        Query<DataPerson> record = getRecordFromDatastore(datastore, deleteName, deletePhone);
         if (record == null) {
             System.out.println("No given record found in database.\n");
         } else {
@@ -306,14 +304,14 @@ public class PhonebookDataBase {
         String phone = parameters[1];
         String newName = parameters[2];
 
-        Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
+        Query<DataPerson> record = getRecordFromDatastore(datastore, name, phone);
         if (record == null) {
             System.out.println("No record with given name and phone.\n");
         } else if (getRecordFromDatastore(datastore, newName, phone) != null) {
             System.out.println("Nothing has been changed! Record with new name and given phone already exists!\n");
         } else {
             datastore.findAndModify(record,
-                    datastore.createUpdateOperations(DataRecord.class).set("name", newName));
+                    datastore.createUpdateOperations(DataPerson.class).set("name", newName));
             System.out.println("Ok! " + name + " has been changed to " + newName + ".\n");
         }
     }
@@ -336,14 +334,14 @@ public class PhonebookDataBase {
             return;
         }
 
-        Query<DataRecord> record = getRecordFromDatastore(datastore, name, phone);
+        Query<DataPerson> record = getRecordFromDatastore(datastore, name, phone);
         if (record == null) {
             System.out.println("No record with given name and phone.\n");
         } else if (getRecordFromDatastore(datastore, name, newPhone) != null) {
             System.out.println("Nothing has been changed! Record with given name and new phone already exists!\n");
         } else {
             datastore.findAndModify(record,
-                    datastore.createUpdateOperations(DataRecord.class).set("phone", newPhone));
+                    datastore.createUpdateOperations(DataPerson.class).set("phone", newPhone));
             System.out.println("Ok! " + phone + " has been changed to " + newPhone + ".\n");
         }
     }
@@ -352,7 +350,7 @@ public class PhonebookDataBase {
      * Prints to System.out all records in database.
      */
     private static void printAll(@NotNull Datastore datastore) {
-        List<DataRecord> records = datastore.createQuery(DataRecord.class).asList();
+        List<DataPerson> records = datastore.createQuery(DataPerson.class).asList();
         if (records.size() == 0) {
             System.out.println("No records in database.\n");
             return;
@@ -388,8 +386,8 @@ public class PhonebookDataBase {
      * Returns null if there is no such record.
      */
     @Nullable
-    private static Query<DataRecord> getRecordFromDatastore(@NotNull Datastore datastore, @NotNull String name, @NotNull String phone) {
-        var result = datastore.find(DataRecord.class).field("name").equal(name).field("phone").equal(phone);
+    private static Query<DataPerson> getRecordFromDatastore(@NotNull Datastore datastore, @NotNull String name, @NotNull String phone) {
+        var result = datastore.find(DataPerson.class).field("name").equal(name).field("phone").equal(phone);
         if (result.get() == null) {
             return null;
         }
