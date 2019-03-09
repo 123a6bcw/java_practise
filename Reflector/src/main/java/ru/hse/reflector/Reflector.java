@@ -1,26 +1,105 @@
 package ru.hse.reflector;
 
 import java.io.*;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Reflector {
-    static String defaultIndent = "    ";
+    private static String defaultIndent = "    ";
 
     public static void printStructure(Class<?> someClass) throws IOException {
         var file = new File("someClass.java");
         var wasCreated = file.createNewFile();
         if (!wasCreated && !file.canWrite()) {
-            throw new RuntimeException("Can't create file someClass.java");
+            throw new RuntimeException("Can't create or write to file someClass.java");
         }
 
         try (var writer = new FileWriter(file)) {
             printClass(someClass, writer, "");
         }
+    }
+
+    public static String diffClasses(Class<?> a, Class<?> b) {
+        return diffBaseClass(a, b) + diffBaseClass(b, a);
+    }
+
+    private static String diffBaseClass(Class<?> base, Class<?> target) {
+        var result = new StringBuilder();
+
+        for (var baseField : base.getDeclaredFields()) {
+            boolean matches = false;
+            for (var targetField : target.getDeclaredFields()) {
+                if (equalFields(baseField, targetField)) {
+                    matches = true;
+                    break;
+                }
+            }
+
+            if (!matches) {
+                result.append(baseField.toGenericString()).append("\n");
+            }
+        }
+
+        result.append("\n");
+
+        for (var baseMethod : base.getDeclaredMethods()) {
+            boolean matches = false;
+            for (var targetMethod : target.getDeclaredMethods()) {
+                if (equalMethods(baseMethod, targetMethod)) {
+                    matches = true;
+                    break;
+                }
+            }
+
+            if (!matches) {
+                result.append(baseMethod.toGenericString()).append("\n");
+            }
+        }
+
+        result.append("\n");
+
+        for (var baseClass : base.getDeclaredClasses()) {
+            boolean matches = false;
+            for (var targetClass : target.getDeclaredClasses()) {
+                if (equalClasses(baseClass, targetClass)) {
+                    matches = true;
+                    result.append(diffBaseClass(baseClass, targetClass));
+                    break;
+                }
+            }
+
+            if (!matches) {
+                result.append(baseClass.toGenericString()).append("\n");
+            }
+        }
+
+        result.append("\n");
+
+        return result.toString();
+    }
+
+    private static boolean equalFields(Field baseField, Field targetField) {
+        return baseField.getName().equals(targetField.getName())
+               && baseField.getModifiers() == targetField.getModifiers()
+               && baseField.getGenericType().equals(targetField.getGenericType());
+    }
+
+    private static boolean equalMethods(Method baseMethod, Method targetMethod) {
+        return baseMethod.getModifiers() == targetMethod.getModifiers()
+                && baseMethod.getName().equals(targetMethod.getName())
+                && Arrays.equals(baseMethod.getParameterTypes(), targetMethod.getParameterTypes())
+                && baseMethod.getGenericReturnType().equals(targetMethod.getGenericReturnType());
+    }
+
+    private static boolean equalClasses(Class<?> baseClass, Class<?> targetClass) {
+        return baseClass.getModifiers() == targetClass.getModifiers()
+                && baseClass.getCanonicalName().equals(targetClass.getCanonicalName())
+                && baseClass.getGenericSuperclass().equals(targetClass.getGenericSuperclass())
+                && Arrays.equals(baseClass.getGenericInterfaces(), targetClass.getGenericInterfaces())
+                && baseClass.getTypeName().equals(targetClass.getTypeName());
     }
 
     private static void printClass(Class<?> someClass, FileWriter writer, String indent) throws IOException {
@@ -29,7 +108,9 @@ public class Reflector {
 
         printFields(someClass, writer, indent + defaultIndent);
         writer.write("\n");
+
         printMethods(someClass, writer, indent + defaultIndent);
+
         printClasses(someClass, writer, indent + defaultIndent);
 
         writer.write(indent + "}");
@@ -88,45 +169,5 @@ public class Reflector {
             writer.write(" implements ");
             writer.write(Arrays.stream(someClass.getGenericInterfaces()).map(Type::getTypeName).collect(Collectors.joining(", ")));
         }
-    }
-
-    public static class closs<E> extends pomidorka<E> implements Cloneable, Closeable, ME_TOO_XD<E> {
-        static int test1;
-        private int someInt;
-        private closs<E> closa;
-        protected String strong;
-
-        public static <E> int doSomethingElse(Integer integer) {
-            return 0;
-        }
-
-        public static <E> int doSomething(Class<? extends E> pokazuha, Class<E> pomoshnik) {
-            return test1;
-        }
-
-        public void close() throws IOException {
-        }
-
-        public class iLikeEatMeat<R> {
-            private int test2;
-
-            private class ILikeAnimanls<O> implements Closeable {
-                public void close() throws IOException {
-
-                }
-            }
-        }
-    }
-
-    public static interface IAMINTERFACE {
-
-    }
-
-    public static interface ME_TOO_XD<E> extends IAMINTERFACE {
-
-    }
-
-    protected static class pomidorka<Pomidor> {
-
     }
 }
