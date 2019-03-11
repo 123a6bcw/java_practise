@@ -133,6 +133,7 @@ public class PhonebookDataBase {
                 String line = inputScanner.nextLine();
                 if (line.equals("yes") || line.equals("Yes") || line.equals("Y") || line.equals("y")) {
                     datastore.delete(datastore.createQuery(DataPerson.class));
+                    datastore.delete(datastore.createQuery(DataPhone.class));
                     System.out.println("Ok! Everything was deleted. It's all gone.\n");
                     break;
                 } else if (line.equals("no") || line.equals("No") || line.equals("n") || line.equals("N")) {
@@ -248,13 +249,13 @@ public class PhonebookDataBase {
                     break;
                 }
 
-                List<DataPerson> records = datastore.find(DataPerson.class).field("phone").equal(phone).asList();
-                if (records.size() == 0) {
-                    System.out.println("No records with given phone.\n");
+                DataPhone dataPhone = datastore.get(DataPhone.class, phone);
+                if (dataPhone == null) {
+                    System.out.println("No given phone in datastore.\n");
                 } else {
-                    for (var iterator = records.iterator(); iterator.hasNext();) {
-                        var record = iterator.next();
-                        System.out.print(record.getName());
+                    for (var iterator = dataPhone.getOwners().iterator(); iterator.hasNext();) {
+                        var person = iterator.next();
+                        System.out.print(person);
                         if (iterator.hasNext()) {
                             System.out.print(", ");
                         }

@@ -23,7 +23,6 @@ public class DataPerson {
     /**
      * Name of this man.
      */
-    @Id
     private String name;
 
     /**

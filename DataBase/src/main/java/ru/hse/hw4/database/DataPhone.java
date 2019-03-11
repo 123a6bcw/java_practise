@@ -4,7 +4,9 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Class for storing phones in phonebook.
@@ -27,12 +29,12 @@ public class DataPhone {
      * Owners of this phone number.
      */
     @Reference
-    private List<DataPerson> owners;
+    private Set<DataPerson> owners;
 
     public DataPhone(String phone) {
         this.phone = phone;
         this.id = phone.hashCode();
-        this.owners = new ArrayList<>();
+        this.owners = new HashSet<>();
     }
 
     public int getId() {
@@ -57,6 +59,10 @@ public class DataPhone {
 
     public boolean removeOwner(DataPerson owner) {
         return owners.remove(owner);
+    }
+
+    public Set<DataPerson> getOwners() {
+        return getOwners();
     }
 
     public boolean changeOwner(DataPerson oldOwner, DataPerson newOwner) {
