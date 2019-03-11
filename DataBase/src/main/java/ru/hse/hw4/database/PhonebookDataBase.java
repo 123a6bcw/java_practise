@@ -18,6 +18,7 @@ import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * A simple phonebook database with console interface.
@@ -111,7 +112,7 @@ public class PhonebookDataBase {
                             clear(datastore, inputScanner);
                             break;
                         default:
-                            System.out.println("Unknown command! Please read help by printing help.\n");
+                            System.out.println("Unknown command! Please read help by printing 'help'.\n");
                             break;
                     }
                 }
@@ -293,13 +294,10 @@ public class PhonebookDataBase {
                 if (person == null) {
                     System.out.println("No person with given name.\n");
                 } else {
-                    for (var iterator = person.getPhones().iterator(); iterator.hasNext();) {
-                        var phone = iterator.next();
-                        System.out.print(getPhoneById(datastore, phone).getPhone());
-                        if (iterator.hasNext()) {
-                            System.out.print(", ");
-                        }
-                    }
+                    System.out.print(person.getPhones()
+                            .stream()
+                            .map(phoneId -> getPhoneById(datastore, phoneId).getPhone())
+                            .collect(Collectors.joining(", ")));
                     System.out.print("\n\n");
                 }
                 break;
@@ -330,13 +328,10 @@ public class PhonebookDataBase {
                 if (dataPhone == null) {
                     System.out.println("No given phone in datastore.\n");
                 } else {
-                    for (var iterator = dataPhone.getOwners().iterator(); iterator.hasNext();) {
-                        var person = iterator.next();
-                        System.out.print(getPersonById(datastore, person).getName());
-                        if (iterator.hasNext()) {
-                            System.out.print(", ");
-                        }
-                    }
+                    System.out.print(dataPhone.getOwners()
+                            .stream()
+                            .map(personId -> getPersonById(datastore, personId).getName())
+                            .collect(Collectors.joining(", ")));
                     System.out.print("\n\n");
                 }
                 break;
@@ -458,21 +453,11 @@ public class PhonebookDataBase {
             return;
         }
 
-        for (var iteratorPerson = persons.iterator(); iteratorPerson.hasNext();) {
-            var person = iteratorPerson.next();
-
-            for (var iteratorPhone = person.getPhones().iterator(); iteratorPhone.hasNext();) {
-                var phone = iteratorPhone.next();
-
-                System.out.print(person.getName() + " " + getPhoneById(datastore, phone).getPhone());
-                if (iteratorPhone.hasNext()) {
-                    System.out.print(", ");
-                }
-            }
-            if (iteratorPerson.hasNext()) {
-                System.out.print(", ");
-            }
-        }
+        System.out.print(persons.stream().map(person ->
+                person.getPhones().stream()
+                        .map(phoneId -> person.getName() + " " + getPhoneById(datastore, phoneId).getPhone())
+                        .collect(Collectors.joining(", ")))
+                .collect(Collectors.joining(", ")));
         System.out.print("\n\n");
     }
 

@@ -82,7 +82,7 @@ class PhonebookDataBaseTest {
     /**
      * The very first line in any database interaction.
      */
-    private String intro = "\nWrite help to get help.\n";
+    private String intro = "\nWrite 'help' to get help.\n";
 
     @BeforeEach
     void setUp() {
@@ -554,7 +554,7 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro
-                + "Unknown command! Please read help by printing help.\n\n", result);
+                + "Unknown command! Please read help by printing 'help'.\n\n", result);
     }
 
     /**
