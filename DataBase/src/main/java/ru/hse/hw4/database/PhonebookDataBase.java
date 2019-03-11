@@ -81,34 +81,34 @@ public class PhonebookDataBase {
                     }
 
                     switch (commandScanner.next()) {
-                        case ("help"):
+                        case "help":
                             printHelp();
                             break;
-                        case ("exit"):
+                        case "exit":
                             stopInteraction = true;
                             break;
-                        case ("addRecord"):
+                        case "addRecord":
                             addRecord(commandScanner, datastore);
                             break;
-                        case ("findPhones"):
+                        case "findPhones":
                             findPhones(commandScanner, datastore);
                             break;
-                        case ("findNames"):
+                        case "findNames":
                             findNames(commandScanner, datastore);
                             break;
-                        case ("deleteRecord"):
+                        case "deleteRecord":
                             deleteRecord(commandScanner, datastore);
                             break;
-                        case ("changeName"):
+                        case "changeName":
                             changeName(commandScanner, datastore);
                             break;
-                        case ("changePhone"):
+                        case "changePhone":
                             changePhone(commandScanner, datastore);
                             break;
-                        case ("printAll"):
+                        case "printAll":
                             printAll(datastore);
                             break;
-                        case ("clear"):
+                        case "clear":
                             clear(datastore, inputScanner);
                             break;
                         default:
@@ -283,7 +283,7 @@ public class PhonebookDataBase {
         But the point is, there COULD be more cases, so I want to leave it as it is.
          */
         switch (key) {
-            case ("-byName"):
+            case "-byName":
                 String name = getParameter(commandScanner);
                 if (name == null) {
                     System.out.println("No name specified for -byName search.\n");
@@ -317,7 +317,7 @@ public class PhonebookDataBase {
         }
 
         switch (findNamesKey) {
-            case ("-byPhone"):
+            case "-byPhone":
                 String phone = getParameter(commandScanner);
                 if (phone == null) {
                     System.out.println("No phone number specified for -byPhone search.\n");
