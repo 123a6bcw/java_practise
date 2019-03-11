@@ -68,8 +68,8 @@ public class PhonebookDataBase {
 
             final Datastore datastore = morphia.createDatastore(mongoClient, dataBaseName);
 
-            //See printHelp() to read help!
-            System.out.println("\nWrite help to get help.");
+            //See printHelp to read help!
+            System.out.println("\nWrite 'help' to get help.");
 
             boolean stopInteraction = false;
             while (!stopInteraction) {
@@ -133,12 +133,12 @@ public class PhonebookDataBase {
         while (true) {
             if (inputScanner.hasNextLine()) {
                 String line = inputScanner.nextLine();
-                if (line.equals("yes") || line.equals("Yes") || line.equals("Y") || line.equals("y")) {
+                if (line.equals("yes")) {
                     datastore.delete(datastore.createQuery(DataPerson.class));
                     datastore.delete(datastore.createQuery(DataPhone.class));
                     System.out.println("Ok! Everything was deleted. It's all gone.\n");
                     break;
-                } else if (line.equals("no") || line.equals("No") || line.equals("n") || line.equals("N")) {
+                } else if (line.equals("no")) {
                     System.out.println("Ok! Nothing was deleted!\n");
                     break;
                 } else {
@@ -248,7 +248,8 @@ public class PhonebookDataBase {
             return;
         }
 
-        String name = parameters[0], phone = parameters[1];
+        String name = parameters[0];
+        String phone = parameters[1];
         if (wrongPhone(phone)) {
             return;
         }
@@ -278,7 +279,7 @@ public class PhonebookDataBase {
 
         /*
         IDEA tells me there is too few cases and I probable should change switch to if statement.
-        But the point is, where COULD be more cases, so I want to leave it as it is.
+        But the point is, there COULD be more cases, so I want to leave it as it is.
          */
         switch (key) {
             case ("-byName"):
