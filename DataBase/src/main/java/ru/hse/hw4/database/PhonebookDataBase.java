@@ -3,6 +3,7 @@ package ru.hse.hw4.database;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
+import org.bson.types.ObjectId;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mongodb.morphia.Datastore;
@@ -13,6 +14,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -166,6 +168,76 @@ public class PhonebookDataBase {
     }
 
     /**
+     * Loads person with given name from database.
+     */
+    private static DataPerson getPersonByName(Datastore datastore, String name) {
+        return datastore.find(DataPerson.class).field("name").equal(name).get();
+    }
+
+    /**
+     * Loads phone with given phone number from database.
+     */
+    private static DataPhone getPhoneByPhone(Datastore datastore, String phone) {
+        return datastore.find(DataPhone.class).field("phone").equal(phone).get();
+    }
+
+    /**
+     * Loads person with given id from database.
+     */
+    private static DataPerson getPersonById(Datastore datastore, ObjectId id) {
+        return datastore.get(DataPerson.class, id);
+    }
+
+    /**
+     * Loads phone with given id from database.
+     */
+    private static DataPhone getPhoneById(Datastore datastore, ObjectId id) {
+        return datastore.get(DataPhone.class, id);
+    }
+
+    /**
+     * Loads person with given name from database.
+     * If there is no such, returns a new person with given name.
+     */
+    private static DataPerson findOrCreatePerson(Datastore datastore, String name) {
+        var dataPerson = getPersonByName(datastore, name);
+        if (dataPerson == null) {
+            return new DataPerson(name);
+        }
+
+        return dataPerson;
+    }
+
+    /**
+     * Loads phone with given phone number from database.
+     * If there is no such,  returns a new phone with given phone number.
+     */
+    private static DataPhone findOrCreatePhone(Datastore datastore, String phone) {
+        var dataPhone = getPhoneByPhone(datastore, phone);
+        if (dataPhone == null) {
+            return new DataPhone(phone);
+        }
+
+        return dataPhone;
+    }
+
+    /**
+     * Attach person to phone and vice versa.
+     */
+    private static void addConnection(@NotNull DataPerson dataPerson, @NotNull DataPhone dataPhone) {
+        dataPerson.getPhones().add(dataPhone.getId());
+        dataPhone.getOwners().add(dataPerson.getId());
+    }
+
+    /**
+     * Deattach person to phone and vice versa.
+     */
+    private static void removeConnection(@NotNull DataPerson dataPerson, @NotNull DataPhone dataPhone) {
+        dataPerson.getPhones().remove(dataPhone.getId());
+        dataPhone.getOwners().remove(dataPerson.getId());
+    }
+
+    /**
      * Reads name and phoneNumber from System.in. Adds corresponding record to the database.
      * Mostly does not make checks on correctness of the phone number. Only check if it uses only digits, whitespaces, '-', '(' and ')'.
      */
@@ -181,13 +253,17 @@ public class PhonebookDataBase {
             return;
         }
 
-        var savedPerson = datastore.getByKey(DataPerson.class, datastore.save(new DataPerson(name)));
-        var savedPhone = datastore.getByKey(DataPhone.class, datastore.save(new DataPhone(phone)));
+        DataPerson dataPerson = findOrCreatePerson(datastore, name);
+        DataPhone dataPhone = findOrCreatePhone(datastore, phone);
 
-        savedPerson.addPhone(savedPhone);
-        savedPhone.addOwner(savedPerson);
-
-        System.out.println("Ok! Record " + name + " " + phone + " has been added.\n");
+        if (dataPerson.getPhones().contains(dataPhone.getId())) {
+            System.out.println("Given record already exists in data base!\n");
+        } else {
+            addConnection(dataPerson, dataPhone);
+            System.out.println("Ok! Record " + name + " " + phone + " has been added.\n");
+        }
+        datastore.save(dataPerson);
+        datastore.save(dataPhone);
     }
 
     /**
@@ -212,13 +288,13 @@ public class PhonebookDataBase {
                     break;
                 }
 
-                DataPerson person = datastore.get(DataPerson.class, name);
+                DataPerson person = getPersonByName(datastore, name);
                 if (person == null) {
                     System.out.println("No person with given name.\n");
                 } else {
                     for (var iterator = person.getPhones().iterator(); iterator.hasNext();) {
                         var phone = iterator.next();
-                        System.out.print(phone);
+                        System.out.print(getPhoneById(datastore, phone).getPhone());
                         if (iterator.hasNext()) {
                             System.out.print(", ");
                         }
@@ -249,13 +325,13 @@ public class PhonebookDataBase {
                     break;
                 }
 
-                DataPhone dataPhone = datastore.get(DataPhone.class, phone);
+                DataPhone dataPhone = getPhoneByPhone(datastore, phone);
                 if (dataPhone == null) {
                     System.out.println("No given phone in datastore.\n");
                 } else {
                     for (var iterator = dataPhone.getOwners().iterator(); iterator.hasNext();) {
                         var person = iterator.next();
-                        System.out.print(person);
+                        System.out.print(getPersonById(datastore, person).getName());
                         if (iterator.hasNext()) {
                             System.out.print(", ");
                         }
@@ -281,12 +357,24 @@ public class PhonebookDataBase {
         String deleteName = parameters[0];
         String deletePhone = parameters[1];
 
-        Query<DataPerson> record = getRecordFromDatastore(datastore, deleteName, deletePhone);
-        if (record == null) {
+        var dataPerson = getPersonByName(datastore, deleteName);
+        var dataPhone = getPhoneByPhone(datastore, deletePhone);
+
+        if (dataPerson == null || dataPhone == null || !dataPerson.getPhones().contains(dataPhone.getId())) {
             System.out.println("No given record found in database.\n");
         } else {
-            datastore.findAndDelete(record);
+            removeConnection(dataPerson, dataPhone);
+            datastore.save(dataPerson);
+            datastore.save(dataPhone);
             System.out.println("Ok! Record " + deleteName + " " + deletePhone + " has been deleted.\n");
+
+            if (dataPerson.getPhones().isEmpty()) {
+                datastore.delete(dataPerson);
+            }
+
+            if (dataPhone.getOwners().isEmpty()) {
+                datastore.delete(dataPhone);
+            }
         }
     }
 
@@ -304,14 +392,20 @@ public class PhonebookDataBase {
         String phone = parameters[1];
         String newName = parameters[2];
 
-        Query<DataPerson> record = getRecordFromDatastore(datastore, name, phone);
-        if (record == null) {
+        var dataPerson = getPersonByName(datastore, name);
+        var dataPhone = getPhoneByPhone(datastore, phone);
+        var dataNewPerson = findOrCreatePerson(datastore, newName);
+
+        if (dataPerson == null || dataPhone == null || !dataPerson.getPhones().contains(dataPhone.getId())) {
             System.out.println("No record with given name and phone.\n");
-        } else if (getRecordFromDatastore(datastore, newName, phone) != null) {
+        } else if (dataPhone.getOwners().contains(dataNewPerson.getId())) {
             System.out.println("Nothing has been changed! Record with new name and given phone already exists!\n");
         } else {
-            datastore.findAndModify(record,
-                    datastore.createUpdateOperations(DataPerson.class).set("name", newName));
+            removeConnection(dataPerson, dataPhone);
+            addConnection(dataNewPerson, dataPhone);
+            if (dataPerson.getPhones().isEmpty()) {
+                datastore.delete(dataPerson);
+            }
             System.out.println("Ok! " + name + " has been changed to " + newName + ".\n");
         }
     }
@@ -334,14 +428,21 @@ public class PhonebookDataBase {
             return;
         }
 
-        Query<DataPerson> record = getRecordFromDatastore(datastore, name, phone);
-        if (record == null) {
+        var dataPerson = getPersonByName(datastore, name);
+        var dataPhone = getPhoneByPhone(datastore, phone);
+        var dataNewPhone = findOrCreatePhone(datastore, newPhone);
+
+        if (dataPerson == null) {
             System.out.println("No record with given name and phone.\n");
-        } else if (getRecordFromDatastore(datastore, name, newPhone) != null) {
+        } else if (dataPerson.getPhones().contains(dataNewPhone.getId())) {
             System.out.println("Nothing has been changed! Record with given name and new phone already exists!\n");
         } else {
-            datastore.findAndModify(record,
-                    datastore.createUpdateOperations(DataPerson.class).set("phone", newPhone));
+            removeConnection(dataPerson, dataPhone);
+            addConnection(dataPerson, dataNewPhone);
+
+            if (dataPhone.getOwners().isEmpty()) {
+                datastore.delete(dataPhone);
+            }
             System.out.println("Ok! " + phone + " has been changed to " + newPhone + ".\n");
         }
     }
@@ -362,7 +463,7 @@ public class PhonebookDataBase {
             for (var iteratorPhone = person.getPhones().iterator(); iteratorPhone.hasNext();) {
                 var phone = iteratorPhone.next();
 
-                System.out.print(person.getName() + " " + phone.getPhone());
+                System.out.print(person.getName() + " " + getPhoneById(datastore, phone).getPhone());
                 if (iteratorPhone.hasNext()) {
                     System.out.print(", ");
                 }
@@ -386,20 +487,6 @@ public class PhonebookDataBase {
             }
         }
         return false;
-    }
-
-    /**
-     * Returns Query with exactly one DataRecord --- one that has the same name and phoneNumber as given ones.
-     * Returns null if there is no such record.
-     */
-    @Nullable
-    private static Query<DataPerson> getRecordFromDatastore(@NotNull Datastore datastore, @NotNull String name, @NotNull String phone) {
-        var result = datastore.find(DataPerson.class).field("name").equal(name).field("phone").equal(phone);
-        if (result.get() == null) {
-            return null;
-        }
-
-        return result;
     }
 
     /**
@@ -433,4 +520,3 @@ public class PhonebookDataBase {
         return result;
     }
 }
-

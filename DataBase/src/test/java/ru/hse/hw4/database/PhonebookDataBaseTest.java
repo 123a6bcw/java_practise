@@ -201,7 +201,7 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro
-                + "No records with given name.\n\n", result);
+                + "No person with given name.\n\n", result);
     }
 
     @Test
@@ -215,12 +215,25 @@ class PhonebookDataBaseTest {
 
         PhonebookDataBase.main(argc);
         String result = getResult();
-        assertEquals(intro
+
+        String expectedResult1 = intro
                 + addRecordMessage("sasha", "699")
                 + addRecordMessage("sasha", "700")
                 + addRecordMessage("dima", "699")
                 + "699, 700\n\n"
-                + "699\n\n", result);
+                + "699\n\n";
+        String expectedResult2 = intro
+                + addRecordMessage("sasha", "699")
+                + addRecordMessage("sasha", "700")
+                + addRecordMessage("dima", "699")
+                + "700, 699\n\n"
+                + "699\n\n";
+
+        if (!expectedResult1.equals(result)) {
+            assertEquals(expectedResult2, result);
+        } else {
+            assertEquals(expectedResult1, result);
+        }
     }
 
     @Test
@@ -246,7 +259,7 @@ class PhonebookDataBaseTest {
         PhonebookDataBase.main(argc);
         String result = getResult();
         assertEquals(intro
-                + "No records with given phone.\n\n", result);
+                + "No given phone in datastore.\n\n", result);
     }
 
     @Test
@@ -260,12 +273,20 @@ class PhonebookDataBaseTest {
 
         PhonebookDataBase.main(argc);
         String result = getResult();
-        assertEquals(intro
+
+        String expectedBegin = intro
                 + addRecordMessage("sasha", "699")
                 + addRecordMessage("sasha", "700")
-                + addRecordMessage("dima", "699")
-                + "sasha, dima\n\n"
-                + "sasha\n\n", result);
+                + addRecordMessage("dima", "699");
+        String expectedEnd = "sasha\n\n";
+        String expectedResult1 = expectedBegin + "sasha, dima\n\n" + expectedEnd;
+        String expectedResult2 = expectedBegin + "dima, sasha\n\n" + expectedEnd;
+
+        if (!expectedResult1.equals(result)) {
+            assertEquals(expectedResult2, result);
+        } else {
+            assertEquals(expectedResult1, result);
+        }
     }
 
     @Test
@@ -312,17 +333,24 @@ class PhonebookDataBaseTest {
                 + "printAll\n"
                 + "exit\n");
 
-        PhonebookDataBase.main(argc);
-        String result = getResult();
-        assertEquals(intro
+        String expectedBegin = intro
                 + addRecordMessage("a", "5")
                 + addRecordMessage("b", "7")
                 + addRecordMessage("a", "9")
-                + "Ok! Record a 5 has been deleted.\n\n"
-                + "b 7, a 9\n\n"
-                + "Ok! Record a 9 has been deleted.\n\n"
+                + "Ok! Record a 5 has been deleted.\n\n";
+        String expectedEnd = "Ok! Record a 9 has been deleted.\n\n"
                 + "Ok! Record b 7 has been deleted.\n\n"
-                + "No records in database.\n\n", result);
+                + "No records in database.\n\n";
+        String expectedResult1 = expectedBegin + "b 7, a 9\n\n" + expectedEnd;
+        String expectedResult2 = expectedBegin + "a 9, b 7\n\n" + expectedEnd; //Correct order is unknown
+
+        PhonebookDataBase.main(argc);
+        String result = getResult();
+        if (!expectedResult1.equals(result)) {
+            assertEquals(expectedResult2, result);
+        } else {
+            assertEquals(expectedResult1, result);
+        }
     }
 
     @Test
