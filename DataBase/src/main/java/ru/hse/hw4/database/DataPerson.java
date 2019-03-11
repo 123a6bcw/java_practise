@@ -23,8 +23,12 @@ public class DataPerson {
     /**
      * Name of this man.
      */
+    @Id
     private String name;
 
+    /**
+     * Phones of this person
+     */
     @Reference
     private Set<DataPhone> phones;
 
@@ -56,6 +60,10 @@ public class DataPerson {
 
     public boolean removePhone(DataPhone phone) {
         return phones.remove(phone);
+    }
+
+    public Set<DataPhone> getPhones() {
+        return phones;
     }
 
     public boolean changePhone(DataPhone oldPhone, DataPhone newPhone) {

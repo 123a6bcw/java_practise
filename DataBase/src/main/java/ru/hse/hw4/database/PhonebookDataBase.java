@@ -180,13 +180,12 @@ public class PhonebookDataBase {
             return;
         }
 
-        Query<DataPerson> record = getRecordFromDatastore(datastore, name, phone);
-        if (record != null) {
-            System.out.println("Given record already exists in data base!\n");
-            return;
-        }
+        var savedPerson = datastore.getByKey(DataPerson.class, datastore.save(new DataPerson(name)));
+        var savedPhone = datastore.getByKey(DataPhone.class, datastore.save(new DataPhone(phone)));
 
-        datastore.save(new DataPerson(name, phone));
+        savedPerson.addPhone(savedPhone);
+        savedPhone.addOwner(savedPerson);
+
         System.out.println("Ok! Record " + name + " " + phone + " has been added.\n");
     }
 
@@ -212,13 +211,13 @@ public class PhonebookDataBase {
                     break;
                 }
 
-                List<DataPerson> records = datastore.find(DataPerson.class).field("name").equal(name).asList();
-                if (records.size() == 0) {
-                    System.out.println("No records with given name.\n");
+                DataPerson person = datastore.get(DataPerson.class, name);
+                if (person == null) {
+                    System.out.println("No person with given name.\n");
                 } else {
-                    for (var iterator = records.iterator(); iterator.hasNext();) {
-                        var record = iterator.next();
-                        System.out.print(record.getPhone());
+                    for (var iterator = person.getPhones().iterator(); iterator.hasNext();) {
+                        var phone = iterator.next();
+                        System.out.print(phone);
                         if (iterator.hasNext()) {
                             System.out.print(", ");
                         }
@@ -350,17 +349,24 @@ public class PhonebookDataBase {
      * Prints to System.out all records in database.
      */
     private static void printAll(@NotNull Datastore datastore) {
-        List<DataPerson> records = datastore.createQuery(DataPerson.class).asList();
-        if (records.size() == 0) {
+        List<DataPerson> persons = datastore.createQuery(DataPerson.class).asList();
+        if (persons.size() == 0) {
             System.out.println("No records in database.\n");
             return;
         }
 
-        for (var iterator = records.iterator(); iterator.hasNext();) {
-            var record = iterator.next();
-            System.out.print(record.getName() + " " + record.getPhone());
+        for (var iteratorPerson = persons.iterator(); iteratorPerson.hasNext();) {
+            var person = iteratorPerson.next();
 
-            if (iterator.hasNext()) {
+            for (var iteratorPhone = person.getPhones().iterator(); iteratorPhone.hasNext();) {
+                var phone = iteratorPhone.next();
+
+                System.out.print(person.getName() + " " + phone.getPhone());
+                if (iteratorPhone.hasNext()) {
+                    System.out.print(", ");
+                }
+            }
+            if (iteratorPerson.hasNext()) {
                 System.out.print(", ");
             }
         }
