@@ -32,7 +32,7 @@ public class QSortThreads {
      * Sorting elements with indexes from l to r in given array using quick sort algorithm and without using threads.
      */
     private static <T extends Comparable<T>> void sortWithoutThreads(T[] array, int l, int r) {
-        if (l > r) {
+        if (l >= r) {
             return;
         }
 
@@ -45,7 +45,7 @@ public class QSortThreads {
      * Sorting elements with indexes from l to r in given array using quick sort algorithm and threads.
      */
     private static <T extends Comparable<T>> void threadSort(T[] array, int l, int r) {
-        if (l > r) {
+        if (l >= r) {
             return;
         }
 
