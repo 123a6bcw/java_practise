@@ -10,6 +10,18 @@ import java.util.Arrays;
  */
 public class QSortThreads {
     /**
+     * If array's length is lower than this, then it's probably better to sort it without using threads as they only
+     * slow down the process.
+     */
+    private static final int DEFAULT_MAX_LENGTH_FOR_THREADS = 100;
+
+    /**
+     * Actual max length may differ from default if user wish to.
+     */
+    private static int ACTUAL_MAX_LENGTH_FOR_THREADS = DEFAULT_MAX_LENGTH_FOR_THREADS;
+
+
+    /**
      * Sorting giving array using quick sort algorithm and without using threads.
      */
     public static <T extends Comparable<T>> void sortWithoutThreads(@NotNull T[] array) {
@@ -23,7 +35,7 @@ public class QSortThreads {
     /**
      * Sorting giving array using quick sort algorithm and threads.
      */
-    public static <T extends Comparable<T>> void threadSort(T[] array) {
+    public static <T extends Comparable<T>> void threadSort(@NotNull T[] array) {
         if (array.length == 0) {
             return;
         }
@@ -32,9 +44,29 @@ public class QSortThreads {
     }
 
     /**
+     * Sorting giving array using quick sort algorithm and threads.
+     * Then array length becomes lower than MAX_LENGTH_FOR_THREADS, does not use threads (if not specified, used default
+     * value for this).
+     */
+    /*
+    To be honest, I added this only for testing...
+     */
+    public static <T extends Comparable<T>> void threadSort(@NotNull T[] array, int MAX_LENGTH_FOR_THREADS) {
+        ACTUAL_MAX_LENGTH_FOR_THREADS = MAX_LENGTH_FOR_THREADS;
+
+        if (array.length == 0) {
+            return;
+        }
+
+        threadSort(array, 0, array.length - 1);
+
+        ACTUAL_MAX_LENGTH_FOR_THREADS = DEFAULT_MAX_LENGTH_FOR_THREADS;
+    }
+
+    /**
      * Sorting elements with indexes from l to r (inclusive) in given array using quick sort algorithm and without using threads.
      */
-    private static <T extends Comparable<T>> void sortWithoutThreads(T[] array, int l, int r) {
+    private static <T extends Comparable<T>> void sortWithoutThreads(@NotNull T[] array, int l, int r) {
         if (l >= r) {
             return;
         }
@@ -47,8 +79,13 @@ public class QSortThreads {
     /**
      * Sorting elements with indexes from l to r (inclusive) in given array using quick sort algorithm and threads.
      */
-    private static <T extends Comparable<T>> void threadSort(T[] array, int l, int r){
+    private static <T extends Comparable<T>> void threadSort(@NotNull T[] array, int l, int r){
         if (l >= r) {
+            return;
+        }
+
+        if (r - l + 1 <= ACTUAL_MAX_LENGTH_FOR_THREADS) {
+            sortWithoutThreads(array, l, r);
             return;
         }
 
@@ -76,7 +113,7 @@ public class QSortThreads {
     /*
     Yeap, it's copypaste of https://neerc.ifmo.ru/wiki/index.php?title=%D0%91%D1%8B%D1%81%D1%82%D1%80%D0%B0%D1%8F_%D1%81%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0
      */
-    private static <T extends Comparable<T>> int partition(T[] array, int l, int r) {
+    private static <T extends Comparable<T>> int partition(@NotNull T[] array, int l, int r) {
         T v = array[(l + r) / 2]; // Could be random, but, like, whatever.
         int i = l;
         int j = r;

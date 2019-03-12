@@ -2,6 +2,10 @@ package ru.hse.hw6.qsort;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.Random;
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class QSortThreadsTest {
@@ -10,7 +14,7 @@ class QSortThreadsTest {
     void sortWithThreadsOfEmptyArrayDoesNothing() {
         var array = new Integer[0];
 
-        assertDoesNotThrow(() -> QSortThreads.threadSort(array));
+        assertDoesNotThrow(() -> QSortThreads.threadSort(array, 0));
     }
 
     @Test
@@ -24,7 +28,7 @@ class QSortThreadsTest {
     void sortWithThreadsOfOneElementArrayDoesNothing() {
         Integer[] array = {1};
 
-        QSortThreads.threadSort(array);
+        QSortThreads.threadSort(array, 0);
         assertEquals(1, array[0]);
     }
 
@@ -41,7 +45,7 @@ class QSortThreadsTest {
         Integer[] arrayToSort = {1,2,3,4,5};
         var arrayResult = arrayToSort.clone();
 
-        QSortThreads.threadSort(arrayToSort);
+        QSortThreads.threadSort(arrayToSort, 0);
         assertArrayEquals(arrayResult, arrayToSort);
     }
 
@@ -59,7 +63,7 @@ class QSortThreadsTest {
         Integer[] arrayToSort = {4,5,1,3,2,6};
         Integer[] arrayResult = {1,2,3,4,5,6};
 
-        QSortThreads.threadSort(arrayToSort);
+        QSortThreads.threadSort(arrayToSort, 0);
         assertArrayEquals(arrayResult, arrayToSort);
     }
 
@@ -77,7 +81,7 @@ class QSortThreadsTest {
         Integer[] arrayToSort = {5,4,3,2,1};
         Integer[] arrayResult = {1,2,3,4,5};
 
-        QSortThreads.threadSort(arrayToSort);
+        QSortThreads.threadSort(arrayToSort, 0);
         assertArrayEquals(arrayResult, arrayToSort);
     }
 
@@ -95,7 +99,7 @@ class QSortThreadsTest {
         Integer[] arrayToSort = {1,2,3,1,6,2,1,2,1,1,6,4,6,5,5,4,3,4};
         Integer[] arrayResult = {1,1,1,1,1,2,2,2,3,3,4,4,4,5,5,6,6,6};
 
-        QSortThreads.threadSort(arrayToSort);
+        QSortThreads.threadSort(arrayToSort, 0);
         assertArrayEquals(arrayResult, arrayToSort);
     }
 
@@ -113,7 +117,7 @@ class QSortThreadsTest {
         Integer[] arrayToSort = {1,1,1,1,1,1};
         Integer[] arrayResult = {1,1,1,1,1,1};
 
-        QSortThreads.threadSort(arrayToSort);
+        QSortThreads.threadSort(arrayToSort, 0);
         assertArrayEquals(arrayResult, arrayToSort);
     }
 
@@ -124,5 +128,32 @@ class QSortThreadsTest {
 
         QSortThreads.sortWithoutThreads(arrayToSort);
         assertArrayEquals(arrayResult, arrayToSort);
+    }
+
+    enum TYPE_OF_CONTENT {
+        SORTED, RANDOM, REVERSED
+    }
+
+    private void compareAlgorithms(int arrayLength, TYPE_OF_CONTENT type_of_content) {
+        var random = new Random(42); //reproducibility!
+        var array = new Integer[arrayLength];
+        for (int i = 0; i < arrayLength; i++) {
+            switch (type_of_content) {
+                case SORTED:
+                    array[i] = i;
+                    break;
+                case RANDOM:
+                    array[i] = random.nextInt();
+                    break;
+                case REVERSED:
+                    array[i] = arrayLength - i - 1;
+                    break;
+            }
+        }
+
+        var arrayCopy = array.clone();
+
+        QSortThreads.sortWithoutThreads(array);
+        QSortThreads.threadSort(arrayCopy);
     }
 }
