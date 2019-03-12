@@ -55,9 +55,36 @@ public class QSortThreads {
     }
 
     /**
-     * Choose randomly element x, split array into parts <x, =x and >x, returns position of x!!!11)))))000 xDDDD
+     * Choose randomly element x, split array into parts <=x and >x, returns position of x!!!11)))))000 xDDDD
+     */
+    /*
+    Yeap, it's copypaste of https://neerc.ifmo.ru/wiki/index.php?title=%D0%91%D1%8B%D1%81%D1%82%D1%80%D0%B0%D1%8F_%D1%81%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0
      */
     private static <T extends Comparable<T>> int partition(T[] array, int l, int r) {
-        return 0;
+        T v = array[(l + r) / 2]; // Could be random, but, like, whatever.
+        int i = l;
+        int j = r;
+        while (i <= j) {
+            while (array[i].compareTo(v) < 0) {
+                i++;
+            }
+
+            while (array[j].compareTo(v) > 0) {
+                j--;
+            }
+
+            if (i >= j) {
+                break;
+            }
+
+            T tmp = array[i];
+            array[i] = array[j];
+            array[j] = tmp;
+
+            i++;
+            j--;
+        }
+
+        return j;
     }
 }
