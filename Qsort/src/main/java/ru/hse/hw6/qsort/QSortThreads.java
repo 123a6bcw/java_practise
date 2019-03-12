@@ -2,6 +2,9 @@ package ru.hse.hw6.qsort;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 /**
  * Class for sorting arrays using quick sort algorithm and either using threads or not.
  */
@@ -29,7 +32,7 @@ public class QSortThreads {
     }
 
     /**
-     * Sorting elements with indexes from l to r in given array using quick sort algorithm and without using threads.
+     * Sorting elements with indexes from l to r (inclusive) in given array using quick sort algorithm and without using threads.
      */
     private static <T extends Comparable<T>> void sortWithoutThreads(T[] array, int l, int r) {
         if (l >= r) {
@@ -42,16 +45,29 @@ public class QSortThreads {
     }
 
     /**
-     * Sorting elements with indexes from l to r in given array using quick sort algorithm and threads.
+     * Sorting elements with indexes from l to r (inclusive) in given array using quick sort algorithm and threads.
      */
-    private static <T extends Comparable<T>> void threadSort(T[] array, int l, int r) {
+    private static <T extends Comparable<T>> void threadSort(T[] array, int l, int r){
         if (l >= r) {
             return;
         }
 
         int q = partition(array, l, r);
-        threadSort(array, l, q); //TODO add multithread
-        threadSort(array, q + 1, r);
+        var leftThread = new Thread(() -> threadSort(array, l, q));
+
+        T[] rightArrayCopy = Arrays.copyOfRange(array, q + 1, r + 1);
+        var rightThread = new Thread(() -> threadSort(rightArrayCopy, 0, rightArrayCopy.length - 1));
+
+        try {
+            leftThread.start();
+            rightThread.start();
+            leftThread.join();
+            rightThread.join();
+        } catch (InterruptedException e) {
+            System.exit(1);
+        }
+
+        System.arraycopy(rightArrayCopy, 0, array, q + 1, r - q);
     }
 
     /**
