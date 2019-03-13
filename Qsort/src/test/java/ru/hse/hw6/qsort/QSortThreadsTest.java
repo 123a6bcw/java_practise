@@ -1,5 +1,6 @@
 package ru.hse.hw6.qsort;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
@@ -221,14 +222,14 @@ class QSortThreadsTest {
      * Difference in percent of base and target assuming base is higher than target.
      */
     private static double getPercentLonger(long base, long target) {
-        return (((double) base) / target) * 100 - 100;
+        return (((double) base - target) / target) * 100;
     }
 
     /**
      * Sorts using two algorithms (with and without threads) and returns results in time.
      */
     private static TimePair compareAlgorithms(int arrayLength, TYPE_OF_CONTENT type_of_content) {
-        var random = new Random(arrayLength); //reproducibility!
+        var random = new Random(arrayLength); //reproducibility! BUT ACTUALLY THERE IS NO REPRODUCIBILITY!!!
         var array = new Integer[arrayLength];
         var arrayCopy = new Integer[arrayLength];
         for (int i = 0; i < arrayLength; i++) {
@@ -252,18 +253,22 @@ class QSortThreadsTest {
         return new TimePair(elapsedTimeWithoutThreads, elapsedTimeWithThreads);
     }
 
-    private static <T extends Comparable<? super T>> long howLongSortsWithoutThreads(T[] array) {
+    /**
+     * Returns how long does sort without threads works.
+     */
+    private static <T extends Comparable<? super T>> long howLongSortsWithoutThreads(@NotNull T[] array) {
         long startTimeWithoutThreads = System.nanoTime();
         QSortThreads.sortWithoutThreads(array);
-        //System.out.println(array[7]);
         long endTimeWithoutThreads = System.nanoTime();
         return (endTimeWithoutThreads - startTimeWithoutThreads);
     }
 
-    private static <T extends Comparable<? super T>> long howLongSortsWithThreads(T[] array) {
+    /**
+     * Returns how long does sort with threads works.
+     */
+    private static <T extends Comparable<? super T>> long howLongSortsWithThreads(@NotNull T[] array) {
         long startTimeWithoutThreads = System.nanoTime();
         QSortThreads.threadSort(array);
-        //System.out.println(array[5]);
         long endTimeWithoutThreads = System.nanoTime();
         return (endTimeWithoutThreads - startTimeWithoutThreads);
     }

@@ -129,7 +129,7 @@ public class QSortThreads {
          */
         private final int r;
 
-        SortWithThreads(T[] array, int l, int r) {
+        SortWithThreads(@NotNull T[] array, int l, int r) {
             this.array = array;
             this.l = l;
             this.r = r;
