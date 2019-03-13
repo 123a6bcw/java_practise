@@ -2,6 +2,7 @@ package ru.hse.hw6.qsort;
 
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -130,13 +131,106 @@ class QSortThreadsTest {
         assertArrayEquals(arrayResult, arrayToSort);
     }
 
-    enum TYPE_OF_CONTENT {
+    /*
+    On my machine for random, works better from 100000 and so on.
+    For not random works... inadequately strange. I think it's some optimisation magic (Or I'm stupid (probably second one)).
+     */
+    public static void main(String[] argc) {
+        compareAlgorithmsAndPrintMessage(1000);
+        compareAlgorithmsAndPrintMessage(10000);
+        compareAlgorithmsAndPrintMessage(50000);
+        compareAlgorithmsAndPrintMessage(100000);
+        compareAlgorithmsAndPrintMessage(200000);
+        compareAlgorithmsAndPrintMessage(400000);
+        compareAlgorithmsAndPrintMessage(800000);
+        compareAlgorithmsAndPrintMessage(2000000);
+    }
+
+    /**
+     * Describing type of content inside array
+     */
+    private enum TYPE_OF_CONTENT {
         SORTED, RANDOM, REVERSED
     }
 
-    private void compareAlgorithms(int arrayLength, TYPE_OF_CONTENT type_of_content) {
-        var random = new Random(42); //reproducibility!
+    /**
+     * Pair of time for sorting arrays with or without threads.
+     */
+    private static class TimePair {
+        private long timeWithoutThreads;
+        private long timeWithThreads;
+
+        private TimePair(long timeWithoutThreads, long timeWithThreads) {
+            this.timeWithoutThreads = timeWithoutThreads;
+            this.timeWithThreads = timeWithThreads;
+        }
+
+        private long getTimeWithoutThreads() {
+            return timeWithoutThreads;
+        }
+
+        private long getTimeWithThreads() {
+            return timeWithThreads;
+        }
+    }
+
+    /**
+     * Compares speed of executing two algorithms and prints corresponding message.
+     */
+    private static void compareAlgorithmsAndPrintMessage(int arrayLength) {
+        TimePair timePairOnSorted = compareAlgorithms(arrayLength, TYPE_OF_CONTENT.SORTED);
+        TimePair timePairOnRandom = compareAlgorithms(arrayLength, TYPE_OF_CONTENT.RANDOM);
+        TimePair timePairOnReversed = compareAlgorithms(arrayLength, TYPE_OF_CONTENT.REVERSED);
+
+        System.out.println("Array length " + arrayLength);
+
+        printMessage(timePairOnSorted, arrayLength, TYPE_OF_CONTENT.SORTED);
+        printMessage(timePairOnRandom, arrayLength, TYPE_OF_CONTENT.RANDOM);
+        printMessage(timePairOnReversed, arrayLength, TYPE_OF_CONTENT.REVERSED);
+    }
+
+    /**
+     * Prints message to System.out about results of the comparison of two algorithms
+     */
+    private static void printMessage(TimePair timePair, int arrayLength, TYPE_OF_CONTENT type_of_content) {
+        double withoutLongerPercent = getPercentLonger(timePair.getTimeWithoutThreads(), timePair.getTimeWithThreads());
+        double withLongerPercent = getPercentLonger(timePair.getTimeWithThreads(), timePair.getTimeWithoutThreads());
+
+        if (timePair.getTimeWithThreads() >= timePair.getTimeWithoutThreads()) {
+            System.out.println("  Oh NOES! Sort withOUT threads is faster by " + String.format("%.2f", withLongerPercent) + "%!");
+        } else {
+            System.out.println("  Oh YEAH! Sort WITH threads is faster by " + String.format("%.2f", withoutLongerPercent) + "%!");
+        }
+
+        //System.out.println(timePair.getTimeWithoutThreads() + " " + timePair.getTimeWithThreads());
+        System.out.print("  Type of the content is ");
+        switch (type_of_content) {
+            case SORTED:
+                System.out.println("sorted\n");
+                break;
+            case RANDOM:
+                System.out.println("random\n");
+                break;
+            case REVERSED:
+                System.out.println("reversed\n");
+                break;
+        }
+    }
+
+    /**
+     * Difference in percent of base and target assuming base is higher than target.
+     */
+    private static double getPercentLonger(long base, long target) {
+        return (((double) base) / target) * 100 - 100;
+    }
+
+    /**
+     * Sorts using two algorithms (with and without threads) and returns results in time.
+     */
+    private static TimePair compareAlgorithms(int arrayLength, TYPE_OF_CONTENT type_of_content) {
+        var random = new Random(arrayLength); //reproducibility!
         var array = new Integer[arrayLength];
+        var arrayCopy = new Integer[arrayLength];
         for (int i = 0; i < arrayLength; i++) {
             switch (type_of_content) {
                 case SORTED:
@@ -149,11 +243,28 @@ class QSortThreadsTest {
                     array[i] = arrayLength - i - 1;
                     break;
             }
+
+            arrayCopy[i] = array[i];
         }
 
-        var arrayCopy = array.clone();
+        long elapsedTimeWithoutThreads = howLongSortsWithoutThreads(array);
+        long elapsedTimeWithThreads = howLongSortsWithThreads(arrayCopy);
+        return new TimePair(elapsedTimeWithoutThreads, elapsedTimeWithThreads);
+    }
 
+    private static <T extends Comparable<? super T>> long howLongSortsWithoutThreads(T[] array) {
+        long startTimeWithoutThreads = System.nanoTime();
         QSortThreads.sortWithoutThreads(array);
-        QSortThreads.threadSort(arrayCopy);
+        //System.out.println(array[7]);
+        long endTimeWithoutThreads = System.nanoTime();
+        return (endTimeWithoutThreads - startTimeWithoutThreads);
+    }
+
+    private static <T extends Comparable<? super T>> long howLongSortsWithThreads(T[] array) {
+        long startTimeWithoutThreads = System.nanoTime();
+        QSortThreads.threadSort(array);
+        //System.out.println(array[5]);
+        long endTimeWithoutThreads = System.nanoTime();
+        return (endTimeWithoutThreads - startTimeWithoutThreads);
     }
 }
