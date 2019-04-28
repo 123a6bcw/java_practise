@@ -67,7 +67,7 @@ public class ThreadPoolImpl {
     /**
      *
      */
-    private static class MyThreadList {
+    private static class MyThreadQueue {
         /**
          *
          */
