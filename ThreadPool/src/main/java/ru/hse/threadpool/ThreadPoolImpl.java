@@ -1,5 +1,7 @@
 package ru.hse.threadpool;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,16 +17,6 @@ public class ThreadPoolImpl {
      *
      */
     private Thread[] threads;
-
-    /**
-     *
-     */
-    private final Queue<LightFuture> tasks = new LinkedList<>();
-
-    /**
-     *
-     */
-    private final Queue<LightFuture> freeThreads = new LinkedList<>();
 
     /**
      *
@@ -66,9 +58,95 @@ public class ThreadPoolImpl {
      */
     public LightFuture<?> submit (Supplier<?> supplier) {
         var task = new LightFutureImpl<>(supplier);
+
+
+
         return task;
     }
 
+    /**
+     *
+     */
+    private static class MyThreadList {
+        /**
+         *
+         */
+        private Node empty = new Node(null);
+
+        /**
+         *
+         */
+        @NotNull
+        private Node tail = empty;
+
+        /**
+         *
+         */
+        @NotNull
+        private Node head = empty;
+
+        /**
+         *
+         */
+        private final Object addLock = new Object();
+
+        /**
+         *
+         */
+        private final Object removeLock = new Object();
+
+        /**
+         *
+         */
+        private void add(LightFuture lightFuture) {
+            synchronized (addLock) {
+                var newNode = new Node(lightFuture);
+                tail.prev = newNode;
+                tail = newNode;
+
+                removeLock.notify();
+            }
+        }
+
+        /**
+         *
+         */
+        private boolean isEmpty() {
+            return head == empty;
+        }
+
+        /**
+         *
+         */
+        private LightFuture remove() {
+            synchronized (removeLock) {
+                while (isEmpty()) {
+                    try {
+                        removeLock.wait();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt(); //google
+                    }
+                }
+
+                var lightFuture = head.lightFuture;
+                head = head.prev;
+                return lightFuture;
+            }
+        }
+
+        /**
+         *
+         */
+        private static class Node {
+            private LightFuture lightFuture;
+
+            private Node prev;
+
+            private Node(LightFuture<?> lightFuture) {
+                this.lightFuture = lightFuture;
+            }
+        }
+    }
 
     /**
      *
