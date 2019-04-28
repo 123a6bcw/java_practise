@@ -47,7 +47,7 @@ public class PhonebookDataBase {
         If exists, argc[1] is host of connections to MongoDB, argc[2] --- port.
         If not specified, tries to connect to localhost.
          */
-        List<ServerAddress> addresses = new ArrayList<ServerAddress>();
+        List<ServerAddress> addresses = new ArrayList<>();
         if (argc.length >= 3) {
             addresses.add(new ServerAddress(argc[1], Integer.parseInt(argc[2])));
         } else {
