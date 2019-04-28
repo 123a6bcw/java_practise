@@ -26,7 +26,7 @@ public interface LightFuture<ResultType> {
      * If original LightFuture object throws and exception during execution, calling get on new object throws
      * LightExecutionException with original LightExecutionException as cause.
      */
-    public <TransformType> LightFuture<TransformType> thenApply(Function<ResultType, TransformType> applier);
+    public <TransformType> LightFuture<TransformType> thenApply(Function<? super ResultType, TransformType> applier);
 
     /** /TODO
      * Exception of evaluating LightFuture expressions. If was created as a result of exception during execution of
