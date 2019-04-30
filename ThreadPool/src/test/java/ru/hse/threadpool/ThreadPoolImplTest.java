@@ -5,11 +5,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ThreadPoolImplTest {
+    private ThreadPool threadPool;
+
     /**
      * This is tasks to run in the pool. Calculation of times and correct answer in the main.
      */
@@ -42,7 +45,7 @@ class ThreadPoolImplTest {
 
     private static int longerTaskResult = 1820229488;
     //~~0.15 second
-/*
+
     public static void main(String[] argc) {
 
         long startTime = System.currentTimeMillis();
@@ -51,8 +54,6 @@ class ThreadPoolImplTest {
 
         long elapsedTime = System.currentTimeMillis() - startTime;
         System.out.println(elapsedTime);
-
-
 
         startTime = System.currentTimeMillis();
 
@@ -64,7 +65,6 @@ class ThreadPoolImplTest {
         System.out.println(shortTaskResult);
         System.out.println(longerTaskResult);
     }
-*/
 
     private static final int SIZE = 1000;
     private Supplier<Integer>[] tasks;
@@ -72,17 +72,22 @@ class ThreadPoolImplTest {
 
     @BeforeEach
     void initialiseTask() {
+        threadPool = new ThreadPoolImpl(4);
+
         //noinspection unchecked
         tasks = (Supplier<Integer>[]) Array.newInstance(shortTask.getClass(), SIZE);
         //noinspection unchecked
         results = (LightFuture<Integer>[]) Array.newInstance(LightFuture.class, SIZE);
     }
 
+    @AfterEach
+    void shutUp() {
+        threadPool.shutdown();
+    }
+
     @Test
     void canSubmitTasksWithDifferentResultType() throws LightFuture.LightExecutionException {
         //Yeah, I'm kinda stupid, so I wasn't sure it does work.
-
-        var threadPool = new ThreadPoolImpl(4);
 
         var task1 = threadPool.submit(() -> 5d);
         var task2 = threadPool.submit(() -> "5");
@@ -94,8 +99,6 @@ class ThreadPoolImplTest {
 
     @Test
     void shortAndLongerTasksReturnsCorrectResults() throws LightFuture.LightExecutionException {
-        var threadPool = new ThreadPoolImpl(4);
-
         var task1 = threadPool.submit(shortTask);
         var task2 = threadPool.submit(longerTask);
         assertEquals(shortTaskResult, task1.get());
@@ -120,8 +123,6 @@ class ThreadPoolImplTest {
 
     @Test
     void worksCorrectlyOnManyThreadPool() throws LightFuture.LightExecutionException {
-        var threadPool = new ThreadPoolImpl(4);
-
         for (int i = 0; i < SIZE; i++) {
             tasks[i] = shortTask;
         }
@@ -136,8 +137,6 @@ class ThreadPoolImplTest {
 
     @Test
     void getOnTaskWithExceptionThrowsLightFutureExceptionWithCorrectCause() {
-        var threadPool = new ThreadPoolImpl(4);
-
         var task = threadPool.submit(() -> {
             throw new NullPointerException();
         });
@@ -152,8 +151,6 @@ class ThreadPoolImplTest {
 
     @Test
     void getOnTaskAppliedAfterTaskWithExceptionThrowsLightFutureExceptionWithCorrectCause() {
-        var threadPool = new ThreadPoolImpl(4);
-
         var task = threadPool.submit(() -> {
             throw new NullPointerException();
         });
@@ -187,6 +184,66 @@ class ThreadPoolImplTest {
             task3.get();
         } catch (LightFuture.LightExecutionException e) {
             assertEquals(NullPointerException.class, e.getCause().getClass());
+        }
+    }
+
+    @Test
+    void thenApplyCorrectlyAppliesApplier() throws LightFuture.LightExecutionException {
+        var task1 = threadPool.submit(() -> 5);
+        var task2 = task1.thenApply(a -> a + 5);
+        assertEquals(10, task2.get());
+    }
+
+    @Test
+    void shutdownFinishesAllTasksAndClosesThreads() throws LightFuture.LightExecutionException {
+        for (int i = 0; i < 10; i++) {
+            results[i] = threadPool.submit(longerTask);
+        }
+
+        threadPool.shutdown();
+
+        for (int i = 0; i < 10; i++) {
+            assertEquals(longerTaskResult, results[i].get());
+        }
+    }
+
+    @Test
+    void threadpoolThrowsExceptionOnSubmitAfterShutdown() throws LightFuture.LightExecutionException {
+        threadPool.shutdown();
+
+        assertThrows(RejectedExecutionException.class, () -> threadPool.submit(shortTask));
+    }
+
+    private static final int SIZE_IN_THIS_TEST = 100;
+    private volatile boolean[][] wasNotEvaluated = new boolean[SIZE_IN_THIS_TEST][1];
+
+    @Test
+    void expressionsDoesNotEvaluatedTwice() throws LightFuture.LightExecutionException {
+        for (int i = 0; i < SIZE_IN_THIS_TEST; i++) {
+            final int i1 = i;
+            wasNotEvaluated[i][0] = true;
+
+            results[i] = threadPool.submit(() -> {
+                if (wasNotEvaluated[i1][0]) {
+                    wasNotEvaluated[i1][0] = false;
+                    return 322;
+                } else {
+                    throw new RuntimeException("You cannot evaluate twice.");
+                }
+            });
+        }
+
+        for (int i = 0; i < SIZE_IN_THIS_TEST; i++) {
+            final int i1 = i;
+            assertDoesNotThrow(() -> results[i1].get());
+        }
+    }
+
+    @Test
+    void severalThenAppliesOnOneObjectWorksCorrectly() throws LightFuture.LightExecutionException {
+        var task = threadPool.submit(longerTask);
+        for (int i = 0; i < 100; i++) {
+            results[i] = task.thenApply(a -> a + 1);
         }
     }
 }

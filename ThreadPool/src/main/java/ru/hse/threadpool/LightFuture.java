@@ -31,7 +31,7 @@ public interface LightFuture<ResultType> {
      * LightExecutionException with 'e' as cause.
      */
     @NotNull
-    public LightFuture<?> thenApply(@NotNull Function<? super ResultType, ?> applier);
+    public <TransformType> LightFuture<TransformType> thenApply(@NotNull Function<? super ResultType, TransformType> applier);
 
     /**
      * Exception of evaluating LightFuture expressions. If was created as a result of exception during execution of

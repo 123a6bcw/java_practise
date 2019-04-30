@@ -320,7 +320,7 @@ public class ThreadPoolImpl implements ThreadPool {
          */
         @NotNull
         @Override
-        public LightFuture<?> thenApply(@NotNull Function<? super ResultType, ?> applier) {
+        public <TransformType> LightFuture<TransformType> thenApply(@NotNull Function<? super ResultType, TransformType> applier) {
             var toDoAfter = new LightFutureImpl<>(() -> {
                 try {
                     return applier.apply(get());
