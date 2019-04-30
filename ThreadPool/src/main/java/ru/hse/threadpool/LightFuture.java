@@ -7,7 +7,7 @@ import java.util.function.Supplier;
  * Simple interface for evaluating expressions with (probably) long execution time.
  */
 public interface LightFuture<ResultType> {
-    /** /TODO
+    /**
      * Returns true if expression was evaluated.
      */
     public boolean isReady();
@@ -26,7 +26,7 @@ public interface LightFuture<ResultType> {
      * If original LightFuture object throws and exception during execution, calling get on new object throws
      * LightExecutionException with original LightExecutionException as cause.
      */
-    public <TransformType> LightFuture<TransformType> thenApply(Function<? super ResultType, TransformType> applier);
+    public LightFuture<?> thenApply(Function<? super ResultType, ?> applier);
 
     /** /TODO
      * Exception of evaluating LightFuture expressions. If was created as a result of exception during execution of

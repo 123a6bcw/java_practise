@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 /**
  *
  */
-public class ThreadPoolImpl {
+public class ThreadPoolImpl implements ThreadPool {
     /**
      *
      */
@@ -37,17 +37,32 @@ public class ThreadPoolImpl {
                     }
 
                     lightFutureImpl.calculate();
-                    if ()
+
+                    //Here I synchronize over an object that over threads has access to, so it's okay.
+                    //noinspection SynchronizationOnLocalVariableOrMethodParameter
+                    synchronized (lightFutureImpl) {
+                        List<LightFutureImpl<?>> toDoAfterList = lightFutureImpl.getToDoAfterList();
+                        if (toDoAfterList != null) {
+                            for (var toDoAfter : toDoAfterList) {
+                                submit(toDoAfter);
+                            }
+                        }
+                    }
                 }
             });
 
             threads[i].setDaemon(true);
+        }
+
+        for (var thread : threads) {
+            thread.start();
         }
     }
 
     /**
      *
      */
+    @Override
     public LightFuture submit(Supplier<?> supplier) {
         var task = new LightFutureImpl<>(supplier);
         tasks.add(task);
@@ -57,14 +72,18 @@ public class ThreadPoolImpl {
     /**
      *
      */
-    private void submit(LightFutureImpl task) {
+    private void submit(LightFutureImpl<?> task) {
         tasks.add(task);
     }
 
     /**
      *
      */
+    @Override
     public void shutdown() {
+        for (var thread : threads) {
+            thread.interrupt();
+        }
     }
 
     /**
@@ -98,10 +117,12 @@ public class ThreadPoolImpl {
          */
         private final Object removeLock = new Object();
 
+        //TODO всякие NotNull
+
         /**
          *
          */
-        private void add(LightFutureImpl lightFutureImpl) {
+        private void add(LightFutureImpl<?> lightFutureImpl) {
             synchronized (addLock) {
                 var newNode = new Node(lightFutureImpl);
                 tail.prev = newNode;
@@ -121,7 +142,7 @@ public class ThreadPoolImpl {
         /**
          *
          */
-        private LightFutureImpl remove() {
+        private LightFutureImpl<?> remove() {
             synchronized (removeLock) {
                 while (isEmpty()) {
                     try {
@@ -141,7 +162,7 @@ public class ThreadPoolImpl {
          *
          */
         private static class Node {
-            private LightFutureImpl lightFutureImpl;
+            private LightFutureImpl<?> lightFutureImpl;
 
             private Node prev;
 
@@ -168,20 +189,13 @@ public class ThreadPoolImpl {
         /**
          *
          */
-        private final List<LightFuture> toDoAfterList = new ArrayList<>();
+        private final List<LightFutureImpl<?>> toDoAfterList = new ArrayList<>();
 
         /**
          *
          */
         private LightFutureImpl(Supplier<ResultType> supplier) {
             this.supplier = supplier;
-        }
-
-        /**
-         *
-         */
-        private boolean notCalculated() {
-            return supplier != null;
         }
 
         /**
@@ -197,7 +211,7 @@ public class ThreadPoolImpl {
          */
         @Override
         public ResultType get() {
-            while (notCalculated()) {
+            while (!isReady()) {
                 try {
                     this.wait();
                 } catch (InterruptedException e) {
@@ -221,11 +235,11 @@ public class ThreadPoolImpl {
          *
          */
         @Override
-        public <TransformType> LightFuture<TransformType> thenApply(Function<? super ResultType, TransformType> applier) {
-            var toDoAfter = new LightFutureImpl<TransformType>(() -> applier.apply(get());
+        public LightFuture<?> thenApply(Function<? super ResultType, ?> applier) {
+            var toDoAfter = new LightFutureImpl<>(() -> applier.apply(get()));
 
             synchronized (this) {
-                if (notCalculated()) {
+                if (!isReady()) {
                     toDoAfterList.add(toDoAfter);
                 } else {
                     submit(toDoAfter);
@@ -238,7 +252,7 @@ public class ThreadPoolImpl {
         /**
          *
          */
-        List<LightFuture> getToDoAfterList() {
+        private List<LightFutureImpl<?>> getToDoAfterList() {
             return toDoAfterList;
         }
     }
