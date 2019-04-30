@@ -3,9 +3,7 @@ package ru.hse.threadpool;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -21,31 +19,25 @@ public class ThreadPoolImpl {
     /**
      *
      */
+    private final MyThreadQueue tasks = new MyThreadQueue();
+
+    /**
+     *
+     */
     public ThreadPoolImpl(int n) {
         threads = new Thread[n];
 
         for (int i = 0; i < n; i++) {
             threads[i] = new Thread(() -> {
-                while (true) {
+                while (!Thread.interrupted()) {
+                    var lightFutureImpl = tasks.remove();
+
                     if (Thread.interrupted()) {
                         break;
                     }
 
-                    synchronized (tasks) {
-                        if (tasks.isEmpty()) {
-                            try {
-                                wait();
-                            } catch (InterruptedException e) {
-                                break;
-                            }
-                        }
-
-                        var task = tasks.remove();
-
-                        try {
-                            task.get();
-                        }
-                    }
+                    lightFutureImpl.calculate();
+                    if ()
                 }
             });
 
@@ -56,12 +48,23 @@ public class ThreadPoolImpl {
     /**
      *
      */
-    public LightFuture<?> submit (Supplier<?> supplier) {
+    public LightFuture submit(Supplier<?> supplier) {
         var task = new LightFutureImpl<>(supplier);
-
-
-
+        tasks.add(task);
         return task;
+    }
+
+    /**
+     *
+     */
+    private void submit(LightFutureImpl task) {
+        tasks.add(task);
+    }
+
+    /**
+     *
+     */
+    public void shutdown() {
     }
 
     /**
@@ -98,9 +101,9 @@ public class ThreadPoolImpl {
         /**
          *
          */
-        private void add(LightFuture lightFuture) {
+        private void add(LightFutureImpl lightFutureImpl) {
             synchronized (addLock) {
-                var newNode = new Node(lightFuture);
+                var newNode = new Node(lightFutureImpl);
                 tail.prev = newNode;
                 tail = newNode;
 
@@ -118,19 +121,19 @@ public class ThreadPoolImpl {
         /**
          *
          */
-        private LightFuture remove() {
+        private LightFutureImpl remove() {
             synchronized (removeLock) {
                 while (isEmpty()) {
                     try {
                         removeLock.wait();
                     } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt(); //google
+                        Thread.currentThread().interrupt();
                     }
                 }
 
-                var lightFuture = head.lightFuture;
+                var lightFutureImpl = head.lightFutureImpl;
                 head = head.prev;
-                return lightFuture;
+                return lightFutureImpl;
             }
         }
 
@@ -138,12 +141,12 @@ public class ThreadPoolImpl {
          *
          */
         private static class Node {
-            private LightFuture lightFuture;
+            private LightFutureImpl lightFutureImpl;
 
             private Node prev;
 
-            private Node(LightFuture<?> lightFuture) {
-                this.lightFuture = lightFuture;
+            private Node(LightFutureImpl<?> lightFuture) {
+                this.lightFutureImpl = lightFuture;
             }
         }
     }
@@ -151,7 +154,7 @@ public class ThreadPoolImpl {
     /**
      *
      */
-    private static class LightFutureImpl<ResultType> implements LightFuture<ResultType> {
+    private class LightFutureImpl<ResultType> implements LightFuture<ResultType> {
         /**
          *
          */
@@ -167,18 +170,34 @@ public class ThreadPoolImpl {
          */
         private final List<LightFuture> toDoAfterList = new ArrayList<>();
 
+        /**
+         *
+         */
         private LightFutureImpl(Supplier<ResultType> supplier) {
             this.supplier = supplier;
         }
 
+        /**
+         *
+         */
+        private boolean notCalculated() {
+            return supplier != null;
+        }
+
+        /**
+         *
+         */
         @Override
         public boolean isReady() {
             return result != null;
         }
 
+        /**
+         *
+         */
         @Override
         public ResultType get() {
-            while (supplier != null) {
+            while (notCalculated()) {
                 try {
                     this.wait();
                 } catch (InterruptedException e) {
@@ -198,12 +217,19 @@ public class ThreadPoolImpl {
             this.notifyAll();
         }
 
+        /**
+         *
+         */
         @Override
         public <TransformType> LightFuture<TransformType> thenApply(Function<? super ResultType, TransformType> applier) {
-            var toDoAfter = new LightFutureImpl<TransformType>(() -> applier.apply(get()));
+            var toDoAfter = new LightFutureImpl<TransformType>(() -> applier.apply(get());
 
-            synchronized (toDoAfterList) {
-                toDoAfterList.add(toDoAfter);
+            synchronized (this) {
+                if (notCalculated()) {
+                    toDoAfterList.add(toDoAfter);
+                } else {
+                    submit(toDoAfter);
+                }
             }
 
             return toDoAfter;
@@ -216,5 +242,4 @@ public class ThreadPoolImpl {
             return toDoAfterList;
         }
     }
-
 }
