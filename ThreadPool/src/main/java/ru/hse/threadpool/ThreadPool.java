@@ -11,7 +11,7 @@ public interface ThreadPool {
     /**
      * Submit task to the pool. Returns LightFuture object which represent a value that will be evaluated in a future.
      *
-     * Blablabla exceptions
+     * Throws RejectedExecutionException if called after shutting down threadpool.
      */
     @NotNull
     public <R> LightFuture<R> submit(@NotNull Supplier<R> supplier);
