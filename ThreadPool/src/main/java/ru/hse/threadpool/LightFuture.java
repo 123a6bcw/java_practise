@@ -22,7 +22,7 @@ public interface LightFuture<ResultType> {
      * as cause.
      */
     @Nullable
-    public ResultType get();
+    public ResultType get() throws LightExecutionException;
 
     /**
      * Creates new LightFuture expression to evaluate over the result of the original one.
@@ -37,6 +37,13 @@ public interface LightFuture<ResultType> {
      * Exception of evaluating LightFuture expressions. If was created as a result of exception during execution of
      * the expression, stores this expressions as cause.
      */
-    public class LightExecutionException extends RuntimeException {
+    public class LightExecutionException extends Exception {
+        LightExecutionException(String message) {
+            super(message);
+        }
+
+        LightExecutionException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 }

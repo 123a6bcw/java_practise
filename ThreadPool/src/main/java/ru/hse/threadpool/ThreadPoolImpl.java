@@ -41,7 +41,6 @@ public class ThreadPoolImpl implements ThreadPool {
                         break;
                     }
 
-
                     lightFutureImpl.evaluate();
 
                     //Here I synchronize over an object that over threads has access to, so it's okay.
@@ -205,6 +204,12 @@ public class ThreadPoolImpl implements ThreadPool {
         private volatile Supplier<? extends ResultType> supplier;
 
         /**
+         * If evaluating expression causes and exception, it stores here.
+         */
+        @Nullable
+        private LightExecutionException exceptionOnExecution = null;
+
+        /**
          * List of expressions that should be evaluated on the result of this expression. Has sense only before
          * pool has evaluated this expressions (more accurately, before pool takes this list synchronized and add this
          * tasks to the pool).
@@ -225,7 +230,7 @@ public class ThreadPoolImpl implements ThreadPool {
          * Does not force expression to evaluate, only force current method to wait until it's done.
          */
         @Override
-        public ResultType get() {
+        public ResultType get() throws LightExecutionException {
             while (!isReady()) {
                 try {
                     this.wait();
@@ -234,7 +239,11 @@ public class ThreadPoolImpl implements ThreadPool {
                 }
             }
 
-            return result;
+            if (exceptionOnExecution != null) {
+                throw exceptionOnExecution;
+            }
+
+             return result;
         }
 
         /**
@@ -242,10 +251,19 @@ public class ThreadPoolImpl implements ThreadPool {
          *
          * No real checks of using this method twice are done and no synchronization are being used because ThreadPoolImpl
          * realisation guarantees that exactly one thread will call this method.
+         *
+         * Throws exception if exectuion causes an exception.
          */
-        private void evaluate() {
+        private void evaluate() throws LightExecutionException {
             //Supplier is null iff someone called this method before. We make sure that does not happen in ThreadPoolImpl.
-            result = Objects.requireNonNull(supplier).get();
+            try {
+                result = Objects.requireNonNull(supplier).get();
+            } catch (Throwable e) {
+                exceptionOnExecution = new LightExecutionException("Exception during execution of the given supplier", e);
+                supplier = null;
+                this.notifyAll();
+                throw exceptionOnExecution;
+            }
             this.supplier = null;
             this.notifyAll();
         }
@@ -256,7 +274,14 @@ public class ThreadPoolImpl implements ThreadPool {
         @NotNull
         @Override
         public LightFuture<?> thenApply(@NotNull Function<? super ResultType, ?> applier) {
-            var toDoAfter = new LightFutureImpl<>(() -> applier.apply(get()));
+            var toDoAfter = new LightFutureImpl<>(() -> {
+                try {
+                    return applier.apply(get());
+                } catch (LightExecutionException e) {
+                    LightFutureImpl.this.exceptionOnExecution = e;
+                    return null;
+                }
+            });
 
             synchronized (this) {
                 if (!isReady()) {
