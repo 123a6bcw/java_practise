@@ -309,8 +309,8 @@ public class ThreadPoolImpl implements ThreadPool {
                     All because I cannot throw exceptions in a freaking Supplier<R>.
                      */
                     var suppressed = e.getSuppressed();
-                    if (e instanceof RuntimeException && suppressed.length == 1 && suppressed[0] instanceof lolKekCheburek) {
-                        e = ((lolKekCheburek) suppressed[0]).getException().getCause();
+                    if (e instanceof RuntimeException && suppressed.length == 1 && suppressed[0] instanceof WrappedException) {
+                        e = ((WrappedException) suppressed[0]).getException().getCause();
                     }
 
                     exceptionOnExecution = new LightExecutionException("Exception during execution of the given supplier", e);
@@ -336,7 +336,7 @@ public class ThreadPoolImpl implements ThreadPool {
                     I am dirty hacker, I know, but I never came up with a better solution...
                      */
                     var toThrow = new RuntimeException();
-                    toThrow.addSuppressed(new lolKekCheburek(e));
+                    toThrow.addSuppressed(new WrappedException(e));
                     throw toThrow;
                 }
             });
@@ -364,10 +364,10 @@ public class ThreadPoolImpl implements ThreadPool {
     /**
      * Secret wrapper for exception, so user (not hacker) could not get this exception.
      */
-    private class lolKekCheburek extends Exception {
+    private class WrappedException extends Exception {
         private final Exception exception;
 
-        private lolKekCheburek(Exception exception) {
+        private WrappedException(Exception exception) {
             this.exception = exception;
         }
 
