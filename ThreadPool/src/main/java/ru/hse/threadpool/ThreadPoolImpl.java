@@ -136,7 +136,9 @@ public class ThreadPoolImpl implements ThreadPool {
                 tail.prev = newNode;
                 tail = newNode;
 
-                headLock.notify();
+                synchronized (headLock) {
+                    headLock.notify();
+                }
             }
         }
 
@@ -231,11 +233,15 @@ public class ThreadPoolImpl implements ThreadPool {
          */
         @Override
         public ResultType get() throws LightExecutionException {
-            while (!isReady()) {
-                try {
-                    this.wait();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+            if (!isReady()) {
+                synchronized (this) {
+                    while (!isReady()) {
+                        try {
+                            this.wait();
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
                 }
             }
 
@@ -255,14 +261,17 @@ public class ThreadPoolImpl implements ThreadPool {
          * Throws exception if exectuion causes an exception.
          */
         private void evaluate() {
-            //Supplier is null iff someone called this method before. We make sure that does not happen in ThreadPoolImpl.
-            try {
-                result = Objects.requireNonNull(supplier).get();
-            } catch (Throwable e) {
-                exceptionOnExecution = new LightExecutionException("Exception during execution of the given supplier", e);
+            synchronized (this) {
+                //Supplier is null iff someone called this method before. We make sure that does not happen in ThreadPoolImpl.
+                try {
+                    result = Objects.requireNonNull(supplier).get();
+                } catch (Throwable e) {
+                    exceptionOnExecution = new LightExecutionException("Exception during execution of the given supplier", e);
+                }
+                this.supplier = null;
+
+                this.notifyAll();
             }
-            this.supplier = null;
-            this.notifyAll();
         }
 
         /**
