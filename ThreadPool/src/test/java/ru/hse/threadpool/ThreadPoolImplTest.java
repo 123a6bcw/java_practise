@@ -242,8 +242,61 @@ class ThreadPoolImplTest {
     @Test
     void severalThenAppliesOnOneObjectWorksCorrectly() throws LightFuture.LightExecutionException {
         var task = threadPool.submit(longerTask);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             results[i] = task.thenApply(a -> a + 1);
         }
+
+        for (int i = 0; i < 1000; i++) {
+            assertEquals(longerTaskResult + 1, results[i].get());
+        }
+    }
+
+    /*
+    This test is bad because a) Runtime.getRuntime().avaiableProcessors() works wrong on my computer
+    (returns 8 rather than 4) and also who the hell knows what will happen on the other computers.
+
+    ... but whatever.
+     */
+    @Test
+    void everythingWorksXTimesFaster() throws LightFuture.LightExecutionException {
+        long startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < 12; i++) {
+            longerTask.get();
+        }
+
+        long elapsedTime1 = System.currentTimeMillis() - startTime;
+
+        startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < 12; i++) {
+            results[i] = threadPool.submit(longerTask);
+        }
+        for (int i = 0; i < 12; i++) {
+            results[i].get();
+        }
+
+        long elapsedTime2 = System.currentTimeMillis() - startTime;
+
+        double fasterFactor = ((double) elapsedTime1) / ((double) elapsedTime2);
+        if (Runtime.getRuntime().availableProcessors() == 1) {
+            return;
+        }
+
+        int workers = Runtime.getRuntime().availableProcessors() / 2;
+        assertTrue(fasterFactor > workers - 1);
+    }
+
+    @Test
+    void threadPoolContainsAtLeastNThread()  {
+        assertTrue(Thread.activeCount() > 4);
+    }
+
+    @Test
+    void shutdownClosesThreads() throws InterruptedException {
+        int current = Thread.activeCount();
+        threadPool.shutdown();
+        Thread.sleep(500);
+        assertEquals(4, current - Thread.activeCount());
     }
 }

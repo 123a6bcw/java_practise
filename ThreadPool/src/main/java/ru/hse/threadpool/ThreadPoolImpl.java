@@ -25,6 +25,11 @@ public class ThreadPoolImpl implements ThreadPool {
     private final MyThreadQueue tasks = new MyThreadQueue();
 
     /**
+     * True if shutdown() has been called.
+     */
+    private volatile boolean isShuttedDown;
+
+    /**
      * Creates n threads and starts it.
      */
     @SuppressWarnings("WeakerAccess")
@@ -66,7 +71,7 @@ public class ThreadPoolImpl implements ThreadPool {
     @Override
     @NotNull
     public <R> LightFuture<R> submit(@NotNull Supplier<R> supplier) {
-        if (Thread.currentThread().isInterrupted()) {
+        if (isShuttedDown) {
             throw new RejectedExecutionException("The pool was shut down, no new task can be submitted");
         }
 
@@ -89,6 +94,8 @@ public class ThreadPoolImpl implements ThreadPool {
 
     @Override
     public void shutdown() {
+        isShuttedDown = true;
+
         for (var thread : threads) {
             thread.interrupt();
         }
