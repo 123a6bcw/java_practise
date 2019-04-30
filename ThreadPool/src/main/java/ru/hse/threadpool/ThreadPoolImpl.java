@@ -9,21 +9,21 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- *
+ * Implementation of ThreadPool with fixed number of threads.
  */
 public class ThreadPoolImpl implements ThreadPool {
     /**
-     *
+     * Working poll's threads.
      */
     private Thread[] threads;
 
     /**
-     *
+     * Queue of tasks in the pool.
      */
     private final MyThreadQueue tasks = new MyThreadQueue();
 
     /**
-     *
+     * Creates n threads and starts it.
      */
     public ThreadPoolImpl(int n) {
         threads = new Thread[n];
@@ -31,7 +31,13 @@ public class ThreadPoolImpl implements ThreadPool {
         for (int i = 0; i < n; i++) {
             threads[i] = new Thread(() -> {
                 while (true) {
-                    var lightFutureImpl = tasks.remove();
+                    LightFutureImpl<?> lightFutureImpl;
+
+                    try {
+                        lightFutureImpl = tasks.remove();
+                    } catch (InterruptedException e) {
+                        break;
+                    }
 
                     lightFutureImpl.calculate();
 
@@ -143,14 +149,10 @@ public class ThreadPoolImpl implements ThreadPool {
         /**
          *
          */
-        private LightFutureImpl<?> remove() {
+        private LightFutureImpl<?> remove() throws InterruptedException {
             synchronized (removeLock) {
                 while (isEmpty()) {
-                    try {
-                        removeLock.wait();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
+                    removeLock.wait();
                 }
 
                 var lightFutureImpl = head.lightFutureImpl;
