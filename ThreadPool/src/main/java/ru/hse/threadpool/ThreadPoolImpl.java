@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -29,12 +30,8 @@ public class ThreadPoolImpl implements ThreadPool {
 
         for (int i = 0; i < n; i++) {
             threads[i] = new Thread(() -> {
-                while (!Thread.interrupted()) {
+                while (true) {
                     var lightFutureImpl = tasks.remove();
-
-                    if (Thread.interrupted()) {
-                        break;
-                    }
 
                     lightFutureImpl.calculate();
 
@@ -63,7 +60,11 @@ public class ThreadPoolImpl implements ThreadPool {
      *
      */
     @Override
-    public LightFuture submit(Supplier<?> supplier) {
+    public LightFuture<?> submit(Supplier<?> supplier) {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new RejectedExecutionException("The pool was shut down, no new task can be submitted");
+        }
+
         var task = new LightFutureImpl<>(supplier);
         tasks.add(task);
         return task;

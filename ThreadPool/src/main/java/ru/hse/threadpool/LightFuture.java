@@ -8,19 +8,19 @@ import java.util.function.Supplier;
  */
 public interface LightFuture<ResultType> {
     /**
-     * Returns true if expression was evaluated.
+     * Returns true if expression was already evaluated.
      */
     public boolean isReady();
 
-    /** /TODO
-     * Returns evaluated value.
+    /**
+     * Returns evaluated value. Blocks current thread until the expression is evaluated.
      *
      * If expressions throws exception during execution, this throws LightExecutionException with original exception
      * as cause.
      */
     public ResultType get();
 
-    /** /TODO
+    /**
      * Creates new LightFuture expression to evaluate over the result of the original one.
      *
      * If original LightFuture object throws and exception during execution, calling get on new object throws
@@ -28,9 +28,9 @@ public interface LightFuture<ResultType> {
      */
     public LightFuture<?> thenApply(Function<? super ResultType, ?> applier);
 
-    /** /TODO
+    /**
      * Exception of evaluating LightFuture expressions. If was created as a result of exception during execution of
-     * the expression, stores
+     * the expression, stores this expressions as cause.
      */
     public class LightExecutionException extends RuntimeException {
     }
