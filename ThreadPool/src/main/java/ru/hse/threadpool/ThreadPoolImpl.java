@@ -64,7 +64,7 @@ public class ThreadPoolImpl implements ThreadPool {
 
     @Override
     @NotNull
-    public LightFuture<?> submit(@NotNull Supplier<?> supplier) {
+    public <R> LightFuture<R> submit(@NotNull Supplier<R> supplier) {
         if (Thread.currentThread().isInterrupted()) {
             throw new RejectedExecutionException("The pool was shut down, no new task can be submitted");
         }
@@ -78,7 +78,7 @@ public class ThreadPoolImpl implements ThreadPool {
      * Submit previously created LightFutureImpl to the pool. Being used when task being creates upon a result of another
      * LightFutureImpl, but this task has been already finished and left the pool.
      */
-    private void submit(@NotNull LightFutureImpl<?> task) {
+    private <R> void submit(@NotNull LightFutureImpl<R> task) {
         tasks.add(task);
     }
 
@@ -125,20 +125,24 @@ public class ThreadPoolImpl implements ThreadPool {
             var newNode = new Node(lightFutureImpl);
 
             synchronized (tailLock) {
+                //Now no one can change tail except for us, because we locked on it.
                 if (tail == null) {
-                    tail = newNode;
+                    /*And if it is null, our queue is empty, therefore head == null too and we need to change it, so
+                     we locks on headLock.
 
+                     And there is no deadlock here, because we try to lock on headLock in a situation tail == head == null,
+                     but in such circumstances remove() releases it's headLock and waits.
+                     */
                     synchronized (headLock) {
+                        tail = newNode;
                         head = newNode;
+                        headLock.notify(); //We also notify a guy who was waiting for an element to appear in empty queue.
+                        return;
                     }
                 }
 
                 tail.prev = newNode;
                 tail = newNode;
-
-                synchronized (headLock) {
-                    headLock.notify();
-                }
             }
         }
 
@@ -155,12 +159,32 @@ public class ThreadPoolImpl implements ThreadPool {
         @NotNull
         private LightFutureImpl<?> remove() throws InterruptedException {
             synchronized (headLock) {
+                //Now only we can change head.
                 while (isEmpty()) {
+                    //But if there is no element in queue (head == null), we release our lock and wait until this elements appears.
                     headLock.wait();
                 }
 
                 var lightFutureImpl = head.lightFutureImpl;
+                if (head == tail) {
+                    /* We need to remove element, but this is the last element in queue, so we also have to change tail,
+                     therefore we need to lock on tail.
+
+                     No deadlock, because add() tries to lock on headLock only if tail is null, but in our situation
+                     we are sure it is not, because there is at least one element in queue.
+                     */
+                    synchronized (tailLock) {
+                        //But someone could add new elements in between, so we need double check.
+                        if (head == tail) {
+                            head = null;
+                            tail = null;
+                            return lightFutureImpl;
+                        }
+                    }
+                }
+
                 head = head.prev;
+                headLock.notify(); //This was not a last element in queue, so we notify next guy who was waiting for elements.
                 return lightFutureImpl;
             }
         }

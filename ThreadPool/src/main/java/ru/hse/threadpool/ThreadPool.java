@@ -14,7 +14,7 @@ public interface ThreadPool {
      * Blablabla exceptions
      */
     @NotNull
-    public LightFuture<?> submit(@NotNull Supplier<?> supplier);
+    public <R> LightFuture<R> submit(@NotNull Supplier<R> supplier);
 
     /**
      * Shuts the pool, all unfinished tasks will be finished, but new submitted task will cause RejectedExecutionException.
