@@ -27,6 +27,7 @@ public class ThreadPoolImpl implements ThreadPool {
     /**
      * Creates n threads and starts it.
      */
+    @SuppressWarnings("WeakerAccess")
     public ThreadPoolImpl(int n) {
         threads = new Thread[n];
 
@@ -79,6 +80,10 @@ public class ThreadPoolImpl implements ThreadPool {
      * LightFutureImpl, but this task has been already finished and left the pool.
      */
     private <R> void submit(@NotNull LightFutureImpl<R> task) {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new RejectedExecutionException("The pool was shut down, no new task can be submitted");
+        }
+
         tasks.add(task);
     }
 
@@ -290,8 +295,20 @@ public class ThreadPoolImpl implements ThreadPool {
                 try {
                     result = Objects.requireNonNull(supplier).get();
                 } catch (Throwable e) {
+                    /*
+                    I am dirty hacker, in order to throw exception from original task to thenApplied task I store it in
+                    unchecked exception.
+
+                    All because I cannot throw exceptions in a freaking Supplier<R>.
+                     */
+                    var suppressed = e.getSuppressed();
+                    if (e instanceof RuntimeException && suppressed.length == 1 && suppressed[0] instanceof lolKekCheburek) {
+                        e = ((lolKekCheburek) suppressed[0]).getException().getCause();
+                    }
+
                     exceptionOnExecution = new LightExecutionException("Exception during execution of the given supplier", e);
                 }
+
                 this.supplier = null;
 
                 this.notifyAll();
@@ -308,8 +325,12 @@ public class ThreadPoolImpl implements ThreadPool {
                 try {
                     return applier.apply(get());
                 } catch (LightExecutionException e) {
-                    LightFutureImpl.this.exceptionOnExecution = e;
-                    return null;
+                    /*
+                    I am dirty hacker, I know, but I never came up with a better solution...
+                     */
+                    var toThrow = new RuntimeException();
+                    toThrow.addSuppressed(new lolKekCheburek(e));
+                    throw toThrow;
                 }
             });
 
@@ -330,6 +351,21 @@ public class ThreadPoolImpl implements ThreadPool {
         @NotNull
         private List<LightFutureImpl<?>> getToDoAfterList() {
             return toDoAfterList;
+        }
+    }
+
+    /**
+     * Secret wrapper for exception, so user (not hacker) could not get this exception.
+     */
+    private class lolKekCheburek extends Exception {
+        private final Exception exception;
+
+        private lolKekCheburek(Exception exception) {
+            this.exception = exception;
+        }
+
+        private Exception getException() {
+            return exception;
         }
     }
 }

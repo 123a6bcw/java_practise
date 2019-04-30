@@ -27,8 +27,8 @@ public interface LightFuture<ResultType> {
     /**
      * Creates new LightFuture expression to evaluate over the result of the original one.
      *
-     * If original LightFuture object throws and exception during execution, calling get on new object throws
-     * LightExecutionException with original LightExecutionException as cause.
+     * If original LightFuture object throws an exception 'e' during execution, calling get on new object throws
+     * LightExecutionException with 'e' as cause.
      */
     @NotNull
     public LightFuture<?> thenApply(@NotNull Function<? super ResultType, ?> applier);
