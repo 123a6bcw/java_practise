@@ -1,9 +1,11 @@
 package ru.hse.threadpool;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -39,16 +41,15 @@ public class ThreadPoolImpl implements ThreadPool {
                         break;
                     }
 
-                    lightFutureImpl.calculate();
+
+                    lightFutureImpl.evaluate();
 
                     //Here I synchronize over an object that over threads has access to, so it's okay.
                     //noinspection SynchronizationOnLocalVariableOrMethodParameter
                     synchronized (lightFutureImpl) {
                         List<LightFutureImpl<?>> toDoAfterList = lightFutureImpl.getToDoAfterList();
-                        if (toDoAfterList != null) {
-                            for (var toDoAfter : toDoAfterList) {
-                                submit(toDoAfter);
-                            }
+                        for (var toDoAfter : toDoAfterList) {
+                            submit(toDoAfter);
                         }
                     }
                 }
@@ -62,11 +63,9 @@ public class ThreadPoolImpl implements ThreadPool {
         }
     }
 
-    /**
-     *
-     */
     @Override
-    public LightFuture<?> submit(Supplier<?> supplier) {
+    @NotNull
+    public LightFuture<?> submit(@NotNull Supplier<?> supplier) {
         if (Thread.currentThread().isInterrupted()) {
             throw new RejectedExecutionException("The pool was shut down, no new task can be submitted");
         }
@@ -77,15 +76,13 @@ public class ThreadPoolImpl implements ThreadPool {
     }
 
     /**
-     *
+     * Submit previously created LightFutureImpl to the pool. Being used when task being creates upon a result of another
+     * LightFutureImpl, but this task has been already finished and left the pool.
      */
-    private void submit(LightFutureImpl<?> task) {
+    private void submit(@NotNull LightFutureImpl<?> task) {
         tasks.add(task);
     }
 
-    /**
-     *
-     */
     @Override
     public void shutdown() {
         for (var thread : threads) {
@@ -94,65 +91,71 @@ public class ThreadPoolImpl implements ThreadPool {
     }
 
     /**
-     *
+     * Thread safe single connected queue with separate blocks on adding elements and removing. Stores only LightFutureImpl.
      */
     private static class MyThreadQueue {
         /**
-         *
+         * Tail of the queue aka the last element.
          */
-        private Node empty = new Node(null);
+        @Nullable
+        private Node tail = null;
 
         /**
-         *
+         * Head of the queue aka the first element.
+         */
+        @Nullable
+        private Node head = null;
+
+        /**
+         * In order to change tail (for example to add element to the queue),
+         * threads synchronize over this object (they cannot sync on tail cause tail is changing)
          */
         @NotNull
-        private Node tail = empty;
+        private final Object tailLock = new Object();
 
         /**
-         *
+         * Same for head.
          */
         @NotNull
-        private Node head = empty;
+        private final Object headLock = new Object();
 
         /**
-         *
+         * Thread-safe add to queue.
          */
-        private final Object addLock = new Object();
+        private void add(@NotNull LightFutureImpl<?> lightFutureImpl) {
+            var newNode = new Node(lightFutureImpl);
 
-        /**
-         *
-         */
-        private final Object removeLock = new Object();
+            synchronized (tailLock) {
+                if (tail == null) {
+                    tail = newNode;
 
-        //TODO всякие NotNull
+                    synchronized (headLock) {
+                        head = newNode;
+                    }
+                }
 
-        /**
-         *
-         */
-        private void add(LightFutureImpl<?> lightFutureImpl) {
-            synchronized (addLock) {
-                var newNode = new Node(lightFutureImpl);
                 tail.prev = newNode;
                 tail = newNode;
 
-                removeLock.notify();
+                headLock.notify();
             }
         }
 
         /**
-         *
+         * Returns true is there is no elements in queue.
          */
         private boolean isEmpty() {
-            return head == empty;
+            return head == null;
         }
 
         /**
-         *
+         * Thread-safe remove from queue. If there is no elements in queue, current thread waits until they appears.
          */
+        @NotNull
         private LightFutureImpl<?> remove() throws InterruptedException {
-            synchronized (removeLock) {
+            synchronized (headLock) {
                 while (isEmpty()) {
-                    removeLock.wait();
+                    headLock.wait();
                 }
 
                 var lightFutureImpl = head.lightFutureImpl;
@@ -162,55 +165,64 @@ public class ThreadPoolImpl implements ThreadPool {
         }
 
         /**
-         *
+         * Class that stores a singe LightFutureImpl object.
          */
         private static class Node {
+            /**
+             * Value.
+             */
+            @NotNull
             private LightFutureImpl<?> lightFutureImpl;
 
-            private Node prev;
+            /**
+             * Previous Node in queue.
+             */
+            @Nullable
+            private Node prev = null;
 
-            private Node(LightFutureImpl<?> lightFuture) {
+            private Node(@NotNull LightFutureImpl<?> lightFuture) {
                 this.lightFutureImpl = lightFuture;
             }
         }
     }
 
     /**
-     *
+     * Implementation of LightFuture connected to this implementation of threadpool.
      */
+    //Not static, because thenApply may submit tasks to the pool.
     private class LightFutureImpl<ResultType> implements LightFuture<ResultType> {
         /**
-         *
+         * Result value. May be null even after evaluating expression (if that is an actualy result of the expression).
          */
+        @Nullable
         private ResultType result;
 
         /**
-         *
+         * Supplier function for evaluating expression.
+         * Null iff expression was evaluated.
          */
-        private volatile Supplier<ResultType> supplier;
+        @Nullable
+        private volatile Supplier<? extends ResultType> supplier;
 
         /**
-         *
+         * List of expressions that should be evaluated on the result of this expression. Has sense only before
+         * pool has evaluated this expressions (more accurately, before pool takes this list synchronized and add this
+         * tasks to the pool).
          */
+        @NotNull
         private final List<LightFutureImpl<?>> toDoAfterList = new ArrayList<>();
 
-        /**
-         *
-         */
-        private LightFutureImpl(Supplier<ResultType> supplier) {
+        private LightFutureImpl(@NotNull Supplier<? extends ResultType> supplier) {
             this.supplier = supplier;
         }
 
-        /**
-         *
-         */
         @Override
         public boolean isReady() {
-            return result != null;
+            return supplier == null;
         }
 
         /**
-         *
+         * Does not force expression to evaluate, only force current method to wait until it's done.
          */
         @Override
         public ResultType get() {
@@ -218,7 +230,7 @@ public class ThreadPoolImpl implements ThreadPool {
                 try {
                     this.wait();
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt(); //google
+                    Thread.currentThread().interrupt();
                 }
             }
 
@@ -226,19 +238,24 @@ public class ThreadPoolImpl implements ThreadPool {
         }
 
         /**
+         * Calculates value of the expression. Block current thread until it's done. After that, supplier is null.
          *
+         * No real checks of using this method twice are done and no synchronization are being used because ThreadPoolImpl
+         * realisation guarantees that exactly one thread will call this method.
          */
-        private void calculate() {
-            result = supplier.get();
-            supplier = null;
+        private void evaluate() {
+            //Supplier is null iff someone called this method before. We make sure that does not happen in ThreadPoolImpl.
+            result = Objects.requireNonNull(supplier).get();
+            this.supplier = null;
             this.notifyAll();
         }
 
         /**
-         *
+         * If original task was already finished, this submit new task directly to the thread pool.
          */
+        @NotNull
         @Override
-        public LightFuture<?> thenApply(Function<? super ResultType, ?> applier) {
+        public LightFuture<?> thenApply(@NotNull Function<? super ResultType, ?> applier) {
             var toDoAfter = new LightFutureImpl<>(() -> applier.apply(get()));
 
             synchronized (this) {
@@ -253,8 +270,9 @@ public class ThreadPoolImpl implements ThreadPool {
         }
 
         /**
-         *
+         * Returns list of task that should evaluate on the result of the given one.
          */
+        @NotNull
         private List<LightFutureImpl<?>> getToDoAfterList() {
             return toDoAfterList;
         }

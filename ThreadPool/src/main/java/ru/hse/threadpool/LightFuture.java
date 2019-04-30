@@ -1,5 +1,8 @@
 package ru.hse.threadpool;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -18,6 +21,7 @@ public interface LightFuture<ResultType> {
      * If expressions throws exception during execution, this throws LightExecutionException with original exception
      * as cause.
      */
+    @Nullable
     public ResultType get();
 
     /**
@@ -26,7 +30,8 @@ public interface LightFuture<ResultType> {
      * If original LightFuture object throws and exception during execution, calling get on new object throws
      * LightExecutionException with original LightExecutionException as cause.
      */
-    public LightFuture<?> thenApply(Function<? super ResultType, ?> applier);
+    @NotNull
+    public LightFuture<?> thenApply(@NotNull Function<? super ResultType, ?> applier);
 
     /**
      * Exception of evaluating LightFuture expressions. If was created as a result of exception during execution of
