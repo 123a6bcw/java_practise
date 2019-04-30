@@ -254,15 +254,12 @@ public class ThreadPoolImpl implements ThreadPool {
          *
          * Throws exception if exectuion causes an exception.
          */
-        private void evaluate() throws LightExecutionException {
+        private void evaluate() {
             //Supplier is null iff someone called this method before. We make sure that does not happen in ThreadPoolImpl.
             try {
                 result = Objects.requireNonNull(supplier).get();
             } catch (Throwable e) {
                 exceptionOnExecution = new LightExecutionException("Exception during execution of the given supplier", e);
-                supplier = null;
-                this.notifyAll();
-                throw exceptionOnExecution;
             }
             this.supplier = null;
             this.notifyAll();
