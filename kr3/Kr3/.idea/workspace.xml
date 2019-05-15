@@ -2,38 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8591f716-e860-4b0b-b50c-8e8f51527b05" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/hse/kr3/MD5HashFiles.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/ru/hse/kr3/MD5HashFilesTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/.idea/checkstyle-idea.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/.idea/uiDesigner.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/GladkovHashTable.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/src/main/java/ru/hse/hashtable/HashTable.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/src/main/java/ru/hse/hashtable/List.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/src/main/java/ru/hse/hashtable/StringPair.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/src/test/java/ru/hse/hashtable/HashTableTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../GladkovHashTable/src/test/java/ru/hse/hashtable/ListTest.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Kr3.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/hse/kr3/lolkek.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/ru/hse/kr3/lolkek.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../trie/.idea/checkstyle-idea.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../trie/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../trie/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../trie/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../trie/.idea/uiDesigner.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../trie/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../trie/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../trie/src/main/java/ru/hse/hw3/trie/MySerializable.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../trie/src/main/java/ru/hse/hw3/trie/Trie.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../trie/src/test/java/ru/hse/hw3/trie/TrieTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../trie/trie.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/hse/kr3/MD5HashFiles.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/hse/kr3/MD5HashFiles.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -48,17 +18,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1245">
+            <state relative-caret-position="408">
               <caret line="83" column="33" selection-start-line="83" selection-start-column="33" selection-end-line="83" selection-end-column="33" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ru/hse/kr3/MD5HashFiles.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="213">
-              <caret line="31" selection-start-line="31" selection-end-line="31" />
+            <state relative-caret-position="169">
+              <caret line="163" column="30" lean-forward="true" selection-start-line="163" selection-start-column="30" selection-end-line="163" selection-end-column="30" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -66,11 +36,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/ru/hse/kr3/MD5HashFilesTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="22" column="44" selection-start-line="22" selection-start-column="44" selection-end-line="22" selection-end-column="44" />
+            <state relative-caret-position="300">
+              <caret line="38" selection-start-line="38" selection-end-line="38" />
             </state>
           </provider>
         </entry>
@@ -95,8 +65,8 @@
         <option value="$PROJECT_DIR$/src/main/java/lolkek.java" />
         <option value="$PROJECT_DIR$/src/main/java/ru/hse/kr3/lolkek.java" />
         <option value="$PROJECT_DIR$/src/main/java/ru/hse/kr3/lolkek.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ru/hse/kr3/MD5HashFiles.java" />
         <option value="$PROJECT_DIR$/src/test/java/ru/hse/kr3/MD5HashFilesTest.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ru/hse/kr3/MD5HashFiles.java" />
       </list>
     </option>
   </component>
@@ -120,7 +90,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1557928542231" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1557928713139" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
     <property name="last_directory_selection" value="$PROJECT_DIR$/src/main/java" />
@@ -203,8 +173,16 @@
       <option name="presentableId" value="Default" />
       <updated>1557922960396</updated>
       <workItem from="1557922962848" duration="1100000" />
-      <workItem from="1557924065876" duration="4385000" />
+      <workItem from="1557924065876" duration="4639000" />
     </task>
+    <task id="LOCAL-00001" summary="Lol">
+      <created>1557928550607</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1557928550607</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -217,9 +195,21 @@
     <history-entry file="MD5HashFilesTest - 2019.05.15 at 16h 54m 02s.xml">
       <configuration name="MD5HashFilesTest" configurationId="JUnit" />
     </history-entry>
+    <history-entry file="MD5HashFilesTest - 2019.05.15 at 16h 54m 19s.xml">
+      <configuration name="MD5HashFilesTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="MD5HashFilesTest - 2019.05.15 at 16h 54m 24s.xml">
+      <configuration name="MD5HashFilesTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="MD5HashFilesTest - 2019.05.15 at 16h 56m 01s.xml">
+      <configuration name="MD5HashFilesTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="MD5HashFilesTest - 2019.05.15 at 16h 57m 01s.xml">
+      <configuration name="MD5HashFilesTest" configurationId="JUnit" />
+    </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5485000" />
+    <option name="totallyTimeSpent" value="5739000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="70" y="27" width="1850" height="1053" extended-state="6" />
@@ -234,8 +224,8 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32972974" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32972974" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -260,14 +250,18 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Lol" />
+    <option name="LAST_COMMIT_MESSAGE" value="Lol" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/test/java/ru/hse/kr3/MD5HashFilesTest.java</url>
-          <line>38</line>
+          <line>22</line>
           <properties />
-          <option name="timeStamp" value="1" />
+          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -275,25 +269,25 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1245">
+        <state relative-caret-position="408">
           <caret line="83" column="33" selection-start-line="83" selection-start-column="33" selection-end-line="83" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ru/hse/kr3/MD5HashFiles.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="31" selection-start-line="31" selection-end-line="31" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/ru/hse/kr3/MD5HashFilesTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="22" column="44" selection-start-line="22" selection-start-column="44" selection-end-line="22" selection-end-column="44" />
+        <state relative-caret-position="300">
+          <caret line="38" selection-start-line="38" selection-end-line="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ru/hse/kr3/MD5HashFiles.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="169">
+          <caret line="163" column="30" lean-forward="true" selection-start-line="163" selection-start-column="30" selection-end-line="163" selection-end-column="30" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

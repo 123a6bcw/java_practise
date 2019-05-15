@@ -159,7 +159,7 @@ public class MD5HashFiles {
             MessageDigest digest = getMessageDigest();
 
             if (fileName != null) {
-                return getMessageDigest().digest(fileName.getBytes());
+                return digest.digest(fileName.getBytes());
             } else
             if (Objects.requireNonNull(file).isDirectory()) { //File is always not null if fileName is Null
                 var task = new MnogoPotokMd5(file.getName());
