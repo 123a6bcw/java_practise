@@ -117,9 +117,9 @@ public class ThreadPoolImpl implements ThreadPool {
 
     @Override
     public void shutdown() {
-        isShuttedDown = true;
-
         synchronized (shutdownLock) {
+            isShuttedDown = true;
+
             while (waitingToAddCount > 0) {
                 try {
                     shutdownLock.wait();
