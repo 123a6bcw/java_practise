@@ -46,6 +46,18 @@ class ThreadPoolImplTest {
     private static int longerTaskResult = 1820229488;
     //~~0.15 second
 
+    private static Supplier<Integer> longestTask = () -> {
+        int result = 0;
+        int n = 100000;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                result = result ^ (result + i) + j * result;
+            }
+        }
+
+        return result;
+    };
+
     public static void main(String[] argc) {
 
         long startTime = System.currentTimeMillis();
@@ -298,5 +310,22 @@ class ThreadPoolImplTest {
         threadPool.shutdown();
         Thread.sleep(500);
         assertEquals(4, current - Thread.activeCount());
+    }
+
+    @Test
+    void taskSubmittedBeforeShutdownEvaluates() throws InterruptedException, LightFuture.LightExecutionException {
+        var task1 = threadPool.submit(longestTask);
+        var task2 = threadPool.submit(longestTask);
+        Thread thread = new Thread(() -> {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {
+            }
+        });
+
+        thread.start();
+
+        assertDoesNotThrow(task1::get);
+        assertDoesNotThrow(task2::get);
     }
 }

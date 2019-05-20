@@ -25,9 +25,19 @@ public class ThreadPoolImpl implements ThreadPool {
     private final MyThreadQueue tasks = new MyThreadQueue();
 
     /**
-     * True if shutdown() has been called.
+     * True if user has called shutdown();
      */
-    private volatile boolean isShuttedDown;
+    private boolean isShuttedDown;
+
+    /**
+     * Object to syncronize over when checking case of threadpool being shutted down.
+     */
+    private final Object shutdownLock = new Object();
+
+    /**
+     * Number of task that are submitted to pool but not yet added to queue.
+     */
+    private int waitingToAddCount = 0;
 
     /**
      * Creates n threads and starts it.
@@ -49,9 +59,7 @@ public class ThreadPoolImpl implements ThreadPool {
 
                     lightFutureImpl.evaluate();
 
-                    //Here I synchronize over an object that over threads has access to, so it's okay.
-                    //noinspection SynchronizationOnLocalVariableOrMethodParameter
-                    synchronized (lightFutureImpl) {
+                    synchronized (lightFutureImpl.getToDoAfterList()) {
                         List<LightFutureImpl<?>> toDoAfterList = lightFutureImpl.getToDoAfterList();
                         for (var toDoAfter : toDoAfterList) {
                             submit(toDoAfter);
@@ -71,33 +79,71 @@ public class ThreadPoolImpl implements ThreadPool {
     @Override
     @NotNull
     public <R> LightFuture<R> submit(@NotNull Supplier<R> supplier) {
-        if (isShuttedDown) {
-            throw new RejectedExecutionException("The pool was shut down, no new task can be submitted");
-        }
+        checkForShutdown();
 
         var task = new LightFutureImpl<>(supplier);
         tasks.add(task);
+
+        decreaseWaitingToAddCount();
+
         return task;
     }
+
 
     /**
      * Submit previously created LightFutureImpl to the pool. Being used when task being creates upon a result of another
      * LightFutureImpl, but this task has been already finished and left the pool.
      */
     private <R> void submit(@NotNull LightFutureImpl<R> task) {
-        if (Thread.currentThread().isInterrupted()) {
-            throw new RejectedExecutionException("The pool was shut down, no new task can be submitted");
-        }
+        checkForShutdown();
 
         tasks.add(task);
+
+        decreaseWaitingToAddCount();
+    }
+
+    /**
+     * Decrease number of tasks that are submitted to pool but not yet added to impl queue.
+     * If all task have benn submitted, notifies thread with shutdown.
+     */
+    private void decreaseWaitingToAddCount() {
+        synchronized (shutdownLock) {
+            waitingToAddCount--;
+            if (waitingToAddCount == 0) {
+                shutdownLock.notify();
+            }
+        }
     }
 
     @Override
     public void shutdown() {
         isShuttedDown = true;
 
+        synchronized (shutdownLock) {
+            while (waitingToAddCount > 0) {
+                try {
+                    shutdownLock.wait();
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }
+
         for (var thread : threads) {
             thread.interrupt();
+        }
+    }
+
+    /**
+     * Throws exception if thread is shutted down (so we cannot submit task to it). Otherwise adds task to the number of task
+     * that are sumbitted to pool but not yet added to queue.
+     */
+    private void checkForShutdown() {
+        synchronized (shutdownLock) {
+            if (isShuttedDown) {
+                throw new RejectedExecutionException("The pool was shut down, no new task can be submitted");
+            } else {
+                waitingToAddCount++;
+            }
         }
     }
 
@@ -265,17 +311,21 @@ public class ThreadPoolImpl implements ThreadPool {
         }
 
         /**
+         * Object to synchronize over to evaluate an expression supplied by this task.
+         */
+        private final Object evaluateLock = new Object();
+
+        /**
          * Does not force expression to evaluate, only force current method to wait until it's done.
          */
         @Override
         public ResultType get() throws LightExecutionException {
             if (!isReady()) {
-                synchronized (this) {
+                synchronized (evaluateLock) {
                     while (!isReady()) {
                         try {
-                            this.wait();
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
+                            evaluateLock.wait();
+                        } catch (InterruptedException ignored) {
                         }
                     }
                 }
@@ -297,20 +347,14 @@ public class ThreadPoolImpl implements ThreadPool {
          * Throws exception if exectuion causes an exception.
          */
         private void evaluate() {
-            synchronized (this) {
+            synchronized (evaluateLock) {
                 //Supplier is null iff someone called this method before. We make sure that does not happen in ThreadPoolImpl.
                 try {
                     result = Objects.requireNonNull(supplier).get();
                 } catch (Throwable e) {
-                    /*
-                    I am dirty hacker, in order to throw exception from original task to thenApplied task I store it in
-                    unchecked exception.
-
-                    All because I cannot throw exceptions in a freaking Supplier<R>.
-                     */
-                    var suppressed = e.getSuppressed();
-                    if (e instanceof RuntimeException && suppressed.length == 1 && suppressed[0] instanceof WrappedException) {
-                        e = ((WrappedException) suppressed[0]).getException().getCause();
+                    if (parent != null && parent.exceptionOnExecution != null) {
+                        e = parent.exceptionOnExecution.getCause();
+                        exceptionOnExecution = parent.exceptionOnExecution;
                     }
 
                     exceptionOnExecution = new LightExecutionException("Exception during execution of the given supplier", e);
@@ -318,8 +362,17 @@ public class ThreadPoolImpl implements ThreadPool {
 
                 this.supplier = null;
 
-                this.notifyAll();
+                evaluateLock.notifyAll();
             }
+        }
+
+        /**
+         * Not null if this task created via thenApply. Then it's link to the original task.
+         */
+        private LightFutureImpl<?> parent = null;
+
+        private void setParent(LightFutureImpl<?> parent) {
+            this.parent = parent;
         }
 
         /**
@@ -332,16 +385,13 @@ public class ThreadPoolImpl implements ThreadPool {
                 try {
                     return applier.apply(get());
                 } catch (LightExecutionException e) {
-                    /*
-                    I am dirty hacker, I know, but I never came up with a better solution...
-                     */
-                    var toThrow = new RuntimeException();
-                    toThrow.addSuppressed(new WrappedException(e));
-                    throw toThrow;
+                    throw new RuntimeException();
                 }
             });
 
-            synchronized (this) {
+            toDoAfter.setParent(this);
+
+            synchronized (toDoAfterList) {
                 if (!isReady()) {
                     toDoAfterList.add(toDoAfter);
                 } else {
@@ -358,21 +408,6 @@ public class ThreadPoolImpl implements ThreadPool {
         @NotNull
         private List<LightFutureImpl<?>> getToDoAfterList() {
             return toDoAfterList;
-        }
-    }
-
-    /**
-     * Secret wrapper for exception, so user (not hacker) could not get this exception.
-     */
-    private class WrappedException extends Exception {
-        private final Exception exception;
-
-        private WrappedException(Exception exception) {
-            this.exception = exception;
-        }
-
-        private Exception getException() {
-            return exception;
         }
     }
 }
