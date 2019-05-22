@@ -15,7 +15,7 @@ public class CanonGame {
     private Canon canon;
     private Terrain terrain;
 
-    private BulletType bulletType;
+    private BulletType bulletType = BulletType.SMALL_BULLET;
 
     public CanonGame(GameSettings gameSettings) {
         this.gameSettings = gameSettings;
@@ -81,7 +81,6 @@ public class CanonGame {
         private double width;
         private double height;
 
-
         public GraphicsContext getGraphicsContext() {
             return graphicsContext;
         }
@@ -105,5 +104,9 @@ public class CanonGame {
         public void setHeight(double height) {
             this.height = height;
         }
+    }
+
+    public Terrain getTerrain() {
+        return terrain;
     }
 }

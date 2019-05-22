@@ -20,7 +20,7 @@ import javafx.util.Duration;
 import java.util.Objects;
 
 public class Main extends Application {
-    private static final int TICK = 10;
+    public static final int TICK = 5; //TODO why not public
 
     private CanonGame game;
     private Timeline timeline;
@@ -119,6 +119,10 @@ public class Main extends Application {
                 resize();
                 gameSettings.getGraphicsContext().clearRect(0, 0, gameSettings.getWidth(), gameSettings.getHeight());
                 game.drawObjects();
+
+                if (game.getTerrain().getTargets().isEmpty()) {
+                    stop();
+                }
             }
         });
 
@@ -136,6 +140,7 @@ public class Main extends Application {
     @Override
     public void stop() {
         timeline.stop();
+        primaryStage.close();
     }
 
     public static void main(String[] args) {

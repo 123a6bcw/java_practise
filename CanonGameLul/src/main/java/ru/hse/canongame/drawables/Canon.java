@@ -41,6 +41,9 @@ public class Canon extends DrawableObject {
     private double ovalXCon;
     private double ovalYCon;
 
+    private double ovalXConRate;
+    private double ovalYConRate;
+
     private Terrain terrain;
 
     private void calculateCoordinates() {
@@ -53,8 +56,11 @@ public class Canon extends DrawableObject {
         xEnd = xEndRate * getGameScreenWidth();
         yEnd = yEndRate * getGameScreenHeight();
 
-        ovalXCon = (xStart + xEnd) / 2;
-        ovalYCon = yStart;
+        ovalXConRate = (xStartRate + xEndRate) / 2;
+        ovalYConRate = yStartRate;
+
+        ovalXCon = ovalXConRate * getGameScreenWidth();
+        ovalYCon = ovalYConRate * getGameScreenHeight();
 
         bodyWidth = getGameScreenWidth() * widthRate;
         bodyHeight = getGameScreenHeight() * heightRate;
@@ -135,23 +141,49 @@ public class Canon extends DrawableObject {
     }
 
     public Bullet createBullet(CanonGame.BulletType bulletType) {
+        var bullet = new Bullet(getGameSettings(), this);
+
         switch (bulletType) {
-            case BIG_BULLET:
-                var bigBullet = new Bullet(getGameSettings());
-                return bigBullet;
             case SMALL_BULLET:
-                var smallBullet = new Bullet(getGameSettings());
-                return smallBullet;
-            default:
-                return null;
+                bullet.setMass(0.3);
+                bullet.setDiameterRate(0.03);
+                bullet.setExplosionRate(0.03);
+                break;
+            case BIG_BULLET:
+                bullet.setMass(0.8);
+                bullet.setDiameterRate(0.06);
+                bullet.setExplosionRate(0.1);
+                break;
         }
+
+        bullet.setAngle(ovalAngle);
+
+        calculateCoordinates();
+
+        var affine = new Affine(new Rotate(-ovalAngle, ovalXConRate, ovalYConRate));
+        var point = affine.transform(ovalXConRate, ovalYConRate);
+        var endPoint = point.add(ovalWidthRate, 0);
+
+        Affine affineInvert = null;
+
+        try {
+            affineInvert = affine.createInverse();
+        } catch (NonInvertibleTransformException e) {
+            return null; //TODO throw something
+        }
+
+        var resultPoint = affineInvert.transform(endPoint.getX(), endPoint.getY());
+        bullet.setxRate(resultPoint.getX());
+        bullet.setyRate(resultPoint.getY());
+
+        return bullet;
     }
 
     private void moveVertical() {
         double yLow = 0;
         double yHigh = 1;
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 1000; i++) { //TODO magic constant
             double yMid = (yHigh + yLow) / 2;
 
             yStartRate = yMid;
@@ -187,15 +219,17 @@ public class Canon extends DrawableObject {
     }
 
     private boolean pointBelow(Point2D point, Point2D leftPoint, Point2D rightPoint, boolean doBelow) {
-        double A = leftPoint.getY() - rightPoint.getY();
-        double B = rightPoint.getX() - leftPoint.getX();
-        double C = leftPoint.getX() * rightPoint.getY() - rightPoint.getX() * leftPoint.getY();
+        Line line = Line.getLineByTwoPoint(leftPoint, rightPoint);
 
-        return point.getX() >= leftPoint.getX() && point.getX() <= rightPoint.getX() && ((A * point.getX() + B * point.getY() + C) * (doBelow ? 1 : -1) > 0);
+        return point.getX() >= leftPoint.getX() && point.getX() <= rightPoint.getX() && ((line.getA() * point.getX() + line.getB() * point.getY() + line.getC()) * (doBelow ? 1 : -1) > 0);
     }
 
     @Override
     public boolean isAlive() {
         return true;
+    }
+
+    Terrain getTerrain() {
+        return terrain;
     }
 }
