@@ -1,5 +1,7 @@
 package ru.hse.canongame;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -11,13 +13,16 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.Objects;
 
-/*
-Main class that simply runs application and has some general function.
- */
 public class Main extends Application {
+    private static final int TICK = 10;
+
+    private CanonGame game;
+    private Timeline timeline;
+    private static final int INFINITY = 2000000000;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -39,23 +44,33 @@ public class Main extends Application {
         final Canvas canvas = new Canvas(primaryScreenBounds.getWidth(), primaryScreenBounds.getHeight());
         GraphicsContext graphic = canvas.getGraphicsContext2D();
 
-        System.out.println(scene.getWidth());
-
         root.getChildren().add(canvas);
         primaryStage.show();
 
-        graphic.setFill(Color.BLUE);
-        Thread thread = new Thread(() -> {
-            for (int i = 1; i <= 100; i++) {
-                graphic.fillRect(i, i, 10, 10);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
+        game = new CanonGame(graphic);
+
+        startCycle();
+    }
+
+    private void startCycle() {
+        var keyFrame = new KeyFrame(Duration.millis(TICK), ae -> {
+            game.drawObjects();
         });
-        thread.start();
+
+        timeline = new Timeline(keyFrame);
+
+        timeline.setAutoReverse(true);
+        timeline.setCycleCount(INFINITY);
+        timeline.setOnFinished(ae -> {
+            timeline.stop();
+            startCycle();
+        });
+        timeline.play();
+    }
+
+    @Override
+    public void stop() {
+        timeline.stop();
     }
 
     public static void main(String[] args) {
