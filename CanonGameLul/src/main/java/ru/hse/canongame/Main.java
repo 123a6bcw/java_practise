@@ -23,6 +23,12 @@ public class Main extends Application {
     private CanonGame game;
     private Timeline timeline;
     private static final int INFINITY = 2000000000;
+    private double width;
+    private double height;
+
+    private GraphicsContext graphic;
+
+    private final Object drawLock = new Object();
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -36,25 +42,59 @@ public class Main extends Application {
 
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
+        width = primaryScreenBounds.getWidth();
+        height = primaryScreenBounds.getHeight();
+
         primaryStage.setX(primaryScreenBounds.getMinX());
         primaryStage.setY(primaryScreenBounds.getMinY());
-        primaryStage.setWidth(primaryScreenBounds.getWidth());
-        primaryStage.setHeight(primaryScreenBounds.getHeight());
+        primaryStage.setWidth(width);
+        primaryStage.setHeight(height);
 
         final Canvas canvas = new Canvas(primaryScreenBounds.getWidth(), primaryScreenBounds.getHeight());
-        GraphicsContext graphic = canvas.getGraphicsContext2D();
+        graphic = canvas.getGraphicsContext2D();
 
         root.getChildren().add(canvas);
         primaryStage.show();
 
-        game = new CanonGame(graphic);
+        game = new CanonGame(graphic, width, height);
+
+        scene.setOnKeyPressed(event -> {
+            synchronized (drawLock) {
+                switch (event.getCode()) {
+                    case LEFT: case A:
+                        game.applyCommand(CanonGame.Command.LEFT);
+                        break;
+                    case RIGHT: case D:
+                        game.applyCommand(CanonGame.Command.RIGHT);
+                        break;
+                    case W: case UP:
+                        game.applyCommand(CanonGame.Command.ROTATE_LEFT);
+                        break;
+                    case S: case DOWN:
+                        game.applyCommand(CanonGame.Command.ROTATE_RIGHT);
+                        break;
+                    case SPACE:
+                        game.applyCommand(CanonGame.Command.FIRE);
+                        break;
+                    case DIGIT1:
+                        game.applyCommand(CanonGame.Command.SMALL_BOMB);
+                        break;
+                    case DIGIT2:
+                        game.applyCommand(CanonGame.Command.BIG_BOMB);
+                        break;
+                }
+            }
+        });
 
         startCycle();
     }
 
     private void startCycle() {
         var keyFrame = new KeyFrame(Duration.millis(TICK), ae -> {
-            game.drawObjects();
+            synchronized (drawLock) {
+                graphic.clearRect(0, 0, width, height);
+                game.drawObjects();
+            }
         });
 
         timeline = new Timeline(keyFrame);
