@@ -19,19 +19,56 @@ import javafx.util.Duration;
 
 import java.util.Objects;
 
+/**
+ * Class that set-ups application and it's settings and runs the game.
+ */
 public class Main extends Application {
-    public static final int TICK = 5; //TODO why not public
+    /**
+     * How often, in mls, does the game field update.
+     */
+    public static final int TICK = 10; //Public, because Bullet class also uses this TICK. I guess, it's okay to make public static final fields.
 
+    /**
+     * Game controller.
+     */
     private CanonGame game;
+
+    /**
+     * An infinitive loop of redrawing game field.
+     */
     private Timeline timeline;
+
+    /**
+     * Infinity number of cycles of redrawing. Should be for about 5 days non-stop-playing, but actually
+     * cycle repeats itself once ends.
+     */
     private static final int INFINITY = 2000000000;
+
+    /**
+     * Game settings, mostly screen's width and height. Yeap, game supports resizability!
+     */
     private CanonGame.GameSettings gameSettings;
 
+    /**
+     * Canvas!
+     */
     private Canvas canvas;
+
+    /**
+     * Stage!!
+     */
     private Stage primaryStage;
 
+    /**
+     * As I strongly believe (a foolish thought perhaps, but) 10mls TICK is more than enough to redraw the whole field,
+     * thread that answers the user's command and thread that redraw objects on the map syncronize over this
+     * object.
+     */
     private final Object drawLock = new Object();
 
+    /**
+     * Change game settings and canvas to correspond current window's size.
+     */
     private void resize() {
         gameSettings.setWidth(primaryStage.getWidth());
         gameSettings.setHeight(primaryStage.getHeight());
@@ -51,7 +88,7 @@ public class Main extends Application {
         primaryStage.setTitle("Cannon game");
         primaryStage.setScene(scene);
         primaryStage.setResizable(true);
-        primaryStage.setFullScreen(false); //TODO true
+        //primaryStage.setFullScreen(false); // NOPE
 
         primaryStage.widthProperty().addListener((observableValue, number, number2) -> setCurrentWidthToStage(number2));
         primaryStage.heightProperty().addListener((observableValue, number, number2) -> setCurrentHeightToStage(number2));
@@ -59,7 +96,7 @@ public class Main extends Application {
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         primaryStage.setX(primaryScreenBounds.getMinX());
         primaryStage.setY(primaryScreenBounds.getMinY());
-        primaryStage.setWidth(primaryScreenBounds.getWidth() - 50);
+        primaryStage.setWidth(primaryScreenBounds.getWidth() - 50); //So it would be easy to drag window...
         primaryStage.setHeight(primaryScreenBounds.getHeight() - 50);
 
         gameSettings = new CanonGame.GameSettings();
@@ -105,14 +142,27 @@ public class Main extends Application {
         startCycle();
     }
 
+    /**
+     * Change primary stage width to the given number after windows size changing (look at widthProperty().setListener() ).
+     */
     private void setCurrentWidthToStage(Number number2) {
-        primaryStage.setWidth((double) number2);
+        synchronized (drawLock) {
+            primaryStage.setWidth((double) number2);
+        }
     }
 
+    /**
+     * Same for height.
+     */
     private void setCurrentHeightToStage(Number number2) {
-        primaryStage.setHeight((double) number2);
+        synchronized (drawLock) {
+            primaryStage.setHeight((double) number2);
+        }
     }
 
+    /**
+     * Starts infinitive redrawing loop.
+     */
     private void startCycle() {
         var keyFrame = new KeyFrame(Duration.millis(TICK), ae -> {
             synchronized (drawLock) {

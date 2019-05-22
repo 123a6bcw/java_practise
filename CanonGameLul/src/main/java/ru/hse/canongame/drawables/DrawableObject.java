@@ -2,48 +2,65 @@ package ru.hse.canongame.drawables;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-import javafx.scene.transform.Affine;
-import javafx.scene.transform.NonInvertibleTransformException;
-import javafx.scene.transform.Rotate;
 import ru.hse.canongame.CanonGame;
-import ru.hse.canongame.drawables.Bullet;
-import ru.hse.canongame.drawables.Target;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
+/**
+ * Object that can be drawn on the GraphicContext object.
+ */
 public abstract class DrawableObject {
+    /**
+     * Actual game settings.
+     */
     private CanonGame.GameSettings gameSettings;
 
-    public DrawableObject(CanonGame.GameSettings gameSettings) {
+    DrawableObject(CanonGame.GameSettings gameSettings) {
         this.gameSettings = gameSettings;
     }
 
-    public GraphicsContext getGraphics() {
+    GraphicsContext getGraphics() {
         return gameSettings.getGraphicsContext();
     }
 
+    /**
+     * Draws this object on the GraphicsContext (provided by gameSettings).
+     *
+     * There are a lot of public and package-private guys in this project --- because I wanted to move all drawable guys to another package
+     * and too lazy to redo it.
+     */
     public abstract void draw();
+
+    /**
+     * False if object was destroyed etc, therefore no longer should be drawn on the screen.
+     */
     public abstract boolean isAlive();
 
-    public double getGameScreenWidth() {
+    double getGameScreenWidth() {
         return gameSettings.getWidth();
     }
 
-    public double getGameScreenHeight() {
+    double getGameScreenHeight() {
         return gameSettings.getHeight();
     }
 
-    public CanonGame.GameSettings getGameSettings() {
+    CanonGame.GameSettings getGameSettings() {
         return gameSettings;
     }
 
-    public static class Line {
+    /**
+     * Actually either a segment or the line.
+     */
+    static class Line {
+        /**
+         * This means coefficients in line's equtation:
+         * A x + B y + C = 0
+         */
         private double A;
         private double B;
         private double C;
+
+        /**
+         * Not null if segment.
+         */
         private Point2D beginPoint;
         private Point2D endPoint;
 
@@ -55,14 +72,20 @@ public abstract class DrawableObject {
             this.endPoint = endPoint;
         }
 
-        public static Line getLineByTwoPoint(Point2D point1, Point2D point2) {
+        /**
+         * Creates line by two points.
+         */
+        static Line getLineByTwoPoint(Point2D point1, Point2D point2) {
             double A = point1.getY() - point2.getY();
             double B = point2.getX() - point1.getX();
             double C = point1.getX() * point2.getY() - point2.getX() * point1.getY();
             return new Line(A, B, C, point1, point2);
         }
 
-        public static Line getNormalLineViaPoint(Line line, Point2D point) {
+        /**
+         * Creates line perpendicular to the given one and starting from the given point.
+         */
+        static Line getNormalLineViaPoint(Line line, Point2D point) {
             double A = -line.getB();
             double B = line.getA();
             double C = -point.getY() * line.getA() + point.getX() * line.getB();
@@ -70,27 +93,32 @@ public abstract class DrawableObject {
             return new Line(A, B, C, null, null);
         }
 
-        public double applyPoint(Point2D point) {
+        /**
+         * Calculates expression
+         * A x0 + B y0 + C
+         * In order to compare it with zero.
+         */
+        double applyPoint(Point2D point) {
             return A * point.getX() + B * point.getY() + C;
         }
 
-        public double getA() {
+        double getA() {
             return A;
         }
 
-        public double getB() {
+        double getB() {
             return B;
         }
 
-        public double getC() {
+        double getC() {
             return C;
         }
 
-        public Point2D getBeginPoint() {
+        Point2D getBeginPoint() {
             return beginPoint;
         }
 
-        public Point2D getEndPoint() {
+        Point2D getEndPoint() {
             return endPoint;
         }
     }

@@ -9,26 +9,49 @@ import javafx.scene.transform.Rotate;
 import ru.hse.canongame.CanonGame;
 
 /**
- * TODO
+ * Cannon. A drawable thing that rides on the mountains and shoots targets.
+ *
+ * Most of the coordinates marked as 'Rate'. That means this coordinates are from 0 to 1 and represents position
+ * on the screen related to the actual windows size (meaning, xRate \in [0, 1] -> x \in [0, gameScreenWidth]).
  */
 public class Canon extends DrawableObject {
+    /**
+     * Rated cannon step's length (from one button pressed).
+     *
+     * Not final, because maybe a shall want to add this as a controllable option later.
+     */
     private final double STEP = 0.005;
+
+    /**
+     * How much does cannon's cannon rotate from one pressed button.
+     */
     private final double ANGLE_STEP = 5;
 
+    /**
+     * Sizes of the body of the canon.
+     */
     private final double widthRate = 0.06;
     private final double heightRate = 0.06;
+
+    /**
+     * Sizes of the cannon's cannon.
+     */
     private final double ovalHeightRate = 0.025;
     private final double ovalWidthRate = 0.025;
 
-
+    /**
+     * Coordinates of the left-up corner of the rectangle cannon's body.
+     */
     private double xStartRate = 0.2;
     private double yStartRate = 0;
     private double xEndRate = 0.2;
     private double yEndRate = 0;
 
+    /**
+     * Coordinates in pixels.
+     */
     private double xStart;
     private double yStart;
-
     private double xEnd;
     private double yEnd;
 
@@ -36,16 +59,28 @@ public class Canon extends DrawableObject {
     private double bodyHeight;
     private double ovalWidth;
     private double ovalHeight;
+
+    /**
+     * Angle of the cannon's cannon in which it shoots the balls.
+     */
     private double ovalAngle = -45;
 
+    /**
+     * Oh... That's the coordinates of the point there oval (cannon's cannon) connect to the rectangle (body).
+     */
+    private double ovalXConRate;
+    private double ovalYConRate;
     private double ovalXCon;
     private double ovalYCon;
 
-    private double ovalXConRate;
-    private double ovalYConRate;
-
+    /**
+     * Terrain on which cannon rides.
+     */
     private Terrain terrain;
 
+    /**
+     * Updates all coordinates knowing only xStartRate, yStartRate and current gameScreen sizes.
+     */
     private void calculateCoordinates() {
         xStart = xStartRate * getGameScreenWidth();
         yStart = yStartRate * getGameScreenHeight();
@@ -76,6 +111,9 @@ public class Canon extends DrawableObject {
         moveVertical();
     }
 
+    /**
+     * Uses some dark magic with affine rotation of the screen in order to draw oval at a certain angle.
+     */
     @Override
     public void draw() {
         GraphicsContext graphics = getGraphics();
@@ -93,7 +131,7 @@ public class Canon extends DrawableObject {
         try {
             affineInverse = affine.createInverse();
         } catch (NonInvertibleTransformException e) {
-            e.printStackTrace();
+            e.printStackTrace(); //rotation is always inversable, so whatever.
             return;
         }
 
@@ -103,6 +141,11 @@ public class Canon extends DrawableObject {
         graphics.fillRect(xStart, yStart, bodyWidth, bodyHeight);
     }
 
+    /**
+     * Moves cannon to the left. Does not move if goes off screen.
+     *
+     * Public because being used from CannonGame.
+     */
     public void moveLeft() {
         xStartRate -= STEP;
 
@@ -114,6 +157,9 @@ public class Canon extends DrawableObject {
         moveVertical();
     }
 
+    /**
+     * Moves to the right.
+     */
     public void moveRight() {
         xStartRate += STEP;
 
@@ -126,6 +172,9 @@ public class Canon extends DrawableObject {
         moveVertical();
     }
 
+    /**
+     * Rotates the oval.
+     */
     public void rotateRight() {
         ovalAngle -= ANGLE_STEP;
         if (ovalAngle < -150) {
@@ -140,6 +189,9 @@ public class Canon extends DrawableObject {
         }
     }
 
+    /**
+     * Creates bullet as a drawable object, attached to the CannonGame.
+     */
     public Bullet createBullet(CanonGame.BulletType bulletType) {
         var bullet = new Bullet(getGameSettings(), this);
 
@@ -179,6 +231,11 @@ public class Canon extends DrawableObject {
         return bullet;
     }
 
+    /**
+     * Founds the bottom-most vertical position for the cannon (for the given x coordinate) there it does not appears below the mountains.
+     *
+     * Uses binsearch. Too lazy to find a formula.
+     */
     private void moveVertical() {
         double yLow = 0;
         double yHigh = 1;
@@ -214,16 +271,26 @@ public class Canon extends DrawableObject {
         calculateCoordinates();
     }
 
+    /**
+     * True if this canon is below given segment (therefore cannon cannot be places here).
+     */
     private boolean canonBelow(Point2D leftPoint, Point2D rightPoint) {
         return pointBelow(new Point2D(xStartRate, yEndRate), leftPoint, rightPoint, true) || pointBelow(new Point2D(xEndRate, yEndRate), leftPoint, rightPoint, true);
     }
 
+    /**
+     * True if point is between x coordinates of the left and right point and either below or above of given segment
+     * depending on doBelod.
+     */
     private boolean pointBelow(Point2D point, Point2D leftPoint, Point2D rightPoint, boolean doBelow) {
         Line line = Line.getLineByTwoPoint(leftPoint, rightPoint);
 
         return point.getX() >= leftPoint.getX() && point.getX() <= rightPoint.getX() && ((line.getA() * point.getX() + line.getB() * point.getY() + line.getC()) * (doBelow ? 1 : -1) > 0);
     }
 
+    /**
+     * For now always alive.
+     */
     @Override
     public boolean isAlive() {
         return true;

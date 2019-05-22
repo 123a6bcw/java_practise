@@ -8,13 +8,33 @@ import ru.hse.canongame.drawables.Terrain;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller of game logic.
+ */
 public class CanonGame {
+    /**
+     * All drawable object's attached to the game. There can be more -- ones who attached to the attached object's.
+     */
     private List<DrawableObject> objects = new ArrayList<>();
 
+    /**
+     * Game settings!
+     */
     private GameSettings gameSettings;
+
+    /**
+     * Canon!
+     */
     private Canon canon;
+
+    /**
+     * Terrain!
+     */
     private Terrain terrain;
 
+    /**
+     * Type of the bullet to use. For now supported are only SMALL_BULLET and BIG_BULLET.
+     */
     private BulletType bulletType = BulletType.SMALL_BULLET;
 
     public CanonGame(GameSettings gameSettings) {
@@ -27,10 +47,16 @@ public class CanonGame {
         addObject(canon);
     }
 
+    /**
+     * Adds drawable object to the list of drawable object's.
+     */
     private void addObject(DrawableObject drawableObject) {
         objects.add(drawableObject);
     }
 
+    /**
+     * Draws all drawable object (and their drawable children, if there any (there are)).
+     */
     void drawObjects() {
         for (var iterator = objects.iterator(); iterator.hasNext();) {
             DrawableObject object = iterator.next();
@@ -42,6 +68,9 @@ public class CanonGame {
         }
     }
 
+    /**
+     * Reaction on user's command.
+     */
     void applyCommand(Command command) {
         switch (command) {
             case LEFT:
@@ -68,14 +97,24 @@ public class CanonGame {
         }
     }
 
+    /**
+     * Type of the bullet to shoot.
+     */
     public enum BulletType {
         SMALL_BULLET, BIG_BULLET;
     }
 
+    /**
+     * List of user's commands.
+     */
     public enum Command {
         RIGHT, LEFT, ROTATE_LEFT, ROTATE_RIGHT, FIRE, SMALL_BOMB, BIG_BOMB;
     }
 
+    /**
+     * Game settings, most important --- width and height, as they may change during the execution
+     * and this class stores their actual values.
+     */
     public static class GameSettings {
         private GraphicsContext graphicsContext;
         private double width;

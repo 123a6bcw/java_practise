@@ -6,44 +6,93 @@ import javafx.scene.paint.Color;
 import ru.hse.canongame.CanonGame;
 import ru.hse.canongame.Main;
 
+/**
+ * Bullet that flies on the screen and blows on the ground.
+ */
 public class Bullet extends DrawableObject {
+    /**
+     * How many times flies between to drawing steps.
+     */
     private static final int TICK = Main.TICK;
 
+    /**
+     * How many ticks has passed since this bullet has been created/
+     */
     private long ticksPassed = 0;
 
+    /**
+     * Mass of the bullet. Simply a coefficient that decrease initial bullet's speed.
+     */
     private double mass = -1;
 
+    /**
+     * Diameter of the bullet. Look at Canon class for the explanation of the "Rate" suffix.
+     */
     private double diameterRate;
 
+    /**
+     * Blow diameter -- meaning all target in this diameter shall be blown after bullet drops on the ground.
+     */
     private double explosionRate;
 
+    /**
+     * Position of... I don't know. I guess, center of the bullet, but I'm not sure at that point.
+     */
     private double xRate;
     private double yRate;
 
+    /**
+     * Initial y position of the bullet.
+     */
     private double initialYRate;
 
+    /**
+     * Coordinates in pixels.
+     */
     private double x;
     private double y;
 
     private double diameter;
 
+    /**
+     * Initial bullet's speed (at the angle).
+     */
     private double speedRate = 0.0006;
+
+    /**
+     * Speed projected on X and Y coordinates.
+     */
     private double initialXSpeedRate;
     private double initialYSpeedRate;
 
+    /**
+     * Gravitational acceleration.
+     */
     private static final double gravityRate = 0.000009;
 
+    /**
+     * Initial! angle that bullet are shoot at.
+     */
     private double angle;
 
+    /**
+     * Cannon that started this mess.
+     */
     private Canon canon;
 
+    /**
+     * Has bullet successfully hit the ground or not yet.
+     */
     private boolean alive = true;
 
-    public Bullet(CanonGame.GameSettings gameSettings, Canon canon) {
+    Bullet(CanonGame.GameSettings gameSettings, Canon canon) {
         super(gameSettings);
         this.canon = canon;
     }
 
+    /**
+     * Updates coordinates on the screen with current gameScreen sizes.
+     */
     private void resize() {
         x = xRate * getGameScreenWidth();
         y = yRate * getGameScreenHeight();
@@ -75,11 +124,15 @@ public class Bullet extends DrawableObject {
 
         GraphicsContext graphics = getGraphics();
         graphics.setFill(Color.BLACK);
-        graphics.fillOval(x - diameter /2, y - diameter, diameter, diameter);
+        graphics.fillOval(x - diameter /2, y - diameter, diameter, diameter); //??????????????????????????????????????
+        //I HATE GEOMETRY
 
         ticksPassed++;
     }
 
+    /**
+     * Distance between two points.
+     */
     private double getDistBetweenPoints(Point2D a, Point2D b) {
         return getDistBetweenPoints(a.getX(), a.getY(), b.getX(), b.getY());
     }
@@ -90,6 +143,9 @@ public class Bullet extends DrawableObject {
         return Math.sqrt(dxPoint * dxPoint + dyPoint * dyPoint);
     }
 
+    /**
+     * True if this bullet are close enough to the given line and therefore should explode.
+     */
     private boolean checkForExplosion(Line line) {
         var ratePoint = new Point2D(xRate, yRate - diameterRate/2);
 
@@ -126,51 +182,51 @@ public class Bullet extends DrawableObject {
         return alive;
     }
 
-    public double getMass() {
+    private double getMass() {
         return mass;
     }
 
-    public void setMass(double mass) {
+    void setMass(double mass) {
         this.mass = mass;
 
         speedRate /= mass;
     }
 
-    public double getDiameterRate() {
+    private double getDiameterRate() {
         return diameterRate;
     }
 
-    public void setDiameterRate(double diameterRate) {
+    void setDiameterRate(double diameterRate) {
         this.diameterRate = diameterRate;
     }
 
-    public double getxRate() {
+    private double getxRate() {
         return xRate;
     }
 
-    public void setxRate(double xRate) {
+    void setxRate(double xRate) {
         this.xRate = xRate;
     }
 
-    public double getyRate() {
+    private double getyRate() {
         return yRate;
     }
 
-    public void setyRate(double yRate) {
+    void setyRate(double yRate) {
         this.yRate = yRate;
 
         initialYRate = yRate;
     }
 
-    public double getExplosionRate() {
+    private double getExplosionRate() {
         return explosionRate;
     }
 
-    public void setExplosionRate(double explosionRate) {
+    void setExplosionRate(double explosionRate) {
         this.explosionRate = explosionRate;
     }
 
-    public void setAngle(double angle) {
+    void setAngle(double angle) {
         this.angle = angle;
 
         if (mass < 0) {
