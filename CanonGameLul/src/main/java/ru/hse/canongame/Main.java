@@ -3,6 +3,8 @@ package ru.hse.canongame;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
@@ -23,40 +25,54 @@ public class Main extends Application {
     private CanonGame game;
     private Timeline timeline;
     private static final int INFINITY = 2000000000;
-    private double width;
-    private double height;
+    private CanonGame.GameSettings gameSettings;
 
-    private GraphicsContext graphic;
+    private Canvas canvas;
+    private Stage primaryStage;
 
     private final Object drawLock = new Object();
+
+    private void resize() {
+        gameSettings.setWidth(primaryStage.getWidth());
+        gameSettings.setHeight(primaryStage.getHeight());
+
+        if (canvas != null) {
+            canvas.setWidth(gameSettings.getWidth());
+            canvas.setHeight(gameSettings.getHeight());
+        }
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         Group root = new Group();
         Scene scene = new Scene(root);
+        this.primaryStage = primaryStage;
 
         primaryStage.setTitle("Cannon game");
         primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         primaryStage.setFullScreen(false); //TODO true
 
+        primaryStage.widthProperty().addListener((observableValue, number, number2) -> setCurrentWidthToStage(number2));
+        primaryStage.heightProperty().addListener((observableValue, number, number2) -> setCurrentHeightToStage(number2));
+
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-
-        width = primaryScreenBounds.getWidth();
-        height = primaryScreenBounds.getHeight();
-
         primaryStage.setX(primaryScreenBounds.getMinX());
         primaryStage.setY(primaryScreenBounds.getMinY());
-        primaryStage.setWidth(width);
-        primaryStage.setHeight(height);
+        primaryStage.setWidth(primaryScreenBounds.getWidth() - 50);
+        primaryStage.setHeight(primaryScreenBounds.getHeight() - 50);
 
-        final Canvas canvas = new Canvas(primaryScreenBounds.getWidth(), primaryScreenBounds.getHeight());
-        graphic = canvas.getGraphicsContext2D();
+        gameSettings = new CanonGame.GameSettings();
+
+        resize();
+
+        canvas = new Canvas(gameSettings.getWidth(), gameSettings.getHeight());
+        gameSettings.setGraphicsContext(canvas.getGraphicsContext2D());
 
         root.getChildren().add(canvas);
         primaryStage.show();
 
-        game = new CanonGame(graphic, width, height);
+        game = new CanonGame(gameSettings);
 
         scene.setOnKeyPressed(event -> {
             synchronized (drawLock) {
@@ -89,10 +105,19 @@ public class Main extends Application {
         startCycle();
     }
 
+    private void setCurrentWidthToStage(Number number2) {
+        primaryStage.setWidth((double) number2);
+    }
+
+    private void setCurrentHeightToStage(Number number2) {
+        primaryStage.setHeight((double) number2);
+    }
+
     private void startCycle() {
         var keyFrame = new KeyFrame(Duration.millis(TICK), ae -> {
             synchronized (drawLock) {
-                graphic.clearRect(0, 0, width, height);
+                resize();
+                gameSettings.getGraphicsContext().clearRect(0, 0, gameSettings.getWidth(), gameSettings.getHeight());
                 game.drawObjects();
             }
         });

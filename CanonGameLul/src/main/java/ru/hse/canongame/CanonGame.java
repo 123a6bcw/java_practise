@@ -9,24 +9,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CanonGame {
-    private GraphicsContext graphicsContext;
     private List<DrawableObject> objects = new ArrayList<>();
 
+    private GameSettings gameSettings;
     private Canon canon;
     private Terrain terrain;
 
-    private double gameScreenWidth;
-    private double gameScreenHeight;
+    private BulletType bulletType;
 
-    public CanonGame(GraphicsContext graphicsContext, double gameScreenWidth, double gameScreenHeight) {
-        this.graphicsContext = graphicsContext;
-        this.gameScreenWidth = gameScreenWidth;
-        this.gameScreenHeight = gameScreenHeight;
+    public CanonGame(GameSettings gameSettings) {
+        this.gameSettings = gameSettings;
 
-        terrain = new Terrain(graphicsContext, gameScreenWidth, gameScreenHeight);
+        terrain = new Terrain(gameSettings);
         addObject(terrain);
 
-        canon = new Canon(graphicsContext, gameScreenWidth, gameScreenHeight, terrain);
+        canon = new Canon(gameSettings, terrain);
         addObject(canon);
     }
 
@@ -59,12 +56,54 @@ public class CanonGame {
             case ROTATE_RIGHT:
                 canon.rotateRight();
                 break;
-            default:
+            case FIRE:
+                addObject(canon.createBullet(bulletType));
+                break;
+            case SMALL_BOMB:
+                bulletType = BulletType.SMALL_BULLET;
+                break;
+            case BIG_BOMB:
+                bulletType = BulletType.BIG_BULLET;
                 break;
         }
     }
 
+    public enum BulletType {
+        SMALL_BULLET, BIG_BULLET;
+    }
+
     public enum Command {
         RIGHT, LEFT, ROTATE_LEFT, ROTATE_RIGHT, FIRE, SMALL_BOMB, BIG_BOMB;
+    }
+
+    public static class GameSettings {
+        private GraphicsContext graphicsContext;
+        private double width;
+        private double height;
+
+
+        public GraphicsContext getGraphicsContext() {
+            return graphicsContext;
+        }
+
+        public void setGraphicsContext(GraphicsContext graphicsContext) {
+            this.graphicsContext = graphicsContext;
+        }
+
+        public double getWidth() {
+            return width;
+        }
+
+        public void setWidth(double width) {
+            this.width = width;
+        }
+
+        public double getHeight() {
+            return height;
+        }
+
+        public void setHeight(double height) {
+            this.height = height;
+        }
     }
 }

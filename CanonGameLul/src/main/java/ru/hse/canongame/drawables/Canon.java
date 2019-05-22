@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
+import ru.hse.canongame.CanonGame;
 
 /**
  * TODO
@@ -30,6 +31,7 @@ public class Canon extends DrawableObject {
 
     private double xEnd;
     private double yEnd;
+
     private double bodyWidth;
     private double bodyHeight;
     private double ovalWidth;
@@ -43,24 +45,25 @@ public class Canon extends DrawableObject {
 
     private void calculateCoordinates() {
         xStart = xStartRate * getGameScreenWidth();
-        yStart = yStartRate * getGetGameScreenHeight();
+        yStart = yStartRate * getGameScreenHeight();
 
         xEndRate = xStartRate + widthRate;
         yEndRate = yStartRate + heightRate;
 
         xEnd = xEndRate * getGameScreenWidth();
-        yEnd = yEndRate * getGetGameScreenHeight();
+        yEnd = yEndRate * getGameScreenHeight();
 
         ovalXCon = (xStart + xEnd) / 2;
         ovalYCon = yStart;
+
+        bodyWidth = getGameScreenWidth() * widthRate;
+        bodyHeight = getGameScreenHeight() * heightRate;
+        ovalWidth = getGameScreenWidth() * ovalWidthRate;
+        ovalHeight = getGameScreenHeight() * ovalHeightRate;
     }
 
-    public Canon(GraphicsContext graphicsContext, double gameScreenWidth, double gameScreenHeight, Terrain terrain) {
-        super(graphicsContext, gameScreenWidth, gameScreenHeight);
-        bodyWidth = gameScreenWidth * widthRate;
-        bodyHeight = gameScreenHeight * heightRate;
-        ovalWidth = gameScreenWidth * ovalWidthRate;
-        ovalHeight = gameScreenHeight * ovalHeightRate;
+    public Canon(CanonGame.GameSettings gameSettings, Terrain terrain) {
+        super(gameSettings);
 
         this.terrain = terrain;
 
@@ -131,8 +134,17 @@ public class Canon extends DrawableObject {
         }
     }
 
-    public void fire() {
-
+    public Bullet createBullet(CanonGame.BulletType bulletType) {
+        switch (bulletType) {
+            case BIG_BULLET:
+                var bigBullet = new Bullet(getGameSettings());
+                return bigBullet;
+            case SMALL_BULLET:
+                var smallBullet = new Bullet(getGameSettings());
+                return smallBullet;
+            default:
+                return null;
+        }
     }
 
     private void moveVertical() {
