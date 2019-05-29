@@ -1,6 +1,5 @@
-package ru.hse.gui8;
-
 import org.junit.jupiter.api.Test;
+import ru.hse.gui8.Main;
 
 import static org.junit.jupiter.api.Assertions.*;
 

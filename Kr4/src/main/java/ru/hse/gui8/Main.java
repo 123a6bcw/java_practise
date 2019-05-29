@@ -149,7 +149,7 @@ public class Main extends Application {
      * Current state of the game.
      */
     //Not private because I won't be able to test it otherwise :(
-    static class GridState {
+    public static class GridState {
         /**
          * True if user can press buttons..
          */
@@ -235,7 +235,7 @@ public class Main extends Application {
          */
         private int leftCells;
 
-        GridState(int n) {
+        public GridState(int n) {
             buttons = new Button[n][n];
             numbers = new int[n][n];
             if (n % 2 == 1) {
