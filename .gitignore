@@ -6,3 +6,5 @@
 */.idea/tasks.xml
 !*/pom.xml
 !*/*.iml
+!*/build.gradle
+!*/settings.gradle
