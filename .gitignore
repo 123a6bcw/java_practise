@@ -1,4 +1,11 @@
-*/target
+*/*
+!*/src
+!*/.idea
 */.idea/workspace.xml
 */.idea/usage.statistics.xml
 */.idea/tasks.xml
+!*/pom.xml
+!*/*.iml
+!*/build.gradle
+!*/settings.gradle
+!*/gradle/
