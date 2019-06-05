@@ -98,6 +98,9 @@ public class Main extends Application {
         primaryStage.setWidth(primaryScreenBounds.getWidth() - 50); //So it would be easy to drag window...
         primaryStage.setHeight(primaryScreenBounds.getHeight() - 50);
 
+        primaryStage.setMinWidth(600);
+        primaryStage.setMinHeight(600);
+
         gameSettings = new CanonGame.GameSettings();
 
         resize();
