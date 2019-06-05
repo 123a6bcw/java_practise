@@ -89,15 +89,11 @@ class ParkingTest {
                             if (currentCar < carLimit) {
                                 currentCar++;
                             }
-
-                            boolean result = parking.registerCar(localI);
-                            if (localCurrentCar < carLimit != result) {
-                                System.out.print(localCurrentCar + " ");
-                                System.out.print(carLimit + " ");
-                                System.out.println(result);
-                                fail();
-                            }
                         }
+
+                        boolean result = parking.registerCar(localI);
+                        assertFalse(localCurrentCar + 10 < carLimit && !result);
+                        assertFalse(localCurrentCar > carLimit + 10 && result);
                     } else {
                         synchronized (currentCarLock) {
                             if (currentCar > 0) {
