@@ -3,6 +3,7 @@ package ru.hse.cannongame;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
@@ -12,6 +13,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -80,7 +82,7 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) {
         Group root = new Group();
         Scene scene = new Scene(root);
         this.primaryStage = primaryStage;
@@ -150,7 +152,16 @@ public class Main extends Application {
                 game.drawObjects();
 
                 if (game.getTerrain().getTargets().isEmpty()) {
-                    stop();
+                    timeline.stop();
+
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setOnCloseRequest(event -> stop());
+                        alert.setTitle("Cannon game");
+                        alert.setHeaderText("Congratulations!");
+                        alert.setContentText("You won!");
+                        alert.showAndWait();
+                    });
                 }
             }
         });
