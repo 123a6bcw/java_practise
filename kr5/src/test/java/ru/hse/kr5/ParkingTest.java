@@ -22,6 +22,8 @@ class ParkingTest {
             final int localI = i;
             final Random random = new Random();
 
+            currentCar = 0;
+
             threads[i] = new Thread(() -> {
                 while (!Thread.interrupted()) {
                     if (random.nextInt() % 2 == 0) {
@@ -70,10 +72,11 @@ class ParkingTest {
     @Test
     void everythingWorksWithRaces() throws InterruptedException {
         final int carLimit = 20;
-        final int en = 10;
+        final int en = 5;
         Parking parking = new Parking(carLimit, en);
 
         Thread[] threads = new Thread[en];
+        currentCar = 0;
         for (int i = 0; i < en; i++) {
             final int localI = i;
             final Random random = new Random();
@@ -99,9 +102,9 @@ class ParkingTest {
                             if (currentCar > 0) {
                                 currentCar--;
                             }
-
-                            parking.unregisterCar(localI);
                         }
+
+                        parking.unregisterCar(localI);
                     }
                 }
             });
