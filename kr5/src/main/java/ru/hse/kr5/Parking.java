@@ -7,15 +7,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * TODO
+ * Class for simulating work with parking automata with several entrances.
  */
 public class Parking {
+    /**
+     * Maximum number of car in the parking zone.
+     */
     private int carLimit;
+
+    /**
+     * Number of entrances.
+     */
     private int entrances;
 
-    private Thread[] entryThreads;
-    private AtomicInteger[] carsInQueue;
-
+    /**
+     * Current number of car in the parking zone.
+     */
     private AtomicInteger currentCars = new AtomicInteger(0);
 
     public Parking(int carLimit, int entrances) {
@@ -25,26 +32,29 @@ public class Parking {
 
         this.carLimit = carLimit;
         this.entrances = entrances;
-
-        entryThreads = new Thread[entrances];
-        carsInQueue = new AtomicInteger[entrances];
-        for (int i = 0; i < entrances; i++) {
-            carsInQueue[i] = new AtomicInteger(0);
-        }
     }
 
+    /**
+     * Throws exception if entrynumber is not within parking bounds.
+     */
     private void checkBounds(int entryNumber) {
         if (entryNumber < 0 || entryNumber >= entrances) {
             throw new IllegalArgumentException("entryNumber is out of bounds");
         }
     }
 
+    /**
+     * Returns true if car can enter the parking zone (and enters it).
+     */
     public boolean registerCar(int entryNumber) {
         checkBounds(entryNumber);
 
         return arbitr();
     }
 
+    /**
+     * Handles car leaving the parking zone throught entryNumber exit.
+     */
     public void unregisterCar(int entryNumber) {
         checkBounds(entryNumber);
 
@@ -58,6 +68,9 @@ public class Parking {
         }
     }
 
+    /**
+     * Returns true if parking zone can accept new car and accept this car if so.
+     */
     private boolean arbitr() {
         int result = currentCars.incrementAndGet();
 
