@@ -90,9 +90,6 @@ public class Main extends Application {
         primaryStage.setResizable(true);
         //primaryStage.setFullScreen(false); // NOPE
 
-        primaryStage.widthProperty().addListener((observableValue, number, number2) -> setCurrentWidthToStage(number2));
-        primaryStage.heightProperty().addListener((observableValue, number, number2) -> setCurrentHeightToStage(number2));
-
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         primaryStage.setX(primaryScreenBounds.getMinX());
         primaryStage.setY(primaryScreenBounds.getMinY());
@@ -140,24 +137,6 @@ public class Main extends Application {
         });
 
         startCycle();
-    }
-
-    /**
-     * Change primary stage width to the given number after windows size changing (look at widthProperty().setListener() ).
-     */
-    private void setCurrentWidthToStage(Number number2) {
-        synchronized (drawLock) {
-            primaryStage.setWidth((double) number2);
-        }
-    }
-
-    /**
-     * Same for height.
-     */
-    private void setCurrentHeightToStage(Number number2) {
-        synchronized (drawLock) {
-            primaryStage.setHeight((double) number2);
-        }
     }
 
     /**
