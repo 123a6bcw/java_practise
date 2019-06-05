@@ -1,4 +1,4 @@
-package ru.hse.canongame.drawables;
+package ru.hse.cannongame.drawables;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -6,7 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
-import ru.hse.canongame.CanonGame;
+import ru.hse.cannongame.CanonGame;
 
 /**
  * Cannon. A drawable thing that rides on the mountains and shoots targets.

@@ -1,10 +1,10 @@
-package ru.hse.canongame.drawables;
+package ru.hse.cannongame.drawables;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import ru.hse.canongame.CanonGame;
-import ru.hse.canongame.Main;
+import ru.hse.cannongame.CanonGame;
+import ru.hse.cannongame.Main;
 
 /**
  * Bullet that flies on the screen and blows on the ground.

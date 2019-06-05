@@ -4,9 +4,10 @@ plugins {
     id 'org.openjfx.javafxplugin' version '0.0.7'
 }
 
-group 'ru.hse.canongame'
+group 'ru.hse'
 version '1.0-SNAPSHOT'
 
+mainClassName = 'ru.hse.cannongame.Main'
 sourceCompatibility = 11
 
 javafx {
@@ -14,22 +15,10 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
-application {
-    mainClassName = 'ru.hse.gui8.Main'
-}
-
-test {
-    useJUnitPlatform()
-}
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile('org.junit.jupiter:junit-jupiter-api:5.3.2')
-    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.3.2')
     compile 'org.jetbrains:annotations:16.0.2'
-    compile group: 'com.google.guava', name: 'guava', version: '23.5-jre' //# or 23.5-android for the Android flavor
-
 }

@@ -1,9 +1,9 @@
-package ru.hse.canongame;
+package ru.hse.cannongame;
 
 import javafx.scene.canvas.GraphicsContext;
-import ru.hse.canongame.drawables.Canon;
-import ru.hse.canongame.drawables.DrawableObject;
-import ru.hse.canongame.drawables.Terrain;
+import ru.hse.cannongame.drawables.Canon;
+import ru.hse.cannongame.drawables.DrawableObject;
+import ru.hse.cannongame.drawables.Terrain;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package ru.hse.canongame;
+package ru.hse.cannongame;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
