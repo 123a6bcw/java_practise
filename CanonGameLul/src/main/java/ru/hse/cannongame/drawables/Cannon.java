@@ -75,11 +75,6 @@ public class Cannon extends DrawableObject {
     private double ovalYCon;
 
     /**
-     * Terrain on which cannon rides.
-     */
-    private Terrain terrain;
-
-    /**
      * Updates all coordinates knowing only xStartRate, yStartRate and current gameScreen sizes.
      */
     private void calculateCoordinates() {
@@ -104,10 +99,8 @@ public class Cannon extends DrawableObject {
         ovalHeight = getGameScreenHeight() * ovalHeightRate;
     }
 
-    public Cannon(GameSettings gameSettings, Terrain terrain) {
+    public Cannon(GameSettings gameSettings) {
         super(gameSettings);
-
-        this.terrain = terrain;
 
         moveVertical();
     }
@@ -252,7 +245,7 @@ public class Cannon extends DrawableObject {
             if (yEndRate > 1) {
                 accept = false;
             } else {
-                for (var triangle : terrain.getTriangles()) {
+                for (var triangle : getGameSettings().getTerrain().getTriangles()) {
                     if (cannonBelow(triangle.getLeftPoint(), triangle.getHighPoint()) || cannonBelow(triangle.getHighPoint(), triangle.getRightPoint()) ||
                             pointBelow(triangle.getHighPoint(), new Point2D(xStartRate, yEndRate), new Point2D(xEndRate, yEndRate), false)) {
                         accept = false;

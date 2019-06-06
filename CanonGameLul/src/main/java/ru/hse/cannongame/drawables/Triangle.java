@@ -55,7 +55,7 @@ public class Triangle extends DrawableObject {
         return true;
     }
 
-    Point2D getLeftPoint() {
+    public Point2D getLeftPoint() {
         return leftPoint;
     }
 
@@ -63,7 +63,7 @@ public class Triangle extends DrawableObject {
         this.leftPoint = leftPoint;
     }
 
-    Point2D getHighPoint() {
+    public Point2D getHighPoint() {
         return highPoint;
     }
 
@@ -71,7 +71,7 @@ public class Triangle extends DrawableObject {
         this.highPoint = highPoint;
     }
 
-    Point2D getRightPoint() {
+    public Point2D getRightPoint() {
         return rightPoint;
     }
 

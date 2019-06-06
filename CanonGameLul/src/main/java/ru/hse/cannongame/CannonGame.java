@@ -28,11 +28,6 @@ public class CannonGame {
     private Cannon cannon;
 
     /**
-     * Terrain!
-     */
-    private Terrain terrain;
-
-    /**
      * Type of the bullet to use. For now supported are only SMALL_BULLET and BIG_BULLET.
      */
     private BulletType bulletType = BulletType.SMALL_BULLET;
@@ -40,10 +35,10 @@ public class CannonGame {
     public CannonGame(GameSettings gameSettings) {
         this.gameSettings = gameSettings;
 
-        terrain = new Terrain(gameSettings);
-        addObject(terrain);
+        gameSettings.setTerrain(new Terrain(gameSettings));
+        addObject(gameSettings.getTerrain());
 
-        cannon = new Cannon(gameSettings, terrain);
+        cannon = new Cannon(gameSettings);
         addObject(cannon);
     }
 
@@ -109,9 +104,5 @@ public class CannonGame {
      */
     public enum Command {
         RIGHT, LEFT, ROTATE_LEFT, ROTATE_RIGHT, FIRE, SMALL_BOMB, BIG_BOMB;
-    }
-
-    public Terrain getTerrain() {
-        return terrain;
     }
 }

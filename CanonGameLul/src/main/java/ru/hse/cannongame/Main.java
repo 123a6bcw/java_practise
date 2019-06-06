@@ -146,7 +146,7 @@ public class Main extends Application {
                 gameSettings.getGraphicsContext().clearRect(0, 0, gameSettings.getWidth(), gameSettings.getHeight());
                 game.drawObjects();
 
-                if (game.getTerrain().getTargets().isEmpty()) {
+                if (gameSettings.getTerrain().getTargets().isEmpty()) {
                     timeline.stop();
 
                     Platform.runLater(() -> {
