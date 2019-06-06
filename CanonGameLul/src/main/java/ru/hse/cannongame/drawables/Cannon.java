@@ -7,6 +7,7 @@ import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
 import ru.hse.cannongame.CannonGame;
+import ru.hse.cannongame.GameSettings;
 
 /**
  * Cannon. A drawable thing that rides on the mountains and shoots targets.
@@ -103,7 +104,7 @@ public class Cannon extends DrawableObject {
         ovalHeight = getGameScreenHeight() * ovalHeightRate;
     }
 
-    public Cannon(CannonGame.GameSettings gameSettings, Terrain terrain) {
+    public Cannon(GameSettings gameSettings, Terrain terrain) {
         super(gameSettings);
 
         this.terrain = terrain;

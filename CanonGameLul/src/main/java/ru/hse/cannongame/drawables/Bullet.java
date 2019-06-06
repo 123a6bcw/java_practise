@@ -4,6 +4,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import ru.hse.cannongame.CannonGame;
+import ru.hse.cannongame.GameSettings;
 import ru.hse.cannongame.Main;
 
 /**
@@ -85,7 +86,7 @@ public class Bullet extends DrawableObject {
      */
     private boolean alive = true;
 
-    Bullet(CannonGame.GameSettings gameSettings, Cannon cannon) {
+    Bullet(GameSettings gameSettings, Cannon cannon) {
         super(gameSettings);
         this.cannon = cannon;
     }

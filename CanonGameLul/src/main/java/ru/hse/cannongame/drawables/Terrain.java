@@ -4,6 +4,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import ru.hse.cannongame.CannonGame;
+import ru.hse.cannongame.GameSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class Terrain extends DrawableObject {
      */
     private List<Target> targets = new ArrayList<>();
 
-    public Terrain(CannonGame.GameSettings gameSettings) {
+    public Terrain(GameSettings gameSettings) {
         super(gameSettings);
 
         /*
@@ -124,7 +125,7 @@ public class Terrain extends DrawableObject {
          */
         private Point2D rightPoint;
 
-        private Triangle(CannonGame.GameSettings gameSettings) {
+        private Triangle(GameSettings gameSettings) {
             super(gameSettings);
         }
 
@@ -205,7 +206,7 @@ public class Terrain extends DrawableObject {
          */
         private boolean alive = true;
 
-        private Target(CannonGame.GameSettings gameSettings, double xRate, double yRate) {
+        private Target(GameSettings gameSettings, double xRate, double yRate) {
             super(gameSettings);
             this.xRate = xRate;
             this.yRate = yRate;

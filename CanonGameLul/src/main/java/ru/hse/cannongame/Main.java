@@ -41,7 +41,7 @@ public class Main extends Application {
     /**
      * Game settings, mostly screen's width and height. Yeap, game supports resizability!
      */
-    private CannonGame.GameSettings gameSettings;
+    private GameSettings gameSettings;
 
     /**
      * Canvas!
@@ -93,7 +93,7 @@ public class Main extends Application {
         primaryStage.setMinWidth(600);
         primaryStage.setMinHeight(600);
 
-        gameSettings = new CannonGame.GameSettings();
+        gameSettings = new GameSettings();
 
         resize();
 
