@@ -163,18 +163,25 @@ public class Bullet extends DrawableObject {
         }
 
         if (minDist <= diameterRate / 2) {
-            alive = false;
-
-            for (var target : canon.getTerrain().getTargets()) {
-                if (getDistBetweenPoints(xRate, yRate - diameterRate / 2, target.getxRate(), target.getyRate()) <= explosionRate) {
-                    target.kill();
-                }
-            }
+            explode();
 
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Destroy current bullet and all nearby targets.
+     */
+    private void explode() {
+        alive = false;
+
+        for (var target : canon.getTerrain().getTargets()) {
+            if (getDistBetweenPoints(xRate, yRate - diameterRate / 2, target.getxRate(), target.getyRate()) <= explosionRate) {
+                target.kill();
+            }
+        }
     }
 
     @Override
