@@ -20,7 +20,7 @@ public class Line {
     private Point2D beginPoint;
     private Point2D endPoint;
 
-    private Line(double coefficientA, double coefficientB, double coefficientC, Point2D beginPoint, Point2D endPoint) {
+    public Line(double coefficientA, double coefficientB, double coefficientC, Point2D beginPoint, Point2D endPoint) {
         this.coefficientA = coefficientA;
         this.coefficientB = coefficientB;
         this.coefficientC = coefficientC;
@@ -31,7 +31,7 @@ public class Line {
     /**
      * Creates line by two points.
      */
-    static Line getLineByTwoPoint(Point2D point1, Point2D point2) {
+    public static Line getLineByTwoPoint(Point2D point1, Point2D point2) {
         double A = point1.getY() - point2.getY();
         double B = point2.getX() - point1.getX();
         double C = point1.getX() * point2.getY() - point2.getX() * point1.getY();
@@ -41,7 +41,7 @@ public class Line {
     /**
      * Creates line perpendicular to the given one and starting from the given point.
      */
-    static Line getNormalLineViaPoint(Line line, Point2D point) {
+    public static Line getNormalLineViaPoint(Line line, Point2D point) {
         double A = -line.getCoefficientB();
         double B = line.getCoefficientA();
         double C = -point.getY() * line.getCoefficientA() + point.getX() * line.getCoefficientB();
@@ -54,27 +54,27 @@ public class Line {
      * A x0 + B y0 + C
      * In order to compare it with zero.
      */
-    double applyPoint(Point2D point) {
+    public double applyPoint(Point2D point) {
         return coefficientA * point.getX() + coefficientB * point.getY() + coefficientC;
     }
 
-    double getCoefficientA() {
+    public double getCoefficientA() {
         return coefficientA;
     }
 
-    double getCoefficientB() {
+    public double getCoefficientB() {
         return coefficientB;
     }
 
-    double getCoefficientC() {
+    public double getCoefficientC() {
         return coefficientC;
     }
 
-    Point2D getBeginPoint() {
+    public Point2D getBeginPoint() {
         return beginPoint;
     }
 
-    Point2D getEndPoint() {
+    public Point2D getEndPoint() {
         return endPoint;
     }
 }
