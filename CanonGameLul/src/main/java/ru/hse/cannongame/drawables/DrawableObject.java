@@ -12,11 +12,11 @@ public abstract class DrawableObject {
      */
     private GameSettings gameSettings;
 
-    DrawableObject(GameSettings gameSettings) {
+    protected DrawableObject(GameSettings gameSettings) {
         this.gameSettings = gameSettings;
     }
 
-    GraphicsContext getGraphics() {
+    protected GraphicsContext getGraphics() {
         return gameSettings.getGraphicsContext();
     }
 
@@ -33,15 +33,15 @@ public abstract class DrawableObject {
      */
     public abstract boolean isAlive();
 
-    double getGameScreenWidth() {
+    protected double getGameScreenWidth() {
         return gameSettings.getWidth();
     }
 
-    double getGameScreenHeight() {
+    protected double getGameScreenHeight() {
         return gameSettings.getHeight();
     }
 
-    GameSettings getGameSettings() {
+    protected GameSettings getGameSettings() {
         return gameSettings;
     }
 }
