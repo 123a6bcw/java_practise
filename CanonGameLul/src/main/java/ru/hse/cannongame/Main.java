@@ -4,22 +4,14 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
-import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import java.util.Objects;
 
 /**
  * Class that set-ups application and it's settings and runs the game.
@@ -33,7 +25,7 @@ public class Main extends Application {
     /**
      * Game controller.
      */
-    private CanonGame game;
+    private CannonGame game;
 
     /**
      * An infinitive loop of redrawing game field.
@@ -49,7 +41,7 @@ public class Main extends Application {
     /**
      * Game settings, mostly screen's width and height. Yeap, game supports resizability!
      */
-    private CanonGame.GameSettings gameSettings;
+    private CannonGame.GameSettings gameSettings;
 
     /**
      * Canvas!
@@ -101,7 +93,7 @@ public class Main extends Application {
         primaryStage.setMinWidth(600);
         primaryStage.setMinHeight(600);
 
-        gameSettings = new CanonGame.GameSettings();
+        gameSettings = new CannonGame.GameSettings();
 
         resize();
 
@@ -111,31 +103,31 @@ public class Main extends Application {
         root.getChildren().add(canvas);
         primaryStage.show();
 
-        game = new CanonGame(gameSettings);
+        game = new CannonGame(gameSettings);
 
         scene.setOnKeyPressed(event -> {
             synchronized (drawLock) {
                 switch (event.getCode()) {
                     case LEFT: case A:
-                        game.applyCommand(CanonGame.Command.LEFT);
+                        game.applyCommand(CannonGame.Command.LEFT);
                         break;
                     case RIGHT: case D:
-                        game.applyCommand(CanonGame.Command.RIGHT);
+                        game.applyCommand(CannonGame.Command.RIGHT);
                         break;
                     case W: case UP:
-                        game.applyCommand(CanonGame.Command.ROTATE_LEFT);
+                        game.applyCommand(CannonGame.Command.ROTATE_LEFT);
                         break;
                     case S: case DOWN:
-                        game.applyCommand(CanonGame.Command.ROTATE_RIGHT);
+                        game.applyCommand(CannonGame.Command.ROTATE_RIGHT);
                         break;
                     case SPACE:
-                        game.applyCommand(CanonGame.Command.FIRE);
+                        game.applyCommand(CannonGame.Command.FIRE);
                         break;
                     case DIGIT1:
-                        game.applyCommand(CanonGame.Command.SMALL_BOMB);
+                        game.applyCommand(CannonGame.Command.SMALL_BOMB);
                         break;
                     case DIGIT2:
-                        game.applyCommand(CanonGame.Command.BIG_BOMB);
+                        game.applyCommand(CannonGame.Command.BIG_BOMB);
                         break;
                 }
             }

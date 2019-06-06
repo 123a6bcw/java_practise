@@ -2,7 +2,7 @@ package ru.hse.cannongame.drawables;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import ru.hse.cannongame.CanonGame;
+import ru.hse.cannongame.CannonGame;
 
 /**
  * Object that can be drawn on the GraphicContext object.
@@ -11,9 +11,9 @@ public abstract class DrawableObject {
     /**
      * Actual game settings.
      */
-    private CanonGame.GameSettings gameSettings;
+    private CannonGame.GameSettings gameSettings;
 
-    DrawableObject(CanonGame.GameSettings gameSettings) {
+    DrawableObject(CannonGame.GameSettings gameSettings) {
         this.gameSettings = gameSettings;
     }
 
@@ -42,7 +42,7 @@ public abstract class DrawableObject {
         return gameSettings.getHeight();
     }
 
-    CanonGame.GameSettings getGameSettings() {
+    CannonGame.GameSettings getGameSettings() {
         return gameSettings;
     }
 

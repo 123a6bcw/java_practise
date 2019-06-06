@@ -3,7 +3,7 @@ package ru.hse.cannongame.drawables;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import ru.hse.cannongame.CanonGame;
+import ru.hse.cannongame.CannonGame;
 import ru.hse.cannongame.Main;
 
 /**
@@ -26,7 +26,7 @@ public class Bullet extends DrawableObject {
     private double mass = -1;
 
     /**
-     * Diameter of the bullet. Look at Canon class for the explanation of the "Rate" suffix.
+     * Diameter of the bullet. Look at Cannon class for the explanation of the "Rate" suffix.
      */
     private double diameterRate;
 
@@ -78,16 +78,16 @@ public class Bullet extends DrawableObject {
     /**
      * Cannon that started this mess.
      */
-    private Canon canon;
+    private Cannon cannon;
 
     /**
      * Has bullet successfully hit the ground or not yet.
      */
     private boolean alive = true;
 
-    Bullet(CanonGame.GameSettings gameSettings, Canon canon) {
+    Bullet(CannonGame.GameSettings gameSettings, Cannon cannon) {
         super(gameSettings);
-        this.canon = canon;
+        this.cannon = cannon;
     }
 
     /**
@@ -114,7 +114,7 @@ public class Bullet extends DrawableObject {
 
         resize();
 
-        for (var trianle : canon.getTerrain().getTriangles()) {
+        for (var trianle : cannon.getTerrain().getTriangles()) {
             var line1 = DrawableObject.Line.getLineByTwoPoint(trianle.getLeftPoint(), trianle.getHighPoint());
             var line2 = DrawableObject.Line.getLineByTwoPoint(trianle.getHighPoint(), trianle.getRightPoint());
             if (checkForExplosion(line1) || checkForExplosion(line2)) {
@@ -177,7 +177,7 @@ public class Bullet extends DrawableObject {
     private void explode() {
         alive = false;
 
-        for (var target : canon.getTerrain().getTargets()) {
+        for (var target : cannon.getTerrain().getTargets()) {
             if (getDistBetweenPoints(xRate, yRate - diameterRate / 2, target.getxRate(), target.getyRate()) <= explosionRate) {
                 target.kill();
             }

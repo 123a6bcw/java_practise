@@ -6,7 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
-import ru.hse.cannongame.CanonGame;
+import ru.hse.cannongame.CannonGame;
 
 /**
  * Cannon. A drawable thing that rides on the mountains and shoots targets.
@@ -14,7 +14,7 @@ import ru.hse.cannongame.CanonGame;
  * Most of the coordinates marked as 'Rate'. That means this coordinates are from 0 to 1 and represents position
  * on the screen related to the actual windows size (meaning, xRate \in [0, 1] -> x \in [0, gameScreenWidth]).
  */
-public class Canon extends DrawableObject {
+public class Cannon extends DrawableObject {
     /**
      * Rated cannon step's length (from one button pressed).
      *
@@ -28,7 +28,7 @@ public class Canon extends DrawableObject {
     private final double ANGLE_STEP = 5;
 
     /**
-     * Sizes of the body of the canon.
+     * Sizes of the body of the cannon.
      */
     private final double widthRate = 0.06;
     private final double heightRate = 0.06;
@@ -103,7 +103,7 @@ public class Canon extends DrawableObject {
         ovalHeight = getGameScreenHeight() * ovalHeightRate;
     }
 
-    public Canon(CanonGame.GameSettings gameSettings, Terrain terrain) {
+    public Cannon(CannonGame.GameSettings gameSettings, Terrain terrain) {
         super(gameSettings);
 
         this.terrain = terrain;
@@ -192,7 +192,7 @@ public class Canon extends DrawableObject {
     /**
      * Creates bullet as a drawable object, attached to the CannonGame.
      */
-    public Bullet createBullet(CanonGame.BulletType bulletType) {
+    public Bullet createBullet(CannonGame.BulletType bulletType) {
         var bullet = new Bullet(getGameSettings(), this);
 
         switch (bulletType) {
@@ -252,7 +252,7 @@ public class Canon extends DrawableObject {
                 accept = false;
             } else {
                 for (var triangle : terrain.getTriangles()) {
-                    if (canonBelow(triangle.getLeftPoint(), triangle.getHighPoint()) || canonBelow(triangle.getHighPoint(), triangle.getRightPoint()) ||
+                    if (cannonBelow(triangle.getLeftPoint(), triangle.getHighPoint()) || cannonBelow(triangle.getHighPoint(), triangle.getRightPoint()) ||
                             pointBelow(triangle.getHighPoint(), new Point2D(xStartRate, yEndRate), new Point2D(xEndRate, yEndRate), false)) {
                         accept = false;
                         break;
@@ -272,9 +272,9 @@ public class Canon extends DrawableObject {
     }
 
     /**
-     * True if this canon is below given segment (therefore cannon cannot be places here).
+     * True if this cannon is below given segment (therefore cannon cannot be places here).
      */
-    private boolean canonBelow(Point2D leftPoint, Point2D rightPoint) {
+    private boolean cannonBelow(Point2D leftPoint, Point2D rightPoint) {
         return pointBelow(new Point2D(xStartRate, yEndRate), leftPoint, rightPoint, true) || pointBelow(new Point2D(xEndRate, yEndRate), leftPoint, rightPoint, true);
     }
 

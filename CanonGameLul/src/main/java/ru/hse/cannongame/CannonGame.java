@@ -1,7 +1,7 @@
 package ru.hse.cannongame;
 
 import javafx.scene.canvas.GraphicsContext;
-import ru.hse.cannongame.drawables.Canon;
+import ru.hse.cannongame.drawables.Cannon;
 import ru.hse.cannongame.drawables.DrawableObject;
 import ru.hse.cannongame.drawables.Terrain;
 
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Controller of game logic.
  */
-public class CanonGame {
+public class CannonGame {
     /**
      * All drawable object's attached to the game. There can be more -- ones who attached to the attached object's.
      */
@@ -23,9 +23,9 @@ public class CanonGame {
     private GameSettings gameSettings;
 
     /**
-     * Canon!
+     * Cannon!
      */
-    private Canon canon;
+    private Cannon cannon;
 
     /**
      * Terrain!
@@ -37,14 +37,14 @@ public class CanonGame {
      */
     private BulletType bulletType = BulletType.SMALL_BULLET;
 
-    public CanonGame(GameSettings gameSettings) {
+    public CannonGame(GameSettings gameSettings) {
         this.gameSettings = gameSettings;
 
         terrain = new Terrain(gameSettings);
         addObject(terrain);
 
-        canon = new Canon(gameSettings, terrain);
-        addObject(canon);
+        cannon = new Cannon(gameSettings, terrain);
+        addObject(cannon);
     }
 
     /**
@@ -74,19 +74,19 @@ public class CanonGame {
     void applyCommand(Command command) {
         switch (command) {
             case LEFT:
-                canon.moveLeft();
+                cannon.moveLeft();
                 break;
             case RIGHT:
-                canon.moveRight();
+                cannon.moveRight();
                 break;
             case ROTATE_LEFT:
-                canon.rotateLeft();
+                cannon.rotateLeft();
                 break;
             case ROTATE_RIGHT:
-                canon.rotateRight();
+                cannon.rotateRight();
                 break;
             case FIRE:
-                addObject(canon.createBullet(bulletType));
+                addObject(cannon.createBullet(bulletType));
                 break;
             case SMALL_BOMB:
                 bulletType = BulletType.SMALL_BULLET;
