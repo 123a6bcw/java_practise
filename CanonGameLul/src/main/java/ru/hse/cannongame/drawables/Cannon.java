@@ -285,7 +285,7 @@ public class Cannon extends DrawableObject {
     private boolean pointBelow(Point2D point, Point2D leftPoint, Point2D rightPoint, boolean doBelow) {
         Line line = Line.getLineByTwoPoint(leftPoint, rightPoint);
 
-        return point.getX() >= leftPoint.getX() && point.getX() <= rightPoint.getX() && ((line.getA() * point.getX() + line.getB() * point.getY() + line.getC()) * (doBelow ? 1 : -1) > 0);
+        return point.getX() >= leftPoint.getX() && point.getX() <= rightPoint.getX() && ((line.getCoefficientA() * point.getX() + line.getCoefficientB() * point.getY() + line.getCoefficientC()) * (doBelow ? 1 : -1) > 0);
     }
 
     /**

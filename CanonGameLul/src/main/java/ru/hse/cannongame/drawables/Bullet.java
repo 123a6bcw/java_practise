@@ -149,7 +149,7 @@ public class Bullet extends DrawableObject {
     private boolean checkForExplosion(Line line) {
         var ratePoint = new Point2D(xRate, yRate - diameterRate / 2);
 
-        double minDist = Math.abs(line.applyPoint(ratePoint)) / (Math.sqrt(line.getA() * line.getA() + line.getB() * line.getB()));
+        double minDist = Math.abs(line.applyPoint(ratePoint)) / (Math.sqrt(line.getCoefficientA() * line.getCoefficientA() + line.getCoefficientB() * line.getCoefficientB()));
 
         double distToPoint1 = getDistBetweenPoints(ratePoint, line.getBeginPoint());
         double distToPoint2 = getDistBetweenPoints(ratePoint, line.getEndPoint());

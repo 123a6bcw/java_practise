@@ -54,9 +54,9 @@ public abstract class DrawableObject {
          * This means coefficients in line's equtation:
          * A x + B y + C = 0
          */
-        private double A;
-        private double B;
-        private double C;
+        private double coefficientA;
+        private double coefficientB;
+        private double coefficientC;
 
         /**
          * Not null if segment.
@@ -64,10 +64,10 @@ public abstract class DrawableObject {
         private Point2D beginPoint;
         private Point2D endPoint;
 
-        private Line(double A, double B, double C, Point2D beginPoint, Point2D endPoint) {
-            this.A = A;
-            this.B = B;
-            this.C = C;
+        private Line(double coefficientA, double coefficientB, double coefficientC, Point2D beginPoint, Point2D endPoint) {
+            this.coefficientA = coefficientA;
+            this.coefficientB = coefficientB;
+            this.coefficientC = coefficientC;
             this.beginPoint = beginPoint;
             this.endPoint = endPoint;
         }
@@ -86,9 +86,9 @@ public abstract class DrawableObject {
          * Creates line perpendicular to the given one and starting from the given point.
          */
         static Line getNormalLineViaPoint(Line line, Point2D point) {
-            double A = -line.getB();
-            double B = line.getA();
-            double C = -point.getY() * line.getA() + point.getX() * line.getB();
+            double A = -line.getCoefficientB();
+            double B = line.getCoefficientA();
+            double C = -point.getY() * line.getCoefficientA() + point.getX() * line.getCoefficientB();
 
             return new Line(A, B, C, null, null);
         }
@@ -99,19 +99,19 @@ public abstract class DrawableObject {
          * In order to compare it with zero.
          */
         double applyPoint(Point2D point) {
-            return A * point.getX() + B * point.getY() + C;
+            return coefficientA * point.getX() + coefficientB * point.getY() + coefficientC;
         }
 
-        double getA() {
-            return A;
+        double getCoefficientA() {
+            return coefficientA;
         }
 
-        double getB() {
-            return B;
+        double getCoefficientB() {
+            return coefficientB;
         }
 
-        double getC() {
-            return C;
+        double getCoefficientC() {
+            return coefficientC;
         }
 
         Point2D getBeginPoint() {
