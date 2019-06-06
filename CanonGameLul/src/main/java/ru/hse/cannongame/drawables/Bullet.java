@@ -116,8 +116,8 @@ public class Bullet extends DrawableObject {
         resize();
 
         for (var trianle : cannon.getTerrain().getTriangles()) {
-            var line1 = DrawableObject.Line.getLineByTwoPoint(trianle.getLeftPoint(), trianle.getHighPoint());
-            var line2 = DrawableObject.Line.getLineByTwoPoint(trianle.getHighPoint(), trianle.getRightPoint());
+            var line1 = Line.getLineByTwoPoint(trianle.getLeftPoint(), trianle.getHighPoint());
+            var line2 = Line.getLineByTwoPoint(trianle.getHighPoint(), trianle.getRightPoint());
             if (checkForExplosion(line1) || checkForExplosion(line2)) {
                 break;
             }
@@ -155,7 +155,7 @@ public class Bullet extends DrawableObject {
         double distToPoint1 = getDistBetweenPoints(ratePoint, line.getBeginPoint());
         double distToPoint2 = getDistBetweenPoints(ratePoint, line.getEndPoint());
 
-        Line perpLine = DrawableObject.Line.getNormalLineViaPoint(line, ratePoint);
+        Line perpLine = Line.getNormalLineViaPoint(line, ratePoint);
         double d1 = perpLine.applyPoint(line.getBeginPoint());
         double d2 = perpLine.applyPoint(line.getEndPoint());
 
