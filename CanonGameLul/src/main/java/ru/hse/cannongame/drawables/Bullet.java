@@ -115,7 +115,7 @@ public class Bullet extends DrawableObject {
 
         resize();
 
-        for (var trianle : cannon.getTerrain().getTriangles()) {
+        for (var trianle : getGameSettings().getTerrain().getTriangles()) {
             var line1 = Line.getLineByTwoPoint(trianle.getLeftPoint(), trianle.getHighPoint());
             var line2 = Line.getLineByTwoPoint(trianle.getHighPoint(), trianle.getRightPoint());
             if (checkForExplosion(line1) || checkForExplosion(line2)) {
@@ -178,7 +178,7 @@ public class Bullet extends DrawableObject {
     private void explode() {
         alive = false;
 
-        for (var target : cannon.getTerrain().getTargets()) {
+        for (var target : getGameSettings().getTerrain().getTargets()) {
             if (getDistBetweenPoints(xRate, yRate - diameterRate / 2, target.getxRate(), target.getyRate()) <= explosionRate) {
                 target.kill();
             }

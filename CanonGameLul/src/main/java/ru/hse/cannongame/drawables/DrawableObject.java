@@ -1,8 +1,6 @@
 package ru.hse.cannongame.drawables;
 
-import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import ru.hse.cannongame.CannonGame;
 import ru.hse.cannongame.GameSettings;
 
 /**

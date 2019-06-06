@@ -296,8 +296,4 @@ public class Cannon extends DrawableObject {
     public boolean isAlive() {
         return true;
     }
-
-    Terrain getTerrain() {
-        return terrain;
-    }
 }
