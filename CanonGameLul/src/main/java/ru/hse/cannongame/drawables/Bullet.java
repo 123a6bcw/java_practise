@@ -124,7 +124,7 @@ public class Bullet extends DrawableObject {
 
         GraphicsContext graphics = getGraphics();
         graphics.setFill(Color.BLACK);
-        graphics.fillOval(x - diameter /2, y - diameter, diameter, diameter); //??????????????????????????????????????
+        graphics.fillOval(x - diameter / 2, y - diameter, diameter, diameter); //??????????????????????????????????????
         //I HATE GEOMETRY
 
         ticksPassed++;
@@ -147,7 +147,7 @@ public class Bullet extends DrawableObject {
      * True if this bullet are close enough to the given line and therefore should explode.
      */
     private boolean checkForExplosion(Line line) {
-        var ratePoint = new Point2D(xRate, yRate - diameterRate/2);
+        var ratePoint = new Point2D(xRate, yRate - diameterRate / 2);
 
         double minDist = Math.abs(line.applyPoint(ratePoint)) / (Math.sqrt(line.getA() * line.getA() + line.getB() * line.getB()));
 
@@ -162,11 +162,11 @@ public class Bullet extends DrawableObject {
             minDist = Math.min(distToPoint1, distToPoint2);
         }
 
-        if (minDist <= diameterRate /2) {
+        if (minDist <= diameterRate / 2) {
             alive = false;
 
             for (var target : canon.getTerrain().getTargets()) {
-                if (getDistBetweenPoints(xRate, yRate - diameterRate/2, target.getxRate(), target.getyRate()) <= explosionRate) {
+                if (getDistBetweenPoints(xRate, yRate - diameterRate / 2, target.getxRate(), target.getyRate()) <= explosionRate) {
                     target.kill();
                 }
             }

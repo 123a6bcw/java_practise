@@ -83,8 +83,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        Group root = new Group();
-        Scene scene = new Scene(root);
+        var root = new Group();
+        var scene = new Scene(root);
         this.primaryStage = primaryStage;
 
         primaryStage.setTitle("Cannon game");
