@@ -65,6 +65,8 @@ public class ThreadPoolImpl implements ThreadPool {
                             submit(toDoAfter);
                         }
                     }
+
+                    decreaseWaitingToEvaluateCount();
                 }
             });
 
@@ -84,8 +86,6 @@ public class ThreadPoolImpl implements ThreadPool {
         var task = new LightFutureImpl<>(supplier);
         tasks.add(task);
 
-        decreaseWaitingToAddCount();
-
         return task;
     }
 
@@ -95,18 +95,14 @@ public class ThreadPoolImpl implements ThreadPool {
      * LightFutureImpl, but this task has been already finished and left the pool.
      */
     private <R> void submit(@NotNull LightFutureImpl<R> task) {
-        checkForShutdown();
-
         tasks.add(task);
-
-        decreaseWaitingToAddCount();
     }
 
     /**
      * Decrease number of tasks that are submitted to pool but not yet added to impl queue.
      * If all task have benn submitted, notifies thread with shutdown.
      */
-    private void decreaseWaitingToAddCount() {
+    private void decreaseWaitingToEvaluateCount() {
         synchronized (shutdownLock) {
             waitingToAddCount--;
             if (waitingToAddCount == 0) {
@@ -127,6 +123,7 @@ public class ThreadPoolImpl implements ThreadPool {
                 }
             }
         }
+
 
         for (var thread : threads) {
             thread.interrupt();
@@ -392,6 +389,8 @@ public class ThreadPoolImpl implements ThreadPool {
             toDoAfter.setParent(this);
 
             synchronized (toDoAfterList) {
+                checkForShutdown();
+
                 if (!isReady()) {
                     toDoAfterList.add(toDoAfter);
                 } else {

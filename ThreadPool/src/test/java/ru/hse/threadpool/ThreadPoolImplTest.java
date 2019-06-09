@@ -58,7 +58,7 @@ class ThreadPoolImplTest {
         return result;
     };
 
-    public static void main(String[] argc) {
+    static void main(String[] argc) {
 
         long startTime = System.currentTimeMillis();
 
@@ -327,5 +327,37 @@ class ThreadPoolImplTest {
 
         assertDoesNotThrow(task1::get);
         assertDoesNotThrow(task2::get);
+    }
+
+    @Test
+    void shutdownBlockCurrentThreadUntilAllTasksAndThenApplyTaskAreEvaluated() throws LightFuture.LightExecutionException {
+        var tasks = new LightFuture<?>[8];
+
+        tasks[0] = threadPool.submit(longerTask);
+        tasks[1] = tasks[0].thenApply(res -> longerTask.get());
+        tasks[2] = tasks[1].thenApply(res -> longerTask.get());
+        tasks[3] = tasks[1].thenApply(res -> longerTask.get());
+
+        tasks[4] = threadPool.submit(longerTask);
+        tasks[5] = threadPool.submit(longerTask);
+        tasks[6] = tasks[4].thenApply(res -> longerTask.get());
+        tasks[7] = tasks[4].thenApply(res -> longerTask.get());
+
+        threadPool.shutdown();
+
+        for (int i = 0; i < 8; i++) {
+            assertTrue(tasks[i].isReady());
+            assertEquals(longerTaskResult, tasks[i].get());
+        }
+    }
+
+    @Test
+    void thenApplyAfterShutdownThrowsException() {
+        var task1 = threadPool.submit(longerTask);
+        var task2 = task1.thenApply(res -> longerTask.get());
+        threadPool.shutdown();
+        assertTrue(task1.isReady());
+        assertTrue(task2.isReady());
+        assertThrows(RejectedExecutionException.class, () -> task2.thenApply(res -> longerTask.get()));
     }
 }
